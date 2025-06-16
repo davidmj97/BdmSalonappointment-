@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sign Up - BDM Salon Booking</title>
+  <style>
+    * {
+      margin: 0; padding: 0; box-sizing: border-box;
+      font-family: 'Helvetica Neue', sans-serif;
+    }
+    html, body {
+      width: 100%;
+      height: 100vh;
+      background: #000;
+      overflow-x: hidden;
+    }
+    .container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+    }
+    .top-section {
+      width: 100%;
+      height: 30vh;
+      background-color: #000;
+      position: relative;
+      z-index: 1;
+    }
+    .top-bar {
+      width: 100%;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      padding-left: 12px;
+    }
+    .back-arrow {
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      fill: white;
+    }
+    .white-box {
+      position: absolute;
+      top: calc(30vh - 6vh);
+      left: 0;
+      width: 100vw;
+      height: calc(70vh + 6vh);
+      background: #fff;
+      border-top-left-radius: 25px;
+      border-top-right-radius: 25px;
+      border-top: 3px solid #000;
+      box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.2);
+      padding: 24px 20px 40px;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-y: auto;
+    }
+    .white-box h1 {
+      font-size: 20px;
+      margin-bottom: 10px;
+      color: #000;
+      text-align: center;
+    }
+    form {
+      width: 100%;
+      max-width: 320px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 20px;
+    }
+    input[type="text"], input[type="email"], input[type="password"], input[type="tel"] {
+      padding: 12px;
+      font-size: 15px;
+      border: 1.5px solid #ccc;
+      border-radius: 8px;
+      outline-offset: 2px;
+      transition: border-color 0.3s;
+    }
+    input:focus {
+      border-color: #000;
+    }
+    button {
+      padding: 14px;
+      background-color: #000;
+      color: #fff;
+      font-size: 15px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #222;
+    }
+    .info-text {
+      font-size: 14px;
+      color: #444;
+      text-align: center;
+      margin-top: 16px;
+    }
+    .login-link {
+      font-size: 14px;
+      text-align: center;
+      margin-top: 10px;
+      color: #666;
+    }
+    .login-link a {
+      color: #000;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .login-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="top-section">
+      <div class="top-bar">
+        <svg class="back-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" onclick="history.back()" aria-label="Back" role="img">
+          <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="white-box">
+      <h1>Create Your Account</h1>
+      <form id="signupForm" autocomplete="off">
+        <input type="text" id="name" placeholder="Full Name" required />
+        <input type="tel" id="phone" placeholder="+1 123 456 7890" required />
+        <input type="email" id="email" placeholder="Email address" required />
+        <input type="password" id="password" placeholder="Password (min 6 chars)" required minlength="6" />
+        <button type="submit">Sign Up</button>
+      </form>
+
+      <div class="info-text" id="infoText"></div>
+
+      <div class="login-link">
+        Already have an account? <a href="login.html">Log In</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAmimDsjW_pF2NGw-w-40QzTsgmf1tdqyI",
+      authDomain: "bdmsalonappointment.firebaseapp.com",
+      projectId: "bdmsalonappointment",
+      storageBucket: "bdmsalonappointment.appspot.com",
+      messagingSenderId: "123933913893",
+      appId: "1:123933913893:web:c1f57caf4dc2a5440ba0cc",
+      measurementId: "G-Q0FVZRVS64"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    const signupForm = document.getElementById('signupForm');
+    const infoText = document.getElementById('infoText');
+
+    signupForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const name = signupForm.name.value.trim();
+      const phone = signupForm.phone.value.trim();
+      const email = signupForm.email.value.trim();
+      const password = signupForm.password.value;
+
+      if (!name || !phone || !email || !password) {
+        alert("Please fill in all fields.");
+        return;
+      }
+
+      try {
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        const user = userCredential.user;
+
+        await user.updateProfile({
+          displayName: name,
+          phoneNumber: phone // optional: not always stored directly
+        });
+
+        await user.sendEmailVerification();
+
+        infoText.innerHTML = `Verification email sent to <strong>${email}</strong>.<br>Please check your inbox and click the link to verify your email.`;
+
+        signupForm.reset();
+        signupForm.style.display = 'none';
+
+      } catch (error) {
+        alert("Error: " + error.message);
+      }
+    });
+  </script>
+</body>
+</html>
