@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login - BDM Salon Booking</title>
+  <style>
+    * {
+      margin: 0; padding: 0; box-sizing: border-box;
+      font-family: 'Helvetica Neue', sans-serif;
+    }
+    html, body {
+      width: 100%;
+      height: 100vh;
+      background: #000;
+      overflow-x: hidden;
+    }
+    .container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+    }
+    .top-section {
+      width: 100%;
+      height: 30vh;
+      background-color: #000;
+      position: relative;
+      z-index: 1;
+    }
+    .top-bar {
+      width: 100%;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      padding-left: 12px;
+    }
+    .back-arrow {
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      fill: white;
+    }
+    .white-box {
+      position: absolute;
+      top: calc(30vh - 6vh);
+      left: 0;
+      width: 100vw;
+      height: calc(70vh + 6vh);
+      background: #fff;
+      border-top-left-radius: 25px;
+      border-top-right-radius: 25px;
+      border-top: 3px solid #000;
+      box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.2);
+      padding: 24px 20px 40px;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-y: auto;
+    }
+    .white-box h1 {
+      font-size: 20px;
+      margin-bottom: 10px;
+      color: #000;
+      text-align: center;
+    }
+    form {
+      width: 100%;
+      max-width: 320px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 20px;
+    }
+    input[type="email"], input[type="password"] {
+      padding: 12px;
+      font-size: 15px;
+      border: 1.5px solid #ccc;
+      border-radius: 8px;
+      outline-offset: 2px;
+      transition: border-color 0.3s;
+    }
+    input:focus {
+      border-color: #000;
+    }
+    button {
+      padding: 14px;
+      background-color: #000;
+      color: #fff;
+      font-size: 15px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #222;
+    }
+    .info-text {
+      font-size: 14px;
+      color: #444;
+      text-align: center;
+      margin-top: 16px;
+    }
+    .signup-link {
+      font-size: 14px;
+      text-align: center;
+      margin-top: 10px;
+      color: #666;
+    }
+    .signup-link a {
+      color: #000;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .signup-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="top-section">
+      <div class="top-bar">
+        <svg class="back-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" onclick="history.back()" aria-label="Back" role="img">
+          <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="white-box">
+      <h1>Welcome Back</h1>
+      <form id="loginForm" autocomplete="off">
+        <input type="email" id="email" placeholder="Email address" required />
+        <input type="password" id="password" placeholder="Password" required />
+        <button type="submit">Log In</button>
+      </form>
+
+      <div class="info-text" id="infoText"></div>
+
+      <div class="signup-link">
+        Don't have an account? <a href="signup.html">Sign Up</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAmimDsjW_pF2NGw-w-40QzTsgmf1tdqyI",
+      authDomain: "bdmsalonappointment.firebaseapp.com",
+      projectId: "bdmsalonappointment",
+      storageBucket: "bdmsalonappointment.appspot.com",
+      messagingSenderId: "123933913893",
+      appId: "1:123933913893:web:c1f57caf4dc2a5440ba0cc",
+      measurementId: "G-Q0FVZRVS64"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    const loginForm = document.getElementById('loginForm');
+    const infoText = document.getElementById('infoText');
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const email = loginForm.email.value.trim();
+      const password = loginForm.password.value;
+
+      infoText.textContent = "";
+
+      try {
+        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        const user = userCredential.user;
+
+        if (user.emailVerified) {
+          window.location.href = "customer-dashboard.html";
+        } else {
+          infoText.innerHTML = `Please verify your email address before logging in. <br>Check your inbox.`;
+          await auth.signOut();
+        }
+
+      } catch (error) {
+        alert("Login Error: " + error.message);
+      }
+    });
+  </script>
+</body>
+</html>
