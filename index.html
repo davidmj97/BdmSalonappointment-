@@ -122,13 +122,12 @@
       <h2>BOOK APPOINTMENT</h2>
 
       <button onclick="window.location.href='login.html'">Log In</button>
-      <button onclick="window.location.href='signin.html'">Sign Up</button>
+      <button onclick="window.location.href='signup.html'">Sign Up</button>
 
       <div class="or">OR</div>
 
       <div class="social-icons">
         <img src="https://img.icons8.com/ios-filled/50/google-logo.png" alt="Google" onclick="signInWithGoogle()" />
-        <img src="https://img.icons8.com/ios-filled/50/mac-os.png" alt="Apple" onclick="signInWithApple()" />
         <img src="https://img.icons8.com/ios-filled/50/phone.png" alt="Phone" onclick="signInWithPhone()" />
         <img src="https://img.icons8.com/ios-filled/50/new-post.png" alt="Email" onclick="signInWithEmail()" />
       </div>
@@ -167,18 +166,7 @@
         });
     }
 
-    // Apple sign-in
-    function signInWithApple() {
-      const provider = new firebase.auth.OAuthProvider('apple.com');
-      auth.signInWithPopup(provider)
-        .then(() => {
-          window.location.href = 'customer-dashboard.html';
-        })
-        .catch(error => {
-          alert("Apple Sign-in Error: " + error.message);
-        });
-    }
-
+   
     // Phone sign-in — redirect to phone sign-in page
     function signInWithPhone() {
       window.location.href = 'phonenumber.html';
@@ -186,7 +174,7 @@
 
     // Email/password sign-in — redirect
     function signInWithEmail() {
-      window.location.href = 'signin.html';
+      window.location.href = 'signup.html';
     }
   </script>
 </body>
