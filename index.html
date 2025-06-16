@@ -9,67 +9,75 @@
       margin: 0; padding: 0; box-sizing: border-box;
       font-family: 'Helvetica Neue', sans-serif;
     }
+
     html, body {
       width: 100%;
-      height: 100vh;
-      background: #fff;
-      overflow-x: hidden;
+      min-height: 100vh;
+      background: #000; /* Black background to blend with fade */
     }
+
     .container {
-      position: relative;
-      width: 100vw;
-      height: 667px;
-      margin: 0;
-      padding: 0;
+      width: 100%;
     }
+
     .top-image {
-      width: 100vw;
+      position: relative;
+      width: 100%;
       height: 30vh;
+      min-height: 300px;
       background-image: url('https://images.pexels.com/photos/1813272/pexels-photo-1813272.jpeg');
       background-position: center;
       background-repeat: no-repeat;
       background-size: cover;
-      position: relative;
-      z-index: 1;
+      mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
     }
+
+    @media (min-width: 768px) {
+      .top-image {
+        min-height: 350px;
+      }
+    }
+
     .white-box {
-      position: absolute;
-      top: calc(30vh - 6vh);
-      left: 0;
-      width: 100vw;
-      height: calc(70vh + 6vh);
+      width: 100%;
       background: #fff;
       border-top-left-radius: 25px;
       border-top-right-radius: 25px;
       border-top: 3px solid #000;
       box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.2);
       padding: 24px 20px 40px;
-      z-index: 2;
       display: flex;
       flex-direction: column;
       align-items: center;
-      overflow-y: auto;
+      margin-top: -40px;
+      position: relative;
+      z-index: 10;
     }
+
     .white-box h1 {
       font-size: 20px;
       margin-bottom: 10px;
       text-align: center;
       color: #000;
     }
+
     .white-box p {
       font-size: 14px;
       text-align: center;
       color: #666;
       margin-bottom: 0;
     }
+
     .white-box h2 {
       font-size: 15px;
       text-transform: uppercase;
-      margin-top: 70px;
+      margin-top: 40px;
       margin-bottom: 24px;
       color: #000;
       letter-spacing: 1px;
     }
+
     button {
       width: 100%;
       max-width: 280px;
@@ -82,32 +90,33 @@
       font-size: 15px;
       cursor: pointer;
       transition: background-color 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
     }
+
     button:hover {
       background-color: #222;
     }
+
     .or {
       font-size: 14px;
       color: #888;
       margin: 24px 0 12px;
     }
+
     .social-icons {
+      width: 100%;
+      max-width: 280px;
       display: flex;
       justify-content: center;
-      gap: 20px;
-      margin-top: 12px;
-      margin-bottom: 20px;
     }
-    .social-icons img {
-      width: 22px;
-      height: 22px;
-      cursor: pointer;
-      filter: brightness(0);
-      transition: transform 0.3s, filter 0.3s;
-    }
-    .social-icons img:hover {
-      filter: brightness(0.3);
-      transform: scale(1.1);
+
+    .google-signup-btn img {
+      width: 20px;
+      height: 20px;
+      filter: brightness(0) invert(1);
     }
   </style>
 </head>
@@ -127,9 +136,10 @@
       <div class="or">OR</div>
 
       <div class="social-icons">
-        <img src="https://img.icons8.com/ios-filled/50/google-logo.png" alt="Google" onclick="signInWithGoogle()" />
-        <img src="https://img.icons8.com/ios-filled/50/phone.png" alt="Phone" onclick="signInWithPhone()" />
-        <img src="https://img.icons8.com/ios-filled/50/new-post.png" alt="Email" onclick="signInWithEmail()" />
+        <button class="google-signup-btn" onclick="signInWithGoogle()">
+          <img src="https://img.icons8.com/ios-filled/50/google-logo.png" alt="Google" />
+          <span>Sign up with Gmail</span>
+        </button>
       </div>
     </div>
   </div>
@@ -139,7 +149,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 
   <script>
-    // Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyAmimDsjW_pF2NGw-w-40QzTsgmf1tdqyI",
       authDomain: "bdmsalonappointment.firebaseapp.com",
@@ -150,11 +159,9 @@
       measurementId: "G-Q0FVZRVS64"
     };
 
-    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
-    // Google sign-in
     function signInWithGoogle() {
       const provider = new firebase.auth.GoogleAuthProvider();
       auth.signInWithPopup(provider)
@@ -164,17 +171,6 @@
         .catch(error => {
           alert("Google Sign-in Error: " + error.message);
         });
-    }
-
-   
-    // Phone sign-in — redirect to phone sign-in page
-    function signInWithPhone() {
-      window.location.href = 'phonenumber.html';
-    }
-
-    // Email/password sign-in — redirect
-    function signInWithEmail() {
-      window.location.href = 'signup.html';
     }
   </script>
 </body>
