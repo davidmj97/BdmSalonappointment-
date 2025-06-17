@@ -3,210 +3,266 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Customer Dashboard – BDM Salon Booking</title>
+<title>Dashboard – BDM Salon</title>
 <style>
-  :root{--bg:#000;--fg:#fff;--grey:#222;--accent:#fff;}
+  :root{--bg:#000;--fg:#fff;--accent:#ffcf33;}
   html,body{margin:0;padding:0;width:100%;min-height:100vh;background:var(--bg);color:var(--fg);font-family:'Helvetica Neue',Arial,sans-serif;}
   body{display:flex;flex-direction:column;}
 
   /* ===== HEADER ===== */
-  .dashboard-header{display:flex;align-items:center;justify-content:space-between;padding:18px;background:var(--bg);}
-  .user-name{font-size:19px;font-weight:600;max-width:60vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .profile-icon{position:relative;width:38px;height:38px;border-radius:50%;background:var(--fg);color:var(--bg);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;cursor:pointer;box-shadow:0 1px 8px #0003;}
-  .profile-icon::after{content:'✎';position:absolute;top:-4px;right:-4px;width:16px;height:16px;border-radius:50%;background:var(--accent);color:var(--bg);font-size:10px;display:flex;align-items:center;justify-content:center;border:1px solid var(--bg);}
+  .header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:#000;}
+  .logo{font-size:18px;font-weight:700;letter-spacing:.5px;}
+  .right-box{display:flex;align-items:center;gap:12px;}
+  .points-badge{font-size:12px;padding:4px 8px;background:#111;border-radius:12px;}
+  .profile-icon{position:relative;width:36px;height:36px;border-radius:50%;background:var(--fg);color:var(--bg);display:flex;align-items:center;justify-content:center;font-weight:700;cursor:pointer;}
+  .profile-icon::after{content:'✎';position:absolute;top:-4px;right:-4px;width:14px;height:14px;border-radius:50%;background:var(--accent);color:#000;font-size:9px;display:flex;align-items:center;justify-content:center;border:1px solid #000;}
 
-  /* ===== MAIN PANELS ===== */
-  .main-content{flex:1;display:flex;flex-direction:column;padding:8px 0 60px;}
-  .home-panel,.bookings-panel,.about-panel{display:none;padding:26px 16px 0;min-height:70vh;}
-  .panel-active{display:block;}
+  /* ===== MAIN ===== */
+  .main{flex:1;display:flex;flex-direction:column;padding:16px 16px 70px;}
+  .welcome{font-size:17px;font-weight:600;margin-bottom:18px;}
+  .cta-btn{width:100%;max-width:360px;background:#fff;color:#000;border:none;border-radius:10px;font-size:16px;font-weight:600;padding:14px 0;margin-bottom:24px;cursor:pointer;}
 
-  /* home additions */
-  .welcome-msg{font-size:20px;font-weight:600;margin-top:10px;}
-  .cta-btn{width:100%;max-width:360px;margin:20px 0;background:var(--fg);color:var(--bg);border:none;border-radius:12px;font-size:17px;font-weight:600;padding:14px 0;cursor:pointer;}
-  .cta-btn:active{background:#ddd;color:#111;}
-  .card{width:100%;max-width:360px;margin:14px 0;background:#111;color:#fff;padding:14px 16px;border-radius:12px;font-size:14px;}
-  .section-title{font-size:16px;font-weight:600;margin:26px 0 8px;}
-  .gallery{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;}
-  .gallery img{width:160px;height:120px;object-fit:cover;border-radius:10px;flex-shrink:0;}
+  /* Top services – mobile carousel */
+  .services-title{font-size:15px;font-weight:600;margin-bottom:10px;}
+  .services{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px;}
+  .service-card{min-width:220px;background:#111;border-radius:10px;padding:12px;color:#eee;flex-shrink:0;}
+  .service-card h4{margin:0 0 4px;font-size:14px;font-weight:600;color:#fff;}
+  .service-meta{font-size:12px;color:#ccc;margin-bottom:6px;}
+  .service-desc{font-size:12px;color:#aaa;margin:0;}
 
-  /* ===== MENU BAR ===== */
-  .menu-bar{position:fixed;bottom:0;left:0;right:0;height:62px;background:var(--bg);border-top:1px solid #fff2;display:flex;justify-content:space-around;z-index:80;}
-  .menu-btn{flex:1;display:flex;flex-direction:column;align-items:center;padding:7px 0 4px;border:none;background:none;color:var(--fg);font-size:13px;font-weight:500;gap:2px;opacity:.85;cursor:pointer;}
+  /* ===== MENU BAR (mobile) ===== */
+  .menu{position:fixed;bottom:0;left:0;right:0;height:58px;background:#000;border-top:1px solid #fff2;display:flex;justify-content:space-around;z-index:80;}
+  .menu-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:12px;color:#fff;opacity:.8;border:none;background:none;}
   .menu-btn.active{opacity:1;color:var(--accent);}
-  .icon{width:23px;height:23px;stroke:var(--fg);fill:none;}
-  .menu-label{font-size:12px;}
+  .menu-btn svg{width:20px;height:20px;margin-bottom:2px;stroke:currentColor;fill:none;}
 
-  /* ===== ACCOUNT SHEET (unchanged) ===== */
-  .sheet{position:fixed;left:0;right:0;bottom:-100%;background:#fff;color:#000;border-top-left-radius:20px;border-top-right-radius:20px;box-shadow:0 -4px 20px #0005;padding:24px 20px 40px;transition:bottom .35s ease;z-index:100;max-height:90vh;overflow-y:auto;}
+  /* ===== ACCOUNT SHEET ===== */
+  .sheet{position:fixed;left:0;right:0;bottom:-100%;background:#fff;color:#000;border-top-left-radius:18px;border-top-right-radius:18px;box-shadow:0 -4px 20px #0005;transition:bottom .35s ease;z-index:100;padding:18px 20px 32px;max-height:88vh;overflow-y:auto;font-size:14px;}
   .sheet.open{bottom:0;}
-  .sheet h2{font-size:18px;margin-bottom:18px;text-align:center;}
-  .sheet form{display:flex;flex-direction:column;gap:14px;}
-  .sheet label{font-size:14px;font-weight:600;}
-  .sheet input{padding:12px;font-size:15px;border:1.5px solid #ccc;border-radius:8px;}
-  .sheet button{padding:14px;font-size:15px;border:none;border-radius:8px;cursor:pointer;}
-  .primary-btn{background:#000;color:#fff;}
-  .secondary-btn{background:#666;color:#fff;}
-  .signout-btn{background:#111;color:#fff;margin-top:26px;}
+  .sheet h3{margin:0 0 14px;text-align:center;font-size:16px;}
+  .sheet input{width:100%;padding:10px;font-size:14px;border:1.2px solid #ccc;border-radius:6px;margin-bottom:12px;}
+  .sheet button{padding:12px;font-size:14px;border:none;border-radius:8px;cursor:pointer;}
+  .save-btn{background:#000;color:#fff;margin-top:4px;}
+  .close-btn{background:#666;color:#fff;margin-top:6px;}
+  .signout-btn{background:#111;color:#fff;width:100%;margin-top:18px;}
+  .reset-link{font-size:13px;text-align:center;margin-top:8px;}
+  .reset-link a{color:#000;font-weight:600;text-decoration:none;}
+  .reset-link a:hover{text-decoration:underline;}
 
-  /* ===== Desktop centre column ===== */
-  @media(min-width:700px){
-    .dashboard-header,.main-content,.menu-bar{max-width:430px;margin:0 auto;}
-    .sheet{left:50%;transform:translateX(-50%);right:auto;width:400px;border-radius:20px;bottom:-100%;}
+  /* ===== DESKTOP (≥900px) ===== */
+  @media(min-width:900px){
+    .main{flex-direction:row;gap:24px;padding:24px 8%;}
+    .left-col{flex:3;}
+    .right-col{flex:2;}
+    .services{flex-wrap:wrap;overflow:visible;}
+    .service-card{width:calc(50% - 12px);margin-bottom:14px;}
+    .menu{display:none;}          /* hide bottom nav */
+    .top-tabs{display:flex;gap:22px;margin-bottom:20px;}
+    .top-tab{font-size:14px;font-weight:600;cursor:pointer;opacity:.6;}
+    .top-tab.active{opacity:1;color:var(--accent);}
   }
 
-  /* hide scrollbars mobile */
+  /* Hide mobile scrollbars */
   ::-webkit-scrollbar{display:none;}body{-ms-overflow-style:none;scrollbar-width:none;}
 </style>
 </head>
 <body>
   <!-- ===== Header ===== -->
-  <div class="dashboard-header">
-    <div class="user-name" id="userName">User</div>
-    <div class="profile-icon" id="profileIcon" title="Account"></div>
-  </div>
+  <header class="header">
+    <div class="logo">BDM Salon</div>
+    <div class="right-box">
+      <span class="points-badge" id="pointsBadge">0 pts</span>
+      <div class="profile-icon" id="profileIcon"></div>
+    </div>
+  </header>
 
-  <!-- ===== Main area ===== -->
-  <div class="main-content">
-    <!-- HOME -->
-    <div class="home-panel panel-active" id="homePanel">
-      <h2 class="welcome-msg" id="welcomeMsg"></h2>
+  <!-- ===== Main ===== -->
+  <main class="main">
+    <!-- LEFT column (mobile=whole) -->
+    <section class="left-col">
+      <div class="welcome" id="welcomeMsg"></div>
       <button class="cta-btn" onclick="alert('Booking flow coming soon!')">Book Now</button>
 
-      <div class="card loyalty-card" id="loyaltyCard">Loading points…</div>
-
-      <h3 class="section-title">Get Inspired</h3>
-      <div class="gallery">
-        <img src="https://images.pexels.com/photos/705255/pexels-photo-705255.jpeg"  alt="Hairstyle inspiration">
-        <img src="https://images.pexels.com/photos/3992875/pexels-photo-3992875.jpeg" alt="Make-up inspiration">
+      <!-- Top services -->
+      <h3 class="services-title">Top Services</h3>
+      <div class="services" id="servicesContainer">
+        <!-- cards injected below -->
       </div>
-    </div>
+    </section>
 
-    <!-- BOOKINGS -->
-    <div class="bookings-panel" id="bookingsPanel">
-      <h2 style="font-size:17px;font-weight:600;margin-bottom:18px;">Your Bookings</h2>
-      <p style="color:#aaa;font-size:15px;">No bookings yet. Book your first appointment!</p>
-    </div>
+    <!-- RIGHT column (desktop) -->
+    <section class="right-col" id="rightCol" style="display:none;">
+      <div class="top-tabs">
+        <span class="top-tab active" id="tabBookings" onclick="showPanel('bookings')">Bookings</span>
+        <span class="top-tab"       id="tabAbout"    onclick="showPanel('about')">About</span>
+      </div>
 
-    <!-- ABOUT -->
-    <div class="about-panel" id="aboutPanel">
-      <h2 style="font-size:17px;font-weight:600;margin-bottom:18px;">About Us</h2>
-      <p style="color:#aaa;font-size:15px;">BDM Salon Booking: Your style, our passion.<br/>Book a luxury grooming experience at your fingertips.</p>
-      <span style="font-size:13px;color:#555;">Version 1.0</span>
-    </div>
-  </div>
+      <div id="bookingsPanel">
+        <h2 style="font-size:17px;font-weight:600;margin-bottom:18px;">Your Bookings</h2>
+        <p style="color:#aaa;font-size:14px;">No bookings yet. Book your first appointment!</p>
+      </div>
 
-  <!-- ===== Bottom nav ===== -->
-  <nav class="menu-bar">
-    <button class="menu-btn active" id="btnHome"     onclick="showPanel('home')">
-      <svg class="icon" viewBox="0 0 24 24"><path d="M4 12 12 5l8 7" stroke-width="2"/><path d="M4 12v7a1 1 0 0 0 1 1h4m6 0h4a1 1 0 0 0 1-1v-7" stroke-width="2"/><path d="M9 21V12h6v9" stroke-width="2"/></svg>
-      <span class="menu-label">Home</span>
+      <div id="aboutPanel" style="display:none;">
+        <h2 style="font-size:17px;font-weight:600;margin-bottom:18px;">About Us</h2>
+        <p style="color:#aaa;font-size:14px;">BDM Salon Booking: Your style, our passion.<br/>Luxury grooming at your fingertips.</p>
+        <span style="font-size:12px;color:#555;">Version 1.0</span>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===== Bottom nav (mobile only) ===== -->
+  <nav class="menu">
+    <button class="menu-btn active" id="btnHome" onclick="scrollToTop()">
+      <svg viewBox="0 0 24 24"><path d="M4 12 12 5l8 7" stroke-width="2"/><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7" stroke-width="2"/></svg>
+      Home
     </button>
-    <button class="menu-btn"        id="btnBookings" onclick="showPanel('bookings')">
-      <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2" stroke-width="2"/><path d="M16 3v4M8 3v4M3 11h18" stroke-width="2"/></svg>
-      <span class="menu-label">Bookings</span>
+    <button class="menu-btn" id="btnBookings" onclick="showPanel('bookings')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2" stroke-width="2"/><path d="M16 3v4M8 3v4M3 11h18" stroke-width="2"/></svg>
+      Bookings
     </button>
-    <button class="menu-btn"        id="btnAbout"    onclick="showPanel('about')">
-      <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 16v-4" stroke-width="2"/><circle cx="12" cy="8" r="1" stroke-width="2" fill="#fff"/></svg>
-      <span class="menu-label">About Us</span>
+    <button class="menu-btn" id="btnAbout" onclick="showPanel('about')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 16v-4" stroke-width="2"/><circle cx="12" cy="8" r="1" stroke-width="2"/></svg>
+      About
     </button>
   </nav>
 
-  <!-- ===== Account sheet (same as before) ===== -->
-  <div class="sheet" id="accountSheet">
-    <h2>Account</h2>
-    <form id="profileForm">
-      <div><label>Name</label>   <input type="text"     id="displayName" placeholder="Full name"></div>
-      <div><label>Phone</label>  <input type="tel"      id="phone"       placeholder="Phone number"></div>
-      <div><label>E-mail</label> <input type="email"    id="email"       placeholder="example@mail.com"></div>
-      <div><label>New Password</label><input type="password" id="password"    placeholder="Leave blank to keep current"></div>
-      <button type="submit" class="primary-btn">Save Changes</button>
-      <button type="button" class="secondary-btn" id="closeSheetBtn">Close</button>
-    </form>
-    <button class="signout-btn" onclick="signOut()">Sign Out</button>
-  </div>
+  <!-- ===== Account sheet ===== -->
+  <aside class="sheet" id="accountSheet">
+    <h3>Account</h3>
+    <input id="displayName" placeholder="Full name">
+    <input id="phone" placeholder="Phone number">
+    <input id="email" placeholder="Email">
+    <div class="reset-link">Forgot password? <a href="#" id="resetPwdLink">Reset</a></div>
 
-<!-- ===== Firebase ===== -->
+    <!-- inline reset form (hidden) -->
+    <div id="resetBox" style="display:none;margin-top:10px;">
+      <input id="resetEmail" placeholder="Enter your email">
+      <button class="save-btn" id="sendResetBtn" style="margin-top:4px;">Send Reset Link</button>
+    </div>
+
+    <button class="save-btn" id="saveBtn">Save Changes</button>
+    <button class="close-btn" id="closeSheetBtn">Close</button>
+    <button class="signout-btn" onclick="signOut()">Sign Out</button>
+  </aside>
+
+<!-- ================= Firebase & Logic ================== -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 <script>
-/* --- Firebase init --- */
-const cfg={apiKey:"AIzaSyAmimDsjW_pF2NGw-w-40QzTsgmf1tdqyI",authDomain:"bdmsalonappointment.firebaseapp.com",projectId:"bdmsalonappointment",storageBucket:"bdmsalonappointment.appspot.com",messagingSenderId:"123933913893",appId:"1:123933913893:web:c1f57caf4dc2a5440ba0cc"};
-firebase.initializeApp(cfg);
+/* ---------- Firebase init ---------- */
+firebase.initializeApp({
+  apiKey:"AIzaSyAmimDsjW_pF2NGw-w-40QzTsgmf1tdqyI",
+  authDomain:"bdmsalonappointment.firebaseapp.com",
+  projectId:"bdmsalonappointment"
+});
 const auth=firebase.auth();
 
-/* --- DOM refs --- */
-const userNameEl     = document.getElementById('userName');
-const profileIconEl  = document.getElementById('profileIcon');
-const welcomeMsgEl   = document.getElementById('welcomeMsg');
-const loyaltyCardEl  = document.getElementById('loyaltyCard');
-const sheet          = document.getElementById('accountSheet');
-const displayNameInp = document.getElementById('displayName');
-const phoneInp       = document.getElementById('phone');
-const emailInp       = document.getElementById('email');
-const pwdInp         = document.getElementById('password');
-const profileForm    = document.getElementById('profileForm');
-const closeSheetBtn  = document.getElementById('closeSheetBtn');
+/* ---------- DOM refs ---------- */
+const profileIcon   = document.getElementById('profileIcon');
+const sheet         = document.getElementById('accountSheet');
+const closeSheetBtn = document.getElementById('closeSheetBtn');
+const saveBtn       = document.getElementById('saveBtn');
+const displayNameIn = document.getElementById('displayName');
+const phoneIn       = document.getElementById('phone');
+const emailIn       = document.getElementById('email');
+const pointsBadge   = document.getElementById('pointsBadge');
+const welcomeMsg    = document.getElementById('welcomeMsg');
+const resetPwdLink  = document.getElementById('resetPwdLink');
+const resetBox      = document.getElementById('resetBox');
+const sendResetBtn  = document.getElementById('sendResetBtn');
+const resetEmailIn  = document.getElementById('resetEmail');
 
-/* --- Auth state --- */
+/* ---------- Services cards ---------- */
+const services=[
+  {name:"Haircut",price:"$25",desc:"Classic cut & style",pts:30},
+  {name:"Hair Coloring",price:"$60",desc:"Full colour",pts:70},
+  {name:"Beard Trim",price:"$15",desc:"Shape & line-up",pts:20},
+  {name:"Facial",price:"$40",desc:"Deep cleansing",pts:45},
+  {name:"Manicure",price:"$22",desc:"Clean & polish",pts:28},
+  {name:"Pedicure",price:"$28",desc:"Spa pedicure",pts:34},
+  {name:"Make-up",price:"$55",desc:"Event glam",pts:65},
+  {name:"Blow-dry",price:"$18",desc:"Quick styling",pts:22},
+  {name:"Hair Spa",price:"$50",desc:"Nourishing mask",pts:60},
+  {name:"Nail Art",price:"$30",desc:"Creative designs",pts:35}
+];
+const servicesContainer=document.getElementById('servicesContainer');
+services.forEach(s=>{
+  servicesContainer.insertAdjacentHTML('beforeend',`
+    <div class="service-card">
+      <h4>${s.name} – ${s.price}</h4>
+      <div class="service-meta">${s.pts} pts</div>
+      <p class="service-desc">${s.desc}</p>
+    </div>`);});
+
+/* ---------- Auth state ---------- */
 auth.onAuthStateChanged(user=>{
   if(!user){location.href='index.html';return;}
-  fillProfile(user);
+  profileIcon.textContent=(user.displayName||'U')[0].toUpperCase();
+  welcomeMsg.textContent=`Hi ${(user.displayName||'there')}, ready for your next beauty session?`;
+  pointsBadge.textContent="120 pts";               // static demo value
+  // Fill sheet fields
+  displayNameIn.value=user.displayName||'';
+  emailIn.value=user.email||'';
+  phoneIn.value=localStorage.getItem('phone_'+user.uid)||'';
 });
 
-function fillProfile(user){
-  userNameEl.textContent = user.displayName || 'User';
-  profileIconEl.textContent = (user.displayName||'U')[0].toUpperCase();
+/* ---------- Sheet open/close ---------- */
+profileIcon.onclick=()=>sheet.classList.add('open');
+closeSheetBtn.onclick=()=>sheet.classList.remove('open');
 
-  welcomeMsgEl.textContent = `Hi ${(user.displayName || 'there')}, ready for your next beauty session?`;
-
-  const points = 120;                       // placeholder demo value
-  loyaltyCardEl.textContent = `You have ${points} points – ${Math.max(0,150-points)} points away from a free haircut!`;
-
-  /* sheet fields */
-  displayNameInp.value = user.displayName || '';
-  emailInp.value       = user.email       || '';
-  phoneInp.value       = localStorage.getItem('phone_'+user.uid) || '';
-}
-
-/* --- Sheet open/close --- */
-profileIconEl.addEventListener('click',()=>sheet.classList.add('open'));
-closeSheetBtn.addEventListener('click',()=>sheet.classList.remove('open'));
-
-/* --- Save profile --- */
-profileForm.addEventListener('submit',async e=>{
-  e.preventDefault();
-  const user=auth.currentUser; if(!user) return;
-
-  const tasks=[];
-  const newName = displayNameInp.value.trim();
-  const newPhone= phoneInp.value.trim();
-  const newEmail= emailInp.value.trim();
-  const newPwd  = pwdInp.value;
-
-  if(newName && newName!==user.displayName) tasks.push(user.updateProfile({displayName:newName}));
-  localStorage.setItem('phone_'+user.uid,newPhone);
-  if(newEmail && newEmail!==user.email)     tasks.push(user.updateEmail(newEmail));
-  if(newPwd)                                tasks.push(user.updatePassword(newPwd));
-
+/* ---------- Save changes ---------- */
+saveBtn.onclick=async()=>{
+  const user=auth.currentUser;if(!user)return;
   try{
-    if(tasks.length) await Promise.all(tasks);
-    alert('Profile updated!');
-    pwdInp.value='';
-    fillProfile(auth.currentUser);
+    if(displayNameIn.value!==user.displayName)await user.updateProfile({displayName:displayNameIn.value});
+    if(emailIn.value!==user.email)              await user.updateEmail(emailIn.value);
+    localStorage.setItem('phone_'+user.uid,phoneIn.value);
+    alert('Saved!');
     sheet.classList.remove('open');
-  }catch(err){alert('Error: '+err.message+'\n(You may need to re-login for sensitive changes)');}
-});
+    welcomeMsg.textContent=`Hi ${(displayNameIn.value||'there')}, ready for your next beauty session?`;
+    profileIcon.textContent=(displayNameIn.value||'U')[0].toUpperCase();
+  }catch(e){alert(e.message);}
+};
 
-/* --- Sign-out --- */
+/* ---------- Reset password ---------- */
+resetPwdLink.onclick=e=>{
+  e.preventDefault();
+  resetBox.style.display='block';
+  resetEmailIn.value=emailIn.value;
+};
+sendResetBtn.onclick=async()=>{
+  try{
+    await auth.sendPasswordResetEmail(resetEmailIn.value.trim());
+    alert('Reset email sent!');
+    resetBox.style.display='none';
+  }catch(e){alert(e.message);}
+};
+
+/* ---------- Sign-out ---------- */
 function signOut(){auth.signOut().then(()=>location.href='index.html');}
 
-/* --- Tab nav --- */
+/* ---------- Mobile tab logic ---------- */
+function scrollToTop(){window.scrollTo({top:0,behavior:'smooth'});}
 function showPanel(p){
-  ['home','bookings','about'].forEach(id=>{
-    document.getElementById(id+'Panel').classList.toggle('panel-active',id===p);
-    document.getElementById('btn'+id.charAt(0).toUpperCase()+id.slice(1)).classList.toggle('active',id===p);
-  });
+  /* desktop top tabs */
+  const isDesktop=window.innerWidth>=900;
+  if(isDesktop){
+    document.getElementById('tabBookings').classList.toggle('active',p==='bookings');
+    document.getElementById('tabAbout').classList.toggle('active',p==='about');
+    document.getElementById('bookingsPanel').style.display=p==='bookings'?'block':'none';
+    document.getElementById('aboutPanel').style.display=p==='about'?'block':'none';
+    return;
+  }
+  /* mobile bottom tabs */
+  document.querySelectorAll('.menu-btn').forEach(btn=>btn.classList.remove('active'));
+  if(p==='bookings'){document.getElementById('btnBookings').classList.add('active')}
+  if(p==='about'){document.getElementById('btnAbout').classList.add('active')}
+  // simple scroll approach – could build separate panels if needed
+  if(p==='bookings')alert('Bookings screen (mobile) coming soon!');
+  if(p==='about')alert('About screen (mobile) coming soon!');
 }
+/* show right column on desktop */
+if(window.innerWidth>=900)document.getElementById('rightCol').style.display='block';
 </script>
 </body>
 </html>
