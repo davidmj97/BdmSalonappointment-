@@ -7,7 +7,7 @@
 <style>
   :root{--bg:#000;--fg:#fff;--accent:#ffcf33;}
   html,body{margin:0;padding:0;width:100%;min-height:100vh;background:var(--bg);color:var(--fg);font-family:'Helvetica Neue',Arial,sans-serif;}
-  body{display:flex;flex-direction:column;}
+  body{display:flex;flex-direction:column}
 
   /* ===== HEADER ===== */
   .header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:#000;}
@@ -22,13 +22,26 @@
   .welcome{font-size:17px;font-weight:600;margin-bottom:18px;}
   .cta-btn{width:100%;max-width:360px;background:#fff;color:#000;border:none;border-radius:10px;font-size:16px;font-weight:600;padding:14px 0;margin-bottom:24px;cursor:pointer;}
 
-  /* Top services – mobile carousel */
+  /* Services */
   .services-title{font-size:15px;font-weight:600;margin-bottom:10px;}
   .services{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px;}
   .service-card{min-width:220px;background:#111;border-radius:10px;padding:12px;color:#eee;flex-shrink:0;}
   .service-card h4{margin:0 0 4px;font-size:14px;font-weight:600;color:#fff;}
   .service-meta{font-size:12px;color:#ccc;margin-bottom:6px;}
   .service-desc{font-size:12px;color:#aaa;margin:0;}
+  .book-link{color:var(--accent);text-decoration:none;font-weight:700;}
+  .book-link:hover{text-decoration:underline;}
+
+  /* Offers / testimonials / gallery cards */
+  .info-card{background:#111;border-radius:12px;padding:14px;color:#fff;font-size:13px;}
+  .gallery{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px;}
+  .gallery img{width:220px;height:140px;object-fit:cover;border-radius:10px;flex-shrink:0;}
+
+  /* Follow row */
+  .social-row{display:flex;align-items:center;gap:18px;font-size:0;margin-top:10px;}
+  .social-row a{display:inline-block;}
+  .social-row svg{width:28px;height:28px;fill:#fff;}
+  .call-link{margin-left:auto;color:#fff;font-size:13px;text-decoration:none;}
 
   /* ===== MENU BAR (mobile) ===== */
   .menu{position:fixed;bottom:0;left:0;right:0;height:58px;background:#000;border-top:1px solid #fff2;display:flex;justify-content:space-around;z-index:80;}
@@ -56,6 +69,7 @@
     .right-col{flex:2;}
     .services{flex-wrap:wrap;overflow:visible;}
     .service-card{width:calc(50% - 12px);margin-bottom:14px;}
+    .gallery img{width:calc(50% - 12px);}
     .menu{display:none;}          /* hide bottom nav */
     .top-tabs{display:flex;gap:22px;margin-bottom:20px;}
     .top-tab{font-size:14px;font-weight:600;cursor:pointer;opacity:.6;}
@@ -71,7 +85,7 @@
   <header class="header">
     <div class="logo">BDM Salon</div>
     <div class="right-box">
-      <span class="points-badge" id="pointsBadge">0 pts</span>
+      <span class="points-badge" id="pointsBadge">0 points</span>
       <div class="profile-icon" id="profileIcon"></div>
     </div>
   </header>
@@ -85,8 +99,44 @@
 
       <!-- Top services -->
       <h3 class="services-title">Top Services</h3>
-      <div class="services" id="servicesContainer">
-        <!-- cards injected below -->
+      <div class="services" id="servicesContainer"></div>
+
+      <!-- Offers -->
+      <h3 class="services-title" style="margin-top:24px;">Special Offers</h3>
+      <div class="info-card">
+        <p style="margin:0 0 6px;"><strong>🎁 Earn 150 points</strong> on your first booking</p>
+        <p style="margin:0;"><strong>💸 20 % OFF</strong> selected hair & nail services this week!</p>
+      </div>
+
+      <!-- Gallery -->
+      <h3 class="services-title" style="margin-top:26px;">Gallery</h3>
+      <div class="gallery">
+        <img src="https://images.pexels.com/photos/705255/pexels-photo-705255.jpeg" alt="">
+        <img src="https://images.pexels.com/photos/3992875/pexels-photo-3992875.jpeg" alt="">
+        <img src="https://images.pexels.com/photos/1813272/pexels-photo-1813272.jpeg" alt="">
+      </div>
+
+      <!-- Testimonials -->
+      <h3 class="services-title" style="margin-top:26px;">What Clients Say</h3>
+      <div class="info-card">
+        <p style="margin:0 0 8px;">“Best haircut I've had in years!” – <em>Sophia L.</em></p>
+        <p style="margin:0;">“Lovely staff and relaxing vibe.” – <em>Aman G.</em></p>
+      </div>
+
+      <!-- Social -->
+      <h3 class="services-title" style="margin-top:26px;">Follow us on</h3>
+      <div class="social-row">
+        <!-- minimalist SVG icons (white) -->
+        <a href="https://instagram.com" target="_blank" aria-label="Instagram">
+          <svg viewBox="0 0 24 24"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5z" stroke-width="2" stroke="#fff" fill="none"/><circle cx="12" cy="12" r="3.5" fill="#fff"/><circle cx="17.5" cy="6.5" r="1.5" fill="#fff"/></svg>
+        </a>
+        <a href="https://facebook.com" target="_blank" aria-label="Facebook">
+          <svg viewBox="0 0 24 24"><path d="M15 2h-3a5 5 0 0 0-5 5v3H5v4h2v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" fill="#fff"/></svg>
+        </a>
+        <a href="https://wa.me/123456789" target="_blank" aria-label="WhatsApp">
+          <svg viewBox="0 0 24 24"><path d="M4.5 20l1.6-5A8 8 0 1 1 20 8a8 8 0 0 1-13.9 7.2L4.5 20z" stroke="#fff" stroke-width="2" fill="none"/><path d="M16.1 13.6c-.3-.1-1.8-.9-2-1s-.5-.1-.8.2-.9 1-.8 1.1.1.3.2.4c.1.1.3.5.7.9s1.2 1 2.3 1.3c1.1.3 1.3.2 1.5.2s.7-.3.8-.5.3-.5.3-.8-.1-.6-.2-.8-.9-1.1-1.2-1.2z" fill="#fff"/></svg>
+        </a>
+        <a href="tel:+123456789" class="call-link">📞 Call us</a>
       </div>
     </section>
 
@@ -174,23 +224,23 @@ const resetEmailIn  = document.getElementById('resetEmail');
 
 /* ---------- Services cards ---------- */
 const services=[
-  {name:"Haircut",price:"$25",desc:"Classic cut & style",pts:30},
-  {name:"Hair Coloring",price:"$60",desc:"Full colour",pts:70},
-  {name:"Beard Trim",price:"$15",desc:"Shape & line-up",pts:20},
-  {name:"Facial",price:"$40",desc:"Deep cleansing",pts:45},
-  {name:"Manicure",price:"$22",desc:"Clean & polish",pts:28},
-  {name:"Pedicure",price:"$28",desc:"Spa pedicure",pts:34},
-  {name:"Make-up",price:"$55",desc:"Event glam",pts:65},
-  {name:"Blow-dry",price:"$18",desc:"Quick styling",pts:22},
-  {name:"Hair Spa",price:"$50",desc:"Nourishing mask",pts:60},
-  {name:"Nail Art",price:"$30",desc:"Creative designs",pts:35}
+  {name:"Haircut",price:"$25",desc:"Classic cut & style",points:30},
+  {name:"Hair Coloring",price:"$60",desc:"Full colour",points:70},
+  {name:"Beard Trim",price:"$15",desc:"Shape & line-up",points:20},
+  {name:"Facial",price:"$40",desc:"Deep cleansing",points:45},
+  {name:"Manicure",price:"$22",desc:"Clean & polish",points:28},
+  {name:"Pedicure",price:"$28",desc:"Spa pedicure",points:34},
+  {name:"Make-up",price:"$55",desc:"Event glam",points:65},
+  {name:"Blow-dry",price:"$18",desc:"Quick styling",points:22},
+  {name:"Hair Spa",price:"$50",desc:"Nourishing mask",points:60},
+  {name:"Nail Art",price:"$30",desc:"Creative designs",points:35}
 ];
 const servicesContainer=document.getElementById('servicesContainer');
 services.forEach(s=>{
   servicesContainer.insertAdjacentHTML('beforeend',`
     <div class="service-card">
-      <h4>${s.name} – ${s.price}</h4>
-      <div class="service-meta">${s.pts} pts</div>
+      <h4><strong>${s.price}</strong> • ${s.name}</h4>
+      <div class="service-meta">${s.points} points  |  <a href="#" class="book-link" onclick="alert('Booking flow coming soon!')">Book Now</a></div>
       <p class="service-desc">${s.desc}</p>
     </div>`);});
 
@@ -198,8 +248,8 @@ services.forEach(s=>{
 auth.onAuthStateChanged(user=>{
   if(!user){location.href='index.html';return;}
   profileIcon.textContent=(user.displayName||'U')[0].toUpperCase();
-  welcomeMsg.textContent=`Hi ${(user.displayName||'there')}, ready for your next beauty session?`;
-  pointsBadge.textContent="120 pts";               // static demo value
+  welcomeMsg.textContent = `Hello ${(user.displayName || 'there')}, you're all set – ready to book your next session?`;
+  pointsBadge.textContent="120 points";               // static demo value
   // Fill sheet fields
   displayNameIn.value=user.displayName||'';
   emailIn.value=user.email||'';
@@ -219,7 +269,7 @@ saveBtn.onclick=async()=>{
     localStorage.setItem('phone_'+user.uid,phoneIn.value);
     alert('Saved!');
     sheet.classList.remove('open');
-    welcomeMsg.textContent=`Hi ${(displayNameIn.value||'there')}, ready for your next beauty session?`;
+    welcomeMsg.textContent=`Hello ${(displayNameIn.value||'there')}, you're all set – ready to book your next session?`;
     profileIcon.textContent=(displayNameIn.value||'U')[0].toUpperCase();
   }catch(e){alert(e.message);}
 };
@@ -233,7 +283,7 @@ resetPwdLink.onclick=e=>{
 sendResetBtn.onclick=async()=>{
   try{
     await auth.sendPasswordResetEmail(resetEmailIn.value.trim());
-    alert('Reset email sent!');
+    alert('Reset e-mail sent!');
     resetBox.style.display='none';
   }catch(e){alert(e.message);}
 };
@@ -257,10 +307,9 @@ function showPanel(p){
   document.querySelectorAll('.menu-btn').forEach(btn=>btn.classList.remove('active'));
   if(p==='bookings'){document.getElementById('btnBookings').classList.add('active')}
   if(p==='about'){document.getElementById('btnAbout').classList.add('active')}
-  // simple scroll approach – could build separate panels if needed
-  if(p==='bookings')alert('Bookings screen (mobile) coming soon!');
-  if(p==='about')alert('About screen (mobile) coming soon!');
+  alert('Screen coming soon!');
 }
+
 /* show right column on desktop */
 if(window.innerWidth>=900)document.getElementById('rightCol').style.display='block';
 </script>
