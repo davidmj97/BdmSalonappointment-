@@ -106,20 +106,23 @@
       }
     }
 
-    // After redirect, or if already logged in, go straight to dashboard
-    auth.getRedirectResult().then(result => {
+    // Always handle redirect result FIRST, then setup onAuthStateChanged!
+    firebase.auth().getRedirectResult().then(result => {
       if (result.user) {
         setTimeout(() => {
           window.location.href = 'customer-dashboard.html';
         }, 200);
+        return; // Don't continue to onAuthStateChanged
       }
-    });
-    auth.onAuthStateChanged(function(user) {
-      if (user && !window.location.pathname.endsWith('customer-dashboard.html')) {
-        setTimeout(() => {
-          window.location.href = 'customer-dashboard.html';
-        }, 200);
-      }
+
+      // Now safe to listen to auth state
+      auth.onAuthStateChanged(function(user) {
+        if (user && !window.location.pathname.endsWith('customer-dashboard.html')) {
+          setTimeout(() => {
+            window.location.href = 'customer-dashboard.html';
+          }, 200);
+        }
+      });
     });
   </script>
 </body>
