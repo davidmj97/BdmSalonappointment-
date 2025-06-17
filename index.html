@@ -162,7 +162,6 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
-    // Detect mobile device for proper Google sign-in
     function isMobile() {
       return /android|iphone|ipad|ipod|opera mini|iemobile|mobile/i.test(navigator.userAgent);
     }
@@ -170,14 +169,12 @@
     function signInWithGoogle() {
       const provider = new firebase.auth.GoogleAuthProvider();
       if (isMobile()) {
-        // On mobile devices, always use redirect
         auth.signInWithRedirect(provider)
           .catch(error => {
             alert("Google Sign-in Error: " + error.message +
               "\nTip: On Chrome, make sure cookies are enabled and browser is updated.");
           });
       } else {
-        // On desktop, use popup
         auth.signInWithPopup(provider)
           .then(() => {
             setTimeout(() => {
@@ -190,7 +187,7 @@
       }
     }
 
-    // On page load, check for redirect result (for mobile Google sign-in)
+    // Check for Google sign-in redirect result (for mobile)
     auth.getRedirectResult()
       .then(result => {
         if (result.user) {
@@ -198,12 +195,18 @@
             window.location.href = 'customer-dashboard.html';
           }, 200);
         }
-      })
-      .catch(error => {
-        if (error && error.message) {
-          alert("Google Sign-in Error: " + error.message);
-        }
       });
+
+    // Always check auth state so user is sent to dashboard if already logged in
+    auth.onAuthStateChanged(function(user) {
+      if (user) {
+        if (!window.location.pathname.endsWith('customer-dashboard.html')) {
+          setTimeout(() => {
+            window.location.href = 'customer-dashboard.html';
+          }, 200);
+        }
+      }
+    });
   </script>
 </body>
 </html>
