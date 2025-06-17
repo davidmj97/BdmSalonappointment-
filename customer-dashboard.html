@@ -1,201 +1,168 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Dashboard – BDM Salon</title>
 <style>
-  :root{--bg:#000;--fg:#fff;--accent:#ffcf33;}
-  html,body{margin:0;padding:0;width:100%;min-height:100vh;background:var(--bg);color:var(--fg);font-family:'Helvetica Neue',Arial,sans-serif;}
-  body{display:flex;flex-direction:column}   ::-webkit-scrollbar{display:none;}
+:root{--bg:#000;--fg:#fff;--accent:#ffcf33;}
+html,body{margin:0;padding:0;width:100%;min-height:100vh;background:var(--bg);color:var(--fg);font-family:'Helvetica Neue',Arial,sans-serif;}
+body{display:flex;flex-direction:column}   ::-webkit-scrollbar{display:none;}
 
-  /* ===== HEADER ===== */
-  .header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:#000;}
-  .logo{font-size:18px;font-weight:700;letter-spacing:.5px;}
-  .right-box{display:flex;align-items:center;gap:12px;}
-  .points-badge{font-size:12px;padding:4px 8px;background:#111;border-radius:12px;}
-  .profile-icon{position:relative;width:36px;height:36px;border-radius:50%;background:var(--fg);color:var(--bg);display:flex;align-items:center;justify-content:center;font-weight:700;cursor:pointer;}
-  .profile-icon::after{content:'✎';position:absolute;top:-4px;right:-4px;width:14px;height:14px;border-radius:50%;background:var(--accent);color:#000;font-size:9px;display:flex;align-items:center;justify-content:center;border:1px solid #000;}
+.header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:#000;}
+.logo{font-size:18px;font-weight:700;}
+.right-box{display:flex;gap:12px;align-items:center;}
+.points-badge{font-size:12px;padding:4px 8px;background:#111;border-radius:12px;}
+.profile-icon{position:relative;width:36px;height:36px;border-radius:50%;background:#fff;color:#000;display:flex;align-items:center;justify-content:center;font-weight:700;cursor:pointer;}
+.profile-icon::after{content:'✎';position:absolute;top:-4px;right:-4px;width:14px;height:14px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:9px;color:#000;border:1px solid #000;}
 
-  /* ===== MAIN ===== */
-  .main{flex:1;display:flex;flex-direction:column;padding:16px 16px 70px;}
-  .welcome{font-size:18px;font-weight:600;margin-bottom:20px;}
-  .cta-btn{width:100%;max-width:360px;background:#fff;color:#000;border:none;border-radius:10px;font-size:17px;font-weight:700;padding:14px 0;margin-bottom:26px;cursor:pointer;}
+.main{flex:1;display:flex;flex-direction:column;padding:16px 16px 70px;}
+.welcome{font-size:18px;font-weight:600;margin-bottom:22px;}
+.cta-btn{width:100%;max-width:360px;margin-bottom:28px;padding:14px 0;border:none;border-radius:10px;background:#fff;color:#000;font-weight:700;font-size:17px;cursor:pointer;}
 
-  /* Service cards */
-  .services-title{font-size:15px;font-weight:700;margin-bottom:12px;}
-  .services{display:flex;gap:14px;overflow-x:auto;padding-bottom:6px;}
-  .service-card{min-width:220px;background:#111;border-radius:12px;padding:14px;color:#eee;flex-shrink:0;display:flex;flex-direction:column;}
-  .svc-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
-  .svc-name{font-size:15px;font-weight:600;}
-  .svc-price{font-size:17px;font-weight:700;color:var(--accent);}
-  .service-meta{font-size:12px;color:#ccc;margin-bottom:6px;}
-  .book-link{color:var(--accent);font-weight:700;text-decoration:none;margin-left:6px;}
-  .book-link:hover{text-decoration:underline;}
+.services-title{font-size:15px;font-weight:700;margin-bottom:12px;}
+.services{display:flex;gap:14px;overflow-x:auto;padding-bottom:6px;}
+.service-card{min-width:220px;background:#111;color:#fff;border-radius:12px;padding:14px 16px;flex-shrink:0;display:flex;flex-direction:column;gap:6px;}
+.svc-name{font-size:16px;font-weight:700;margin:0;}
+.svc-desc{font-size:12px;color:#ccc;line-height:1.35;max-height:2.7em;overflow:hidden;}
+.svc-points{font-size:12px;color:#ccc;margin-top:4px;}
+.svc-price{font-size:50px;font-weight:800;color:var(--accent);line-height:0.9;margin:6px 0;}
+.book-link{font-size:14px;font-weight:700;color:var(--accent);text-decoration:none;}
+.book-link:hover{text-decoration:underline;}
 
-  /* Info / gallery / testimonials */
-  .info-card{background:#111;border-radius:12px;padding:14px;color:#fff;font-size:13px;}
-  .carousel{position:relative;}
-  .carousel-track{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px;}
-  .carousel-track>*{scroll-snap-align:start;}
-  .arrow{display:flex;position:absolute;top:50%;transform:translateY(-50%);background:#000b;color:#fff;border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;align-items:center;justify-content:center;}
-  .arrow svg{width:18px;height:18px;}
-  .arrow.left{left:-14px;} .arrow.right{right:-14px;}
+.info-card{background:#111;border-radius:12px;padding:14px;color:#fff;font-size:13px;}
+.carousel{position:relative;}
+.carousel-track{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px;}
+.carousel-track>*{scroll-snap-align:start;}
 
-  .gallery-img{width:220px;height:140px;object-fit:cover;border-radius:10px;flex-shrink:0;}
+.arrow{display:none;position:absolute;top:50%;transform:translateY(-50%);background:#000c;border:none;width:34px;height:34px;border-radius:50%;color:#fff;cursor:pointer;align-items:center;justify-content:center;}
+.arrow svg{width:18px;height:18px;}
+.arrow.left{left:-18px;} .arrow.right{right:-18px;}
 
-  .testimonial-card{min-width:240px;background:#111;border-radius:10px;padding:14px;font-size:13px;color:#fff;flex-shrink:0;}
+.gallery-img{width:220px;height:140px;object-fit:cover;border-radius:10px;flex-shrink:0;}
+.testimonial-card{min-width:240px;background:#111;border-radius:10px;padding:14px;font-size:13px;color:#fff;flex-shrink:0;}
 
-  /* Footer social row */
-  .social-row{display:flex;align-items:center;gap:18px;font-size:0;margin-top:12px;}
-  .social-row a{display:inline-block;}
-  .social-row img{width:28px;height:28px;}
-  .social-row svg{width:28px;height:28px;fill:#fff;}
-  .call-btn{margin-left:auto;background:#fff;color:#000;font-size:13px;padding:8px 12px;border:none;border-radius:8px;cursor:pointer;}
+.social-row{display:flex;align-items:center;gap:18px;margin-top:14px;}
+.social-row svg,.social-row img{width:28px;height:28px;}
+.call-btn{margin-left:auto;padding:8px 14px;border:none;border-radius:8px;background:#fff;color:#000;font-size:13px;cursor:pointer;}
 
-  /* ===== MENU BAR ===== */
-  .menu{position:fixed;bottom:0;left:0;right:0;height:58px;background:#000;border-top:1px solid #fff2;display:flex;justify-content:space-around;z-index:80;}
-  .menu-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:12px;color:#fff;opacity:.8;border:none;background:none;}
-  .menu-btn.active{opacity:1;color:var(--accent);}
-  .menu-btn svg{width:20px;height:20px;margin-bottom:2px;stroke:currentColor;fill:none;}
+.menu{position:fixed;bottom:0;left:0;right:0;height:58px;background:#000;border-top:1px solid #fff2;display:flex;justify-content:space-around;z-index:80;}
+.menu-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:12px;color:#fff;opacity:.8;border:none;background:none;}
+.menu-btn.active{opacity:1;color:var(--accent);}
+.menu-btn svg{width:20px;height:20px;margin-bottom:2px;stroke:currentColor;fill:none;}
 
-  /* ===== ACCOUNT SHEET ===== */
-  .sheet{position:fixed;left:0;right:0;bottom:-100%;background:#fff;color:#000;border-top-left-radius:18px;border-top-right-radius:18px;box-shadow:0 -4px 20px #0005;transition:bottom .35s ease;z-index:100;padding:24px 22px 32px;max-height:88vh;overflow-y:auto;font-size:14px;}
-  .sheet.open{bottom:0;}  .sheet h3{margin:0 0 18px;text-align:center;font-size:17px;}
-  .close-x{position:absolute;top:12px;right:14px;font-size:20px;font-weight:600;cursor:pointer;}
-  .sheet input{width:100%;padding:10px;font-size:14px;border:1.2px solid #ccc;border-radius:6px;margin-bottom:12px;}
-  .sheet button{padding:12px;font-size:14px;border:none;border-radius:8px;cursor:pointer;}
-  .save-btn{background:#000;color:#fff;margin:14px auto 0;display:block;width:140px;}
-  .signout-btn{background:#111;color:#fff;width:100%;margin-top:20px;}
-  .reset-link{font-size:12px;text-align:center;margin-top:2px;}
-  .reset-link a{color:#000;font-weight:600;text-decoration:none;}  .reset-link a:hover{text-decoration:underline;}
+.sheet{position:fixed;left:0;right:0;bottom:-100%;background:#fff;color:#000;border-top-left-radius:18px;border-top-right-radius:18px;box-shadow:0 -4px 20px #0005;max-height:88vh;overflow-y:auto;transition:bottom .35s;z-index:100;padding:24px 22px;font-size:14px;}
+.sheet.open{bottom:0;}
+.close-x{position:absolute;top:12px;right:14px;font-size:20px;font-weight:600;cursor:pointer;}
+.sheet input{width:100%;padding:10px;margin-bottom:12px;font-size:14px;border:1.2px solid #ccc;border-radius:6px;}
+.save-btn{display:block;margin:18px auto 0;padding:12px 28px;border:none;border-radius:8px;background:#000;color:#fff;font-size:14px;font-weight:700;}
+.signout-btn{width:100%;margin-top:20px;padding:12px;border:none;border-radius:8px;background:#111;color:#fff;font-size:14px;}
+.reset-link{font-size:12px;text-align:center;margin-top:2px;}
+.reset-link a{font-weight:700;color:#000;text-decoration:none;}
+
+@media(min-width:900px){
+  /* show arrows on desktop */
+  .arrow{display:flex;}
+}
 </style>
 </head>
 <body>
-  <!-- ===== Header ===== -->
-  <header class="header">
-    <div class="logo">BDM Salon</div>
-    <div class="right-box">
-      <span class="points-badge" id="pointsBadge">0 points</span>
-      <div class="profile-icon" id="profileIcon"></div>
+<header class="header">
+  <div class="logo">BDM Salon</div>
+  <div class="right-box">
+    <span class="points-badge" id="pointsBadge">0 points</span>
+    <div class="profile-icon" id="profileIcon"></div>
+  </div>
+</header>
+
+<main class="main">
+  <div class="welcome" id="welcomeMsg"></div>
+  <button class="cta-btn" onclick="alert('Booking flow coming soon!')">Book Now</button>
+
+  <h3 class="services-title">Top Services</h3>
+  <div class="services" id="servicesContainer"></div>
+
+  <h3 class="services-title" style="margin-top:26px;">Special Offers</h3>
+  <div class="info-card">
+    <p style="margin:0 0 6px;"><strong>🎁 Earn 150 points</strong> on your first booking</p>
+    <p style="margin:0;"><strong>💸 20 % OFF</strong> selected hair & nail services this week!</p>
+  </div>
+
+  <h3 class="services-title" style="margin-top:28px;">Gallery</h3>
+  <div class="carousel">
+    <button class="arrow left"  onclick="scrollByTrack('galleryTrack',-1)"><svg viewBox="0 0 24 24"><path d="M15 6 9 12l6 6" stroke="#fff" stroke-width="2"/></svg></button>
+    <div class="carousel-track" id="galleryTrack">
+      <img src="https://images.pexels.com/photos/705255/pexels-photo-705255.jpeg"  class="gallery-img" alt="">
+      <img src="https://images.pexels.com/photos/3992875/pexels-photo-3992875.jpeg" class="gallery-img" alt="">
+      <img src="https://images.pexels.com/photos/1813272/pexels-photo-1813272.jpeg" class="gallery-img" alt="">
     </div>
-  </header>
+    <button class="arrow right" onclick="scrollByTrack('galleryTrack',1)"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6" stroke="#fff" stroke-width="2"/></svg></button>
+  </div>
 
-  <!-- ===== Main ===== -->
-  <main class="main">
-    <div class="welcome" id="welcomeMsg"></div>
-    <button class="cta-btn" onclick="alert('Booking flow coming soon!')">Book Now</button>
-
-    <!-- Top services -->
-    <h3 class="services-title">Top Services</h3>
-    <div class="services" id="servicesContainer"></div>
-
-    <!-- Offers -->
-    <h3 class="services-title" style="margin-top:26px;">Special Offers</h3>
-    <div class="info-card">
-      <p style="margin:0 0 6px;"><strong>🎁 Earn 150 points</strong> on your first booking</p>
-      <p style="margin:0;"><strong>💸 20 % OFF</strong> selected hair & nail services this week!</p>
+  <h3 class="services-title" style="margin-top:30px;">What Clients Say</h3>
+  <div class="carousel">
+    <button class="arrow left"  onclick="scrollByTrack('testiTrack',-1)"><svg viewBox="0 0 24 24"><path d="M15 6 9 12l6 6" stroke="#fff" stroke-width="2"/></svg></button>
+    <div class="carousel-track" id="testiTrack">
+      <div class="testimonial-card">“Best haircut I've had in years!”<br><em>– Sophia L.</em></div>
+      <div class="testimonial-card">“Lovely staff and relaxing vibe.”<br><em>– Aman G.</em></div>
+      <div class="testimonial-card">“Colour came out perfect. 10/10.”<br><em>– Priya S.</em></div>
+      <div class="testimonial-card">“Great manicure, lasted 3 weeks!”<br><em>– Kate D.</em></div>
+      <div class="testimonial-card">“Booking was quick and easy.”<br><em>– Marco V.</em></div>
     </div>
+    <button class="arrow right" onclick="scrollByTrack('testiTrack',1)"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6" stroke="#fff" stroke-width="2"/></svg></button>
+  </div>
 
-    <!-- Gallery -->
-    <h3 class="services-title" style="margin-top:28px;">Gallery</h3>
-    <div class="carousel">
-      <button class="arrow left"  onclick="scrollByTrack('galleryTrack',-1)"><svg viewBox="0 0 24 24"><path d="M15 6 9 12l6 6" stroke="#fff" stroke-width="2"/></svg></button>
-      <div class="carousel-track" id="galleryTrack">
-        <img src="https://images.pexels.com/photos/705255/pexels-photo-705255.jpeg"  class="gallery-img" alt="">
-        <img src="https://images.pexels.com/photos/3992875/pexels-photo-3992875.jpeg" class="gallery-img" alt="">
-        <img src="https://images.pexels.com/photos/1813272/pexels-photo-1813272.jpeg" class="gallery-img" alt="">
-      </div>
-      <button class="arrow right" onclick="scrollByTrack('galleryTrack',1)"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6" stroke="#fff" stroke-width="2"/></svg></button>
-    </div>
+  <h3 class="services-title" style="margin-top:32px;">Follow us on</h3>
+  <div class="social-row">
+    <a href="https://instagram.com" target="_blank" aria-label="Instagram"><svg viewBox="0 0 24 24"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5z" stroke="#fff" stroke-width="2" fill="none"/><circle cx="12" cy="12" r="3.5" fill="#fff"/><circle cx="17.5" cy="6.5" r="1.5" fill="#fff"/></svg></a>
+    <a href="https://facebook.com" target="_blank" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M15 2h-3a5 5 0 0 0-5 5v3H5v4h2v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" fill="#fff"/></svg></a>
+    <a href="https://wa.me/123456789" target="_blank" aria-label="WhatsApp"><img src="https://img.icons8.com/ios/50/whatsapp--v1.png" alt="WhatsApp"></a>
+    <button class="call-btn" onclick="location.href='tel:+123456789'">📞 Call Us</button>
+  </div>
+</main>
 
-    <!-- Testimonials -->
-    <h3 class="services-title" style="margin-top:30px;">What Clients Say</h3>
-    <div class="carousel">
-      <button class="arrow left"  onclick="scrollByTrack('testiTrack',-1)"><svg viewBox="0 0 24 24"><path d="M15 6 9 12l6 6" stroke="#fff" stroke-width="2"/></svg></button>
-      <div class="carousel-track" id="testiTrack">
-        <div class="testimonial-card">“Best haircut I've had in years!”<br><em>– Sophia L.</em></div>
-        <div class="testimonial-card">“Lovely staff and relaxing vibe.”<br><em>– Aman G.</em></div>
-        <div class="testimonial-card">“Colour came out perfect. 10/10.”<br><em>– Priya S.</em></div>
-        <div class="testimonial-card">“Great manicure, lasted 3 weeks!”<br><em>– Kate D.</em></div>
-        <div class="testimonial-card">“Booking was quick and easy.”<br><em>– Marco V.</em></div>
-      </div>
-      <button class="arrow right" onclick="scrollByTrack('testiTrack',1)"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6" stroke="#fff" stroke-width="2"/></svg></button>
-    </div>
+<nav class="menu">
+  <button class="menu-btn active" onclick="scrollToTop()"><svg viewBox="0 0 24 24"><path d="M4 12 12 5l8 7" stroke-width="2"/><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7" stroke-width="2"/></svg>Home</button>
+  <button class="menu-btn" onclick="alert('Bookings coming soon!')"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2" stroke-width="2"/><path d="M16 3v4M8 3v4M3 11h18" stroke-width="2"/></svg>Bookings</button>
+  <button class="menu-btn" onclick="alert('About coming soon!')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 16v-4" stroke-width="2"/><circle cx="12" cy="8" r="1" stroke-width="2"/></svg>About</button>
+</nav>
 
-    <!-- Social -->
-    <h3 class="services-title" style="margin-top:32px;">Follow us on</h3>
-    <div class="social-row">
-      <a href="https://instagram.com" target="_blank" aria-label="Instagram">
-        <svg viewBox="0 0 24 24"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5z" stroke-width="2" stroke="#fff" fill="none"/><circle cx="12" cy="12" r="3.5" fill="#fff"/><circle cx="17.5" cy="6.5" r="1.5" fill="#fff"/></svg>
-      </a>
-      <a href="https://facebook.com" target="_blank" aria-label="Facebook">
-        <svg viewBox="0 0 24 24"><path d="M15 2h-3a5 5 0 0 0-5 5v3H5v4h2v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" fill="#fff"/></svg>
-      </a>
-      <a href="https://wa.me/123456789" target="_blank" aria-label="WhatsApp">
-        <img src="https://img.icons8.com/ios/50/whatsapp--v1.png" alt="WhatsApp">
-      </a>
-      <button class="call-btn" onclick="location.href='tel:+123456789'">📞 Call Us</button>
-    </div>
-  </main>
+<aside class="sheet" id="accountSheet">
+  <span class="close-x" id="closeSheetX">&times;</span>
+  <h3>Account</h3>
+  <input id="displayName" placeholder="Full name">
+  <input id="phone" placeholder="Phone number">
+  <input id="email" placeholder="Email">
+  <div class="reset-link">Forgot password? <a href="#" id="resetPwdLink">Reset</a></div>
+  <div id="resetBox" style="display:none;margin-top:10px;"><input id="resetEmail" placeholder="Enter your email"><button class="save-btn" id="sendResetBtn" style="margin-top:10px;width:100%;max-width:160px;">Send</button></div>
+  <button class="save-btn" id="saveBtn">Save Changes</button>
+  <button class="signout-btn" onclick="signOut()">Sign Out</button>
+</aside>
 
-  <!-- ===== Bottom nav ===== -->
-  <nav class="menu">
-    <button class="menu-btn active" id="btnHome" onclick="scrollToTop()">
-      <svg viewBox="0 0 24 24"><path d="M4 12 12 5l8 7" stroke-width="2"/><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7" stroke-width="2"/></svg>
-      Home
-    </button>
-    <button class="menu-btn" id="btnBookings" onclick="alert('Bookings coming soon!')">
-      <svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2" stroke-width="2"/><path d="M16 3v4M8 3v4M3 11h18" stroke-width="2"/></svg>
-      Bookings
-    </button>
-    <button class="menu-btn" id="btnAbout" onclick="alert('About coming soon!')">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 16v-4" stroke-width="2"/><circle cx="12" cy="8" r="1" stroke-width="2"/></svg>
-      About
-    </button>
-  </nav>
-
-  <!-- ===== Account sheet ===== -->
-  <aside class="sheet" id="accountSheet">
-    <span class="close-x" id="closeSheetX">&times;</span>
-    <h3>Account</h3>
-    <input id="displayName" placeholder="Full name">
-    <input id="phone" placeholder="Phone number">
-    <input id="email" placeholder="Email">
-    <div class="reset-link">Forgot password? <a href="#" id="resetPwdLink">Reset</a></div>
-
-    <div id="resetBox" style="display:none;margin-top:10px;">
-      <input id="resetEmail" placeholder="Enter your email">
-      <button class="save-btn" id="sendResetBtn" style="width:100%;max-width:160px;">Send</button>
-    </div>
-
-    <button class="save-btn" id="saveBtn">Save Changes</button>
-    <button class="signout-btn" onclick="signOut()">Sign Out</button>
-  </aside>
-
-<!-- ================= Firebase & Logic ================== -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 <script>
 firebase.initializeApp({apiKey:"AIzaSyAmimDsjW_pF2NGw-w-40QzTsgmf1tdqyI",authDomain:"bdmsalonappointment.firebaseapp.com",projectId:"bdmsalonappointment"});
 const auth=firebase.auth();
 
-const profileIcon=document.getElementById('profileIcon'),sheet=document.getElementById('accountSheet'),closeSheetX=document.getElementById('closeSheetX');
-const saveBtn=document.getElementById('saveBtn');const displayNameIn=document.getElementById('displayName');
-const phoneIn=document.getElementById('phone');const emailIn=document.getElementById('email');
-const pointsBadge=document.getElementById('pointsBadge');const welcomeMsg=document.getElementById('welcomeMsg');
-const resetPwdLink=document.getElementById('resetPwdLink');const resetBox=document.getElementById('resetBox');
-const sendResetBtn=document.getElementById('sendResetBtn');const resetEmailIn=document.getElementById('resetEmail');
+/* ---- DOM refs ---- */
+const pointsBadge=document.getElementById('pointsBadge'),profileIcon=document.getElementById('profileIcon'),welcomeMsg=document.getElementById('welcomeMsg');
+const sheet=document.getElementById('accountSheet'),closeSheetX=document.getElementById('closeSheetX');
+const displayNameIn=document.getElementById('displayName'),emailIn=document.getElementById('email'),phoneIn=document.getElementById('phone');
+const resetPwdLink=document.getElementById('resetPwdLink'),resetBox=document.getElementById('resetBox'),resetEmailIn=document.getElementById('resetEmail'),sendResetBtn=document.getElementById('sendResetBtn');
+const saveBtn=document.getElementById('saveBtn');
 
-const services=[{name:"Haircut",price:"$25",desc:"Classic cut & style",points:30},{name:"Hair Coloring",price:"$60",desc:"Full colour",points:70},{name:"Beard Trim",price:"$15",desc:"Shape & line-up",points:20},{name:"Facial",price:"$40",desc:"Deep cleansing",points:45},{name:"Manicure",price:"$22",desc:"Clean & polish",points:28},{name:"Pedicure",price:"$28",desc:"Spa pedicure",points:34},{name:"Make-up",price:"$55",desc:"Event glam",points:65},{name:"Blow-dry",price:"$18",desc:"Quick styling",points:22},{name:"Hair Spa",price:"$50",desc:"Nourishing mask",points:60},{name:"Nail Art",price:"$30",desc:"Creative designs",points:35}];
-const servicesContainer=document.getElementById('servicesContainer');
-services.forEach(s=>servicesContainer.insertAdjacentHTML('beforeend',`
-    <div class="service-card">
-      <div class="svc-row"><span class="svc-name">${s.name}</span><span class="svc-price">${s.price}</span></div>
-      <div class="service-meta">${s.points} points <a href="#" class="book-link" onclick="alert('Booking flow coming soon!')">Book Now</a></div>
-      <p class="service-desc">${s.desc}</p>
-    </div>`));
+/* ---- Services ---- */
+const services=[{name:"Haircut",price:"$25",desc:"Classic cut & style",points:30},{name:"Hair Coloring",price:"$60",desc:"Full colour service",points:70},{name:"Beard Trim",price:"$15",desc:"Shape & line-up",points:20},{name:"Facial",price:"$40",desc:"Deep cleansing facial",points:45},{name:"Manicure",price:"$22",desc:"Clean & polish nails",points:28},{name:"Pedicure",price:"$28",desc:"Spa pedicure treatment",points:34},{name:"Make-up",price:"$55",desc:"Event/party glam look",points:65},{name:"Blow-dry",price:"$18",desc:"Quick styling session",points:22},{name:"Hair Spa",price:"$50",desc:"Nourishing mask therapy",points:60},{name:"Nail Art",price:"$30",desc:"Creative nail designs",points:35}];
+const sc=document.getElementById('servicesContainer');
+services.forEach(s=>sc.insertAdjacentHTML('beforeend',`
+  <div class="service-card">
+    <p class="svc-name">${s.name}</p>
+    <p class="svc-desc">${s.desc}</p>
+    <p class="svc-points">${s.points} points</p>
+    <p class="svc-price">${s.price}</p>
+    <a href="#" class="book-link" onclick="alert('Booking flow coming soon!')">Book Now</a>
+  </div>`));
 
+/* ---- Auth ---- */
 auth.onAuthStateChanged(u=>{
   if(!u){location.href='index.html';return;}
   profileIcon.textContent=(u.displayName||'U')[0].toUpperCase();
@@ -204,23 +171,17 @@ auth.onAuthStateChanged(u=>{
   displayNameIn.value=u.displayName||''; emailIn.value=u.email||''; phoneIn.value=localStorage.getItem('phone_'+u.uid)||'';
 });
 
+/* ---- Sheet ---- */
 profileIcon.onclick=()=>sheet.classList.add('open'); closeSheetX.onclick=()=>sheet.classList.remove('open');
-saveBtn.onclick=async()=>{
-  const u=auth.currentUser;if(!u)return;
-  try{
-    if(displayNameIn.value!==u.displayName)await u.updateProfile({displayName:displayNameIn.value});
-    if(emailIn.value!==u.email)await u.updateEmail(emailIn.value);
-    localStorage.setItem('phone_'+u.uid,phoneIn.value); alert('Saved!'); sheet.classList.remove('open');
-    welcomeMsg.textContent=`Hello ${(displayNameIn.value||'there')}, you're all set – ready to book your next session?`;
-    profileIcon.textContent=(displayNameIn.value||'U')[0].toUpperCase();
-  }catch(e){alert(e.message);}
-};
+saveBtn.onclick=async()=>{const u=auth.currentUser;if(!u)return;try{if(displayNameIn.value!==u.displayName)await u.updateProfile({displayName:displayNameIn.value});if(emailIn.value!==u.email)await u.updateEmail(emailIn.value);localStorage.setItem('phone_'+u.uid,phoneIn.value);alert('Saved!');sheet.classList.remove('open');welcomeMsg.textContent=`Hello ${(displayNameIn.value||'there')}, you're all set – ready to book your next session?`;profileIcon.textContent=(displayNameIn.value||'U')[0].toUpperCase();}catch(e){alert(e.message);}};
 
+/* ---- Reset ---- */
 resetPwdLink.onclick=e=>{e.preventDefault();resetBox.style.display='block';resetEmailIn.value=emailIn.value;};
 sendResetBtn.onclick=async()=>{try{await auth.sendPasswordResetEmail(resetEmailIn.value.trim());alert('Reset e-mail sent!');resetBox.style.display='none';}catch(e){alert(e.message);}};
 
+/* ---- Utils ---- */
 function signOut(){auth.signOut().then(()=>location.href='index.html');}
-function scrollByTrack(id,d){const el=document.getElementById(id),c=el.firstElementChild;if(!c)return;el.scrollBy({left:d*(c.getBoundingClientRect().width+14),behavior:'smooth'});}
+function scrollByTrack(id,d){const el=document.getElementById(id);if(!el)return;const wd=el.firstElementChild.getBoundingClientRect().width+14;el.scrollBy({left:d*wd,behavior:'smooth'});}
 function scrollToTop(){window.scrollTo({top:0,behavior:'smooth'});}
 </script>
 </body>
