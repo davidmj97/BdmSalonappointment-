@@ -79,7 +79,6 @@
       measurementId: "G-Q0FVZRVS64"
     };
     firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
 
     function isMobile() {
       return /android|iphone|ipad|ipod|opera mini|iemobile|mobile/i.test(navigator.userAgent);
@@ -88,17 +87,17 @@
     function signInWithGoogle() {
       const provider = new firebase.auth.GoogleAuthProvider();
       if (isMobile()) {
-        auth.signInWithRedirect(provider)
+        firebase.auth().signInWithRedirect(provider)
           .catch(error => {
             alert("Google Sign-in Error: " + error.message +
               "\nTip: On Chrome, make sure cookies are enabled and browser is updated.");
           });
       } else {
-        auth.signInWithPopup(provider)
+        firebase.auth().signInWithPopup(provider)
           .then(() => {
             setTimeout(() => {
               window.location.href = 'customer-dashboard.html';
-            }, 200);
+            }, 150);
           })
           .catch(error => {
             alert("Google Sign-in Error: " + error.message);
@@ -106,23 +105,25 @@
       }
     }
 
-    // Always handle redirect result FIRST, then setup onAuthStateChanged!
+    // --- ONLY RUN onAuthStateChanged AFTER getRedirectResult ---
     firebase.auth().getRedirectResult().then(result => {
-      if (result.user) {
+      if (result && result.user) {
+        // User just signed in with redirect (mobile), go to dashboard
         setTimeout(() => {
           window.location.href = 'customer-dashboard.html';
-        }, 200);
-        return; // Don't continue to onAuthStateChanged
+        }, 150);
+        return;
       }
-
-      // Now safe to listen to auth state
-      auth.onAuthStateChanged(function(user) {
+      // Now, and ONLY now, set up auth state watcher
+      firebase.auth().onAuthStateChanged(user => {
         if (user && !window.location.pathname.endsWith('customer-dashboard.html')) {
           setTimeout(() => {
             window.location.href = 'customer-dashboard.html';
-          }, 200);
+          }, 150);
         }
       });
+    }).catch(error => {
+      alert("Google Auth Error: " + error.message);
     });
   </script>
 </body>
