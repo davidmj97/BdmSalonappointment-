@@ -5,11 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Login – BDM Salon Booking</title>
   <style>
+    /* ===== Base layout / colours ===== */
     *{margin:0;padding:0;box-sizing:border-box;font-family:'Helvetica Neue',sans-serif;}
     html,body{width:100%;height:100vh;background:#000;overflow-x:hidden;}
     .container{position:relative;width:100vw;height:100vh;}
 
-    /* Top black area / back arrow */
+    /* Top black header + back arrow */
     .top-section{width:100%;height:30vh;background:#000;position:relative;z-index:1;}
     .top-bar{width:100%;height:50px;display:flex;align-items:center;padding-left:12px;}
     .back-arrow{width:24px;height:24px;cursor:pointer;fill:#fff;}
@@ -23,24 +24,31 @@
     }
     .white-box h1{font-size:20px;margin-bottom:10px;color:#000;text-align:center;}
 
-    /* Form */
+    /* Forms */
     form{width:100%;max-width:320px;display:flex;flex-direction:column;gap:16px;margin-top:20px;}
     input[type=email],input[type=password]{
       padding:12px;font-size:15px;border:1.5px solid #ccc;border-radius:8px;outline-offset:2px;transition:border-color .3s;
     }
     input:focus{border-color:#000;}
-    button{padding:14px;background:#000;color:#fff;font-size:15px;border:none;border-radius:8px;cursor:pointer;transition:background-color .3s;}
+    button{
+      padding:14px;background:#000;color:#fff;font-size:15px;border:none;border-radius:8px;
+      cursor:pointer;transition:background-color .3s;
+    }
     button:hover{background:#222;}
 
     .info-text{font-size:14px;color:#444;text-align:center;margin-top:16px;}
 
-    .signup-link,.forgot-link{font-size:14px;text-align:center;margin-top:10px;color:#666;}
-    .signup-link a,.forgot-link a{color:#000;font-weight:600;text-decoration:none;}
-    .signup-link a:hover,.forgot-link a:hover{text-decoration:underline;}
+    .center-link{font-size:14px;text-align:center;margin-top:12px;color:#666;}
+    .center-link a{color:#000;font-weight:600;text-decoration:none;}
+    .center-link a:hover{text-decoration:underline;}
+
+    /* Smooth show / hide */
+    .hidden{display:none;}
   </style>
 </head>
 <body>
   <div class="container">
+    <!-- Black header -->
     <div class="top-section">
       <div class="top-bar">
         <svg class="back-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" onclick="history.back()">
@@ -49,23 +57,30 @@
       </div>
     </div>
 
+    <!-- White bottom sheet -->
     <div class="white-box">
-      <h1>Welcome Back</h1>
+      <h1 id="formTitle">Welcome Back</h1>
 
-      <form id="loginForm" autocomplete="off">
-        <input type="email"    id="email"    placeholder="Email address" required />
-        <input type="password" id="password" placeholder="Password"      required />
+      <!-- ========= Login form ========= -->
+      <form id="loginForm">
+        <input type="email"    id="loginEmail"    placeholder="Email address" required />
+        <input type="password" id="loginPassword" placeholder="Password"      required />
         <button type="submit">Log In</button>
+      </form>
+
+      <!-- ========= Password-reset form (hidden by default) ========= -->
+      <form id="resetForm" class="hidden">
+        <input type="email" id="resetEmail" placeholder="Enter your registered email" required />
+        <button type="submit">Send Reset Link</button>
+        <button type="button" id="backToLoginBtn" style="background:#666;margin-top:4px;">Back to Login</button>
       </form>
 
       <div class="info-text" id="infoText"></div>
 
-      <div class="signup-link">
-        Don’t have an account? <a href="signup.html">Sign Up</a>
-      </div>
-
-      <div class="forgot-link">
-        Forgot your password? <a href="#" id="forgotPwdLink">Reset</a>
+      <!-- Links under forms -->
+      <div id="loginLinks">
+        <div class="center-link">Don’t have an account? <a href="signup.html">Sign Up</a></div>
+        <div class="center-link">Forgot your password? <a href="#" id="showResetLink">Reset</a></div>
       </div>
     </div>
   </div>
@@ -75,7 +90,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 
   <script>
-    // --- Firebase config ---
+    /* ---------- Firebase init ---------- */
     const firebaseConfig = {
       apiKey: "AIzaSyAmimDsjW_pF2NGw-w-40QzTsgmf1tdqyI",
       authDomain: "bdmsalonappointment.firebaseapp.com",
@@ -88,14 +103,21 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
-    // --- Log-in flow ---
-    const loginForm = document.getElementById('loginForm');
-    const infoText  = document.getElementById('infoText');
+    /* ---------- DOM refs ---------- */
+    const loginForm   = document.getElementById('loginForm');
+    const resetForm   = document.getElementById('resetForm');
+    const infoText    = document.getElementById('infoText');
+    const formTitle   = document.getElementById('formTitle');
+    const loginLinks  = document.getElementById('loginLinks');
 
+    const showResetLink   = document.getElementById('showResetLink');
+    const backToLoginBtn  = document.getElementById('backToLoginBtn');
+
+    /* ---------- Login flow ---------- */
     loginForm.addEventListener('submit', async e => {
       e.preventDefault();
-      const email    = loginForm.email.value.trim();
-      const password = loginForm.password.value;
+      const email    = loginForm.loginEmail.value.trim();
+      const password = loginForm.loginPassword.value;
       infoText.textContent = '';
 
       try {
@@ -111,15 +133,35 @@
       }
     });
 
-    // --- Password-reset flow ---
-    document.getElementById('forgotPwdLink').addEventListener('click', async e => {
+    /* ---------- Show reset form ---------- */
+    showResetLink.addEventListener('click', e => {
       e.preventDefault();
-      const email = prompt('Enter the e-mail address you used to register:');
+      loginForm.classList.add('hidden');
+      loginLinks.classList.add('hidden');
+      resetForm.classList.remove('hidden');
+      formTitle.textContent = 'Reset Password';
+      infoText.textContent  = '';
+    });
+
+    /* ---------- Back to login ---------- */
+    backToLoginBtn.addEventListener('click', () => {
+      resetForm.classList.add('hidden');
+      loginForm.classList.remove('hidden');
+      loginLinks.classList.remove('hidden');
+      formTitle.textContent = 'Welcome Back';
+      infoText.textContent  = '';
+    });
+
+    /* ---------- Password-reset flow ---------- */
+    resetForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      const email = resetForm.resetEmail.value.trim();
       if (!email) return;
 
       try {
-        await auth.sendPasswordResetEmail(email.trim());
-        alert('Password-reset link sent! Check your inbox.');
+        await auth.sendPasswordResetEmail(email);
+        infoText.textContent = 'Reset link sent! Check your inbox.';
+        resetForm.reset();
       } catch (err) {
         alert('Error: ' + err.message);
       }
