@@ -1,213 +1,212 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Customer Dashboard - BDM Salon Booking</title>
-  <style>
-    :root {
-      --bg: #000;
-      --fg: #fff;
-      --grey: #222;
-      --accent: #fff;
-    }
-    html, body {
-      margin: 0; padding: 0;
-      width: 100vw; min-height: 100vh;
-      background: var(--bg); color: var(--fg);
-      font-family: 'Helvetica Neue', Arial, sans-serif;
-      overscroll-behavior: none;
-      -webkit-tap-highlight-color: transparent;
-    }
-    body {
-      display: flex; flex-direction: column; min-height: 100vh;
-    }
-    .dashboard-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 18px 18px 12px 18px;
-      background: var(--bg);
-    }
-    .user-name {
-      font-size: 19px;
-      font-weight: 600;
-      color: var(--fg);
-      letter-spacing: 0.5px;
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 60vw;
-    }
-    .profile-icon {
-      width: 38px; height: 38px; border-radius: 50%;
-      background: var(--fg); color: var(--bg);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 20px; font-weight: 700;
-      box-shadow: 0 1px 8px #0003;
-      cursor: pointer; user-select: none;
-    }
-    .main-content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      justify-content: flex-start;
-      background: var(--bg);
-      padding: 8px 0 60px 0;
-    }
-    .menu-bar {
-      position: fixed;
-      bottom: 0; left: 0; right: 0;
-      background: var(--bg);
-      border-top: 1px solid #fff2;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      height: 62px;
-      z-index: 100;
-    }
-    .menu-btn {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 7px 0 4px 0;
-      border: none;
-      background: none;
-      color: var(--fg);
-      font-size: 13px;
-      font-weight: 500;
-      gap: 2px;
-      opacity: 0.85;
-      cursor: pointer;
-      transition: opacity 0.2s;
-    }
-    .menu-btn.active { opacity: 1; color: var(--accent);}
-    .icon {
-      width: 23px; height: 23px;
-      display: block; margin-bottom: 3px;
-      stroke: var(--fg); fill: none;
-    }
-    .menu-label { font-size: 12px; }
-    .home-panel, .bookings-panel, .about-panel {
-      display: none;
-      padding: 26px 16px 0 16px;
-      min-height: 70vh;
-    }
-    .panel-active { display: block; }
-    .book-btn {
-      width: 100%; max-width: 360px;
-      margin: 36px auto 0 auto; display: block;
-      background: var(--fg); color: var(--bg);
-      border: none; border-radius: 12px;
-      font-size: 19px; font-weight: 600;
-      padding: 16px 0; letter-spacing: 1px;
-      box-shadow: 0 2px 8px #2227;
-      cursor: pointer; transition: background .18s, color .18s;
-    }
-    .book-btn:active { background: #ddd; color: #111; }
-    @media (min-width: 600px) {
-      .dashboard-header, .main-content, .menu-bar {
-        max-width: 430px; margin: 0 auto;
-      }
-    }
-    /* Hide scrollbars on mobile */
-    ::-webkit-scrollbar { display: none; }
-    body { -ms-overflow-style: none; scrollbar-width: none; }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Customer Dashboard – BDM Salon Booking</title>
+<style>
+  :root{--bg:#000;--fg:#fff;--grey:#222;--accent:#fff;}
+  html,body{margin:0;padding:0;width:100%;min-height:100vh;background:var(--bg);color:var(--fg);font-family:'Helvetica Neue',Arial,sans-serif;}
+  body{display:flex;flex-direction:column;}
+
+  /* ===== HEADER ===== */
+  .dashboard-header{display:flex;align-items:center;justify-content:space-between;padding:18px;background:var(--bg);}
+  .user-name{font-size:19px;font-weight:600;max-width:60vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .profile-icon{position:relative;width:38px;height:38px;border-radius:50%;background:var(--fg);color:var(--bg);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;cursor:pointer;box-shadow:0 1px 8px #0003;}
+  .profile-icon::after{content:'✎';position:absolute;top:-4px;right:-4px;width:16px;height:16px;border-radius:50%;background:var(--accent);color:var(--bg);font-size:10px;display:flex;align-items:center;justify-content:center;border:1px solid var(--bg);}
+
+  /* ===== MAIN PANELS ===== */
+  .main-content{flex:1;display:flex;flex-direction:column;padding:8px 0 60px;}
+  .home-panel,.bookings-panel,.about-panel{display:none;padding:26px 16px 0;min-height:70vh;}
+  .panel-active{display:block;}
+
+  /* home additions */
+  .welcome-msg{font-size:20px;font-weight:600;margin-top:10px;}
+  .cta-btn{width:100%;max-width:360px;margin:20px 0;background:var(--fg);color:var(--bg);border:none;border-radius:12px;font-size:17px;font-weight:600;padding:14px 0;cursor:pointer;}
+  .cta-btn:active{background:#ddd;color:#111;}
+  .card{width:100%;max-width:360px;margin:14px 0;background:#111;color:#fff;padding:14px 16px;border-radius:12px;font-size:14px;}
+  .section-title{font-size:16px;font-weight:600;margin:26px 0 8px;}
+  .gallery{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;}
+  .gallery img{width:160px;height:120px;object-fit:cover;border-radius:10px;flex-shrink:0;}
+
+  /* ===== MENU BAR ===== */
+  .menu-bar{position:fixed;bottom:0;left:0;right:0;height:62px;background:var(--bg);border-top:1px solid #fff2;display:flex;justify-content:space-around;z-index:80;}
+  .menu-btn{flex:1;display:flex;flex-direction:column;align-items:center;padding:7px 0 4px;border:none;background:none;color:var(--fg);font-size:13px;font-weight:500;gap:2px;opacity:.85;cursor:pointer;}
+  .menu-btn.active{opacity:1;color:var(--accent);}
+  .icon{width:23px;height:23px;stroke:var(--fg);fill:none;}
+  .menu-label{font-size:12px;}
+
+  /* ===== ACCOUNT SHEET (unchanged) ===== */
+  .sheet{position:fixed;left:0;right:0;bottom:-100%;background:#fff;color:#000;border-top-left-radius:20px;border-top-right-radius:20px;box-shadow:0 -4px 20px #0005;padding:24px 20px 40px;transition:bottom .35s ease;z-index:100;max-height:90vh;overflow-y:auto;}
+  .sheet.open{bottom:0;}
+  .sheet h2{font-size:18px;margin-bottom:18px;text-align:center;}
+  .sheet form{display:flex;flex-direction:column;gap:14px;}
+  .sheet label{font-size:14px;font-weight:600;}
+  .sheet input{padding:12px;font-size:15px;border:1.5px solid #ccc;border-radius:8px;}
+  .sheet button{padding:14px;font-size:15px;border:none;border-radius:8px;cursor:pointer;}
+  .primary-btn{background:#000;color:#fff;}
+  .secondary-btn{background:#666;color:#fff;}
+  .signout-btn{background:#111;color:#fff;margin-top:26px;}
+
+  /* ===== Desktop centre column ===== */
+  @media(min-width:700px){
+    .dashboard-header,.main-content,.menu-bar{max-width:430px;margin:0 auto;}
+    .sheet{left:50%;transform:translateX(-50%);right:auto;width:400px;border-radius:20px;bottom:-100%;}
+  }
+
+  /* hide scrollbars mobile */
+  ::-webkit-scrollbar{display:none;}body{-ms-overflow-style:none;scrollbar-width:none;}
+</style>
 </head>
 <body>
+  <!-- ===== Header ===== -->
   <div class="dashboard-header">
     <div class="user-name" id="userName">User</div>
     <div class="profile-icon" id="profileIcon" title="Account"></div>
   </div>
+
+  <!-- ===== Main area ===== -->
   <div class="main-content">
+    <!-- HOME -->
     <div class="home-panel panel-active" id="homePanel">
-      <button class="book-btn" onclick="alert('Booking flow coming soon!')">
-        BOOK APPOINTMENT
-      </button>
+      <h2 class="welcome-msg" id="welcomeMsg"></h2>
+      <button class="cta-btn" onclick="alert('Booking flow coming soon!')">Book Now</button>
+
+      <div class="card loyalty-card" id="loyaltyCard">Loading points…</div>
+
+      <h3 class="section-title">Get Inspired</h3>
+      <div class="gallery">
+        <img src="https://images.pexels.com/photos/705255/pexels-photo-705255.jpeg"  alt="Hairstyle inspiration">
+        <img src="https://images.pexels.com/photos/3992875/pexels-photo-3992875.jpeg" alt="Make-up inspiration">
+      </div>
     </div>
+
+    <!-- BOOKINGS -->
     <div class="bookings-panel" id="bookingsPanel">
       <h2 style="font-size:17px;font-weight:600;margin-bottom:18px;">Your Bookings</h2>
       <p style="color:#aaa;font-size:15px;">No bookings yet. Book your first appointment!</p>
     </div>
+
+    <!-- ABOUT -->
     <div class="about-panel" id="aboutPanel">
       <h2 style="font-size:17px;font-weight:600;margin-bottom:18px;">About Us</h2>
-      <p style="color:#aaa;font-size:15px;">
-        BDM Salon Booking: Your style, our passion.<br/>
-        Book a luxury grooming experience at your fingertips.<br/><br/>
-        <span style="font-size:13px;color:#555;">Version 1.0</span>
-      </p>
-      <button class="book-btn" style="background:#111;color:#fff;margin-top:28px;font-size:15px;" onclick="signOut()">Sign Out</button>
+      <p style="color:#aaa;font-size:15px;">BDM Salon Booking: Your style, our passion.<br/>Book a luxury grooming experience at your fingertips.</p>
+      <span style="font-size:13px;color:#555;">Version 1.0</span>
     </div>
   </div>
+
+  <!-- ===== Bottom nav ===== -->
   <nav class="menu-bar">
-    <button class="menu-btn active" id="btnHome" onclick="showPanel('home')">
-      <svg class="icon" viewBox="0 0 24 24"><path d="M4 12L12 5l8 7" stroke-width="2"/><path d="M4 12v7a1 1 0 0 0 1 1h4m6 0h4a1 1 0 0 0 1-1v-7" stroke-width="2"/><path d="M9 21V12h6v9" stroke-width="2"/></svg>
+    <button class="menu-btn active" id="btnHome"     onclick="showPanel('home')">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M4 12 12 5l8 7" stroke-width="2"/><path d="M4 12v7a1 1 0 0 0 1 1h4m6 0h4a1 1 0 0 0 1-1v-7" stroke-width="2"/><path d="M9 21V12h6v9" stroke-width="2"/></svg>
       <span class="menu-label">Home</span>
     </button>
-    <button class="menu-btn" id="btnBookings" onclick="showPanel('bookings')">
+    <button class="menu-btn"        id="btnBookings" onclick="showPanel('bookings')">
       <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2" stroke-width="2"/><path d="M16 3v4M8 3v4M3 11h18" stroke-width="2"/></svg>
       <span class="menu-label">Bookings</span>
     </button>
-    <button class="menu-btn" id="btnAbout" onclick="showPanel('about')">
-      <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 16v-4" stroke-width="2"/><circle cx="12" cy="8" r="1" stroke-width="2" fill="var(--fg)"/></svg>
+    <button class="menu-btn"        id="btnAbout"    onclick="showPanel('about')">
+      <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 16v-4" stroke-width="2"/><circle cx="12" cy="8" r="1" stroke-width="2" fill="#fff"/></svg>
       <span class="menu-label">About Us</span>
     </button>
   </nav>
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyAmimDsjW_pF2NGw-w-40QzTsgmf1tdqyI",
-      authDomain: "bdmsalonappointment.firebaseapp.com",
-      projectId: "bdmsalonappointment",
-      storageBucket: "bdmsalonappointment.appspot.com",
-      messagingSenderId: "123933913893",
-      appId: "1:123933913893:web:c1f57caf4dc2a5440ba0cc",
-      measurementId: "G-Q0FVZRVS64"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
 
-    // Show user info or redirect to login
-    auth.onAuthStateChanged(function(user) {
-      if (user) {
-        document.getElementById('userName').textContent = user.displayName || "User";
-        let letter = user.displayName ? user.displayName.trim()[0].toUpperCase() : "U";
-        document.getElementById('profileIcon').textContent = letter;
-      } else {
-        window.location.href = 'index.html';
-      }
-    });
+  <!-- ===== Account sheet (same as before) ===== -->
+  <div class="sheet" id="accountSheet">
+    <h2>Account</h2>
+    <form id="profileForm">
+      <div><label>Name</label>   <input type="text"     id="displayName" placeholder="Full name"></div>
+      <div><label>Phone</label>  <input type="tel"      id="phone"       placeholder="Phone number"></div>
+      <div><label>E-mail</label> <input type="email"    id="email"       placeholder="example@mail.com"></div>
+      <div><label>New Password</label><input type="password" id="password"    placeholder="Leave blank to keep current"></div>
+      <button type="submit" class="primary-btn">Save Changes</button>
+      <button type="button" class="secondary-btn" id="closeSheetBtn">Close</button>
+    </form>
+    <button class="signout-btn" onclick="signOut()">Sign Out</button>
+  </div>
 
-    function signOut() {
-      auth.signOut().then(() => {
-        window.location.href = 'index.html';
-      });
-    }
+<!-- ===== Firebase ===== -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script>
+/* --- Firebase init --- */
+const cfg={apiKey:"AIzaSyAmimDsjW_pF2NGw-w-40QzTsgmf1tdqyI",authDomain:"bdmsalonappointment.firebaseapp.com",projectId:"bdmsalonappointment",storageBucket:"bdmsalonappointment.appspot.com",messagingSenderId:"123933913893",appId:"1:123933913893:web:c1f57caf4dc2a5440ba0cc"};
+firebase.initializeApp(cfg);
+const auth=firebase.auth();
 
-    // Tab navigation logic
-    function showPanel(panel) {
-      // Panels
-      document.getElementById('homePanel').classList.remove('panel-active');
-      document.getElementById('bookingsPanel').classList.remove('panel-active');
-      document.getElementById('aboutPanel').classList.remove('panel-active');
-      // Menu buttons
-      document.getElementById('btnHome').classList.remove('active');
-      document.getElementById('btnBookings').classList.remove('active');
-      document.getElementById('btnAbout').classList.remove('active');
-      // Show selected
-      if (panel === 'home') {
-        document.getElementById('homePanel').classList.add('panel-active');
-        document.getElementById('btnHome').classList.add('active');
-      } else if (panel === 'bookings') {
-        document.getElementById('bookingsPanel').classList.add('panel-active');
-        document.getElementById('btnBookings').classList.add('active');
-      } else if (panel === 'about') {
-        document.getElementById('aboutPanel').classList.add('panel-active');
-        document.getElementById('btnAbout').classList.add('active');
-      }
-    }
-  </script>
+/* --- DOM refs --- */
+const userNameEl     = document.getElementById('userName');
+const profileIconEl  = document.getElementById('profileIcon');
+const welcomeMsgEl   = document.getElementById('welcomeMsg');
+const loyaltyCardEl  = document.getElementById('loyaltyCard');
+const sheet          = document.getElementById('accountSheet');
+const displayNameInp = document.getElementById('displayName');
+const phoneInp       = document.getElementById('phone');
+const emailInp       = document.getElementById('email');
+const pwdInp         = document.getElementById('password');
+const profileForm    = document.getElementById('profileForm');
+const closeSheetBtn  = document.getElementById('closeSheetBtn');
+
+/* --- Auth state --- */
+auth.onAuthStateChanged(user=>{
+  if(!user){location.href='index.html';return;}
+  fillProfile(user);
+});
+
+function fillProfile(user){
+  userNameEl.textContent = user.displayName || 'User';
+  profileIconEl.textContent = (user.displayName||'U')[0].toUpperCase();
+
+  welcomeMsgEl.textContent = `Hi ${(user.displayName || 'there')}, ready for your next beauty session?`;
+
+  const points = 120;                       // placeholder demo value
+  loyaltyCardEl.textContent = `You have ${points} points – ${Math.max(0,150-points)} points away from a free haircut!`;
+
+  /* sheet fields */
+  displayNameInp.value = user.displayName || '';
+  emailInp.value       = user.email       || '';
+  phoneInp.value       = localStorage.getItem('phone_'+user.uid) || '';
+}
+
+/* --- Sheet open/close --- */
+profileIconEl.addEventListener('click',()=>sheet.classList.add('open'));
+closeSheetBtn.addEventListener('click',()=>sheet.classList.remove('open'));
+
+/* --- Save profile --- */
+profileForm.addEventListener('submit',async e=>{
+  e.preventDefault();
+  const user=auth.currentUser; if(!user) return;
+
+  const tasks=[];
+  const newName = displayNameInp.value.trim();
+  const newPhone= phoneInp.value.trim();
+  const newEmail= emailInp.value.trim();
+  const newPwd  = pwdInp.value;
+
+  if(newName && newName!==user.displayName) tasks.push(user.updateProfile({displayName:newName}));
+  localStorage.setItem('phone_'+user.uid,newPhone);
+  if(newEmail && newEmail!==user.email)     tasks.push(user.updateEmail(newEmail));
+  if(newPwd)                                tasks.push(user.updatePassword(newPwd));
+
+  try{
+    if(tasks.length) await Promise.all(tasks);
+    alert('Profile updated!');
+    pwdInp.value='';
+    fillProfile(auth.currentUser);
+    sheet.classList.remove('open');
+  }catch(err){alert('Error: '+err.message+'\n(You may need to re-login for sensitive changes)');}
+});
+
+/* --- Sign-out --- */
+function signOut(){auth.signOut().then(()=>location.href='index.html');}
+
+/* --- Tab nav --- */
+function showPanel(p){
+  ['home','bookings','about'].forEach(id=>{
+    document.getElementById(id+'Panel').classList.toggle('panel-active',id===p);
+    document.getElementById('btn'+id.charAt(0).toUpperCase()+id.slice(1)).classList.toggle('active',id===p);
+  });
+}
+</script>
 </body>
 </html>
