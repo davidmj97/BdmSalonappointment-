@@ -112,7 +112,11 @@
       }
       // Now, and ONLY now, set up auth state watcher
       firebase.auth().onAuthStateChanged(user => {
-        if (user && !window.location.pathname.endsWith('customer-dashboard.html')) {
+        if (
+          user &&
+          !window.location.pathname.endsWith('customer-dashboard.html') &&
+          !window.location.pathname.endsWith('/customer-dashboard.html')
+        ) {
           window.location.replace('customer-dashboard.html');
         }
       });
