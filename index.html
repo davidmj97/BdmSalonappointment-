@@ -162,16 +162,44 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
+    // Utility: Detect if mobile browser
+    function isMobile() {
+      return /android|iphone|ipad|ipod|opera mini|iemobile|mobile/i.test(navigator.userAgent);
+    }
+
     function signInWithGoogle() {
       const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider)
-        .then(() => {
-          window.location.href = 'customer-dashboard.html';
-        })
-        .catch(error => {
-          alert("Google Sign-in Error: " + error.message);
-        });
+      if (isMobile()) {
+        // On mobile, use redirect
+        auth.signInWithRedirect(provider)
+          .catch(error => {
+            alert("Google Sign-in Error: " + error.message);
+          });
+      } else {
+        // On desktop, use popup
+        auth.signInWithPopup(provider)
+          .then(() => {
+            window.location.href = 'customer-dashboard.html';
+          })
+          .catch(error => {
+            alert("Google Sign-in Error: " + error.message);
+          });
+      }
     }
+
+    // After redirect, check if we have a result (on both desktop & mobile)
+    auth.getRedirectResult()
+      .then(result => {
+        if (result.user) {
+          window.location.href = 'customer-dashboard.html';
+        }
+      })
+      .catch(error => {
+        // Only show if not already handled
+        if (error && error.message) {
+          alert("Google Sign-in Error: " + error.message);
+        }
+      });
   </script>
 </body>
 </html>
