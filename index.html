@@ -162,7 +162,7 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
-    // Utility: Detect if mobile browser
+    // Detect mobile device for proper Google sign-in
     function isMobile() {
       return /android|iphone|ipad|ipod|opera mini|iemobile|mobile/i.test(navigator.userAgent);
     }
@@ -170,16 +170,19 @@
     function signInWithGoogle() {
       const provider = new firebase.auth.GoogleAuthProvider();
       if (isMobile()) {
-        // On mobile, use redirect
+        // On mobile devices, always use redirect
         auth.signInWithRedirect(provider)
           .catch(error => {
-            alert("Google Sign-in Error: " + error.message);
+            alert("Google Sign-in Error: " + error.message +
+              "\nTip: On Chrome, make sure cookies are enabled and browser is updated.");
           });
       } else {
         // On desktop, use popup
         auth.signInWithPopup(provider)
           .then(() => {
-            window.location.href = 'customer-dashboard.html';
+            setTimeout(() => {
+              window.location.href = 'customer-dashboard.html';
+            }, 200);
           })
           .catch(error => {
             alert("Google Sign-in Error: " + error.message);
@@ -187,15 +190,16 @@
       }
     }
 
-    // After redirect, check if we have a result (on both desktop & mobile)
+    // On page load, check for redirect result (for mobile Google sign-in)
     auth.getRedirectResult()
       .then(result => {
         if (result.user) {
-          window.location.href = 'customer-dashboard.html';
+          setTimeout(() => {
+            window.location.href = 'customer-dashboard.html';
+          }, 200);
         }
       })
       .catch(error => {
-        // Only show if not already handled
         if (error && error.message) {
           alert("Google Sign-in Error: " + error.message);
         }
