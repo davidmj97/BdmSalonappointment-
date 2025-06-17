@@ -69,6 +69,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script>
+    // Your Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyAmimDsjW_pF2NGw-w-40QzTsgmf1tdqyI",
       authDomain: "bdmsalonappointment.firebaseapp.com",
@@ -105,7 +106,8 @@
       }
     }
 
-    // --- ONLY RUN onAuthStateChanged AFTER getRedirectResult ---
+    // --------- THIS IS THE KEY FIX -----------
+    // Only set up onAuthStateChanged AFTER getRedirectResult resolves!
     firebase.auth().getRedirectResult().then(result => {
       if (result && result.user) {
         // User just signed in with redirect (mobile), go to dashboard
