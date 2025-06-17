@@ -69,6 +69,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script>
+    // Your Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyAmimDsjW_pF2NGw-w-40QzTsgmf1tdqyI",
       authDomain: "bdmsalonappointment.firebaseapp.com",
@@ -87,6 +88,8 @@
     function signInWithGoogle() {
       const provider = new firebase.auth.GoogleAuthProvider();
       if (isMobile()) {
+        // Add redirect URL explicitly for mobile
+        sessionStorage.setItem('postLoginRedirect', 'customer-dashboard.html');
         firebase.auth().signInWithRedirect(provider)
           .catch(error => {
             alert("Google Sign-in Error: " + error.message +
@@ -105,19 +108,33 @@
 
     // --- ONLY RUN onAuthStateChanged AFTER getRedirectResult ---
     firebase.auth().getRedirectResult().then(result => {
-      if (result && result.user) {
-        // User just signed in with redirect (mobile), go to dashboard
-        window.location.replace('customer-dashboard.html');
-        return;
-      }
-      // Now, and ONLY now, set up auth state watcher
-      firebase.auth().onAuthStateChanged(user => {
-        if (
-          user &&
+      // Check for post-login redirect (for mobile/redirect mode)
+      const postLoginRedirect = sessionStorage.getItem('postLoginRedirect');
+      if ((result && result.user) || firebase.auth().currentUser) {
+        if (postLoginRedirect) {
+          sessionStorage.removeItem('postLoginRedirect');
+          window.location.replace(postLoginRedirect);
+        } else if (
           !window.location.pathname.endsWith('customer-dashboard.html') &&
           !window.location.pathname.endsWith('/customer-dashboard.html')
         ) {
           window.location.replace('customer-dashboard.html');
+        }
+        return;
+      }
+      // Now, and ONLY now, set up auth state watcher
+      firebase.auth().onAuthStateChanged(user => {
+        if (user) {
+          const redirect = sessionStorage.getItem('postLoginRedirect');
+          if (redirect) {
+            sessionStorage.removeItem('postLoginRedirect');
+            window.location.replace(redirect);
+          } else if (
+            !window.location.pathname.endsWith('customer-dashboard.html') &&
+            !window.location.pathname.endsWith('/customer-dashboard.html')
+          ) {
+            window.location.replace('customer-dashboard.html');
+          }
         }
       });
     }).catch(error => {
