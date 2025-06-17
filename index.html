@@ -45,6 +45,15 @@
       width: 20px; height: 20px;
       filter: brightness(0) invert(1);
     }
+    .redirect-spinner {
+      margin-top: 20px;
+      font-size: 16px;
+      color: #444;
+      display: none;
+    }
+    .redirect-spinner.active {
+      display: block;
+    }
   </style>
 </head>
 <body>
@@ -62,6 +71,9 @@
           <img src="https://img.icons8.com/ios-filled/50/google-logo.png" alt="Google" />
           <span>Sign in / Sign up with Gmail</span>
         </button>
+      </div>
+      <div class="redirect-spinner" id="redirectSpinner">
+        Redirecting to your dashboard...
       </div>
     </div>
   </div>
@@ -81,6 +93,11 @@
     };
     firebase.initializeApp(firebaseConfig);
 
+    // Spinner for redirect feedback
+    function showRedirectSpinner() {
+      document.getElementById('redirectSpinner').classList.add('active');
+    }
+
     function isMobile() {
       return /android|iphone|ipad|ipod|opera mini|iemobile|mobile/i.test(navigator.userAgent);
     }
@@ -88,53 +105,38 @@
     function signInWithGoogle() {
       const provider = new firebase.auth.GoogleAuthProvider();
       if (isMobile()) {
-        // Add redirect URL explicitly for mobile
-        sessionStorage.setItem('postLoginRedirect', 'customer-dashboard.html');
+        showRedirectSpinner();
         firebase.auth().signInWithRedirect(provider)
           .catch(error => {
             alert("Google Sign-in Error: " + error.message +
               "\nTip: On Chrome, make sure cookies are enabled and browser is updated.");
+            document.getElementById('redirectSpinner').classList.remove('active');
           });
       } else {
+        showRedirectSpinner();
         firebase.auth().signInWithPopup(provider)
           .then(() => {
             window.location.replace('customer-dashboard.html');
           })
           .catch(error => {
             alert("Google Sign-in Error: " + error.message);
+            document.getElementById('redirectSpinner').classList.remove('active');
           });
       }
     }
 
     // --- ONLY RUN onAuthStateChanged AFTER getRedirectResult ---
     firebase.auth().getRedirectResult().then(result => {
-      // Check for post-login redirect (for mobile/redirect mode)
-      const postLoginRedirect = sessionStorage.getItem('postLoginRedirect');
       if ((result && result.user) || firebase.auth().currentUser) {
-        if (postLoginRedirect) {
-          sessionStorage.removeItem('postLoginRedirect');
-          window.location.replace(postLoginRedirect);
-        } else if (
-          !window.location.pathname.endsWith('customer-dashboard.html') &&
-          !window.location.pathname.endsWith('/customer-dashboard.html')
-        ) {
-          window.location.replace('customer-dashboard.html');
-        }
+        showRedirectSpinner();
+        window.location.replace('customer-dashboard.html');
         return;
       }
       // Now, and ONLY now, set up auth state watcher
       firebase.auth().onAuthStateChanged(user => {
-        if (user) {
-          const redirect = sessionStorage.getItem('postLoginRedirect');
-          if (redirect) {
-            sessionStorage.removeItem('postLoginRedirect');
-            window.location.replace(redirect);
-          } else if (
-            !window.location.pathname.endsWith('customer-dashboard.html') &&
-            !window.location.pathname.endsWith('/customer-dashboard.html')
-          ) {
-            window.location.replace('customer-dashboard.html');
-          }
+        if (user && !window.location.pathname.endsWith('customer-dashboard.html') && !window.location.pathname.endsWith('/customer-dashboard.html')) {
+          showRedirectSpinner();
+          window.location.replace('customer-dashboard.html');
         }
       });
     }).catch(error => {
