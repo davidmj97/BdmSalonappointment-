@@ -99,7 +99,7 @@ body{display:flex;flex-direction:column}   ::-webkit-scrollbar{display:none}
 <!-- MAIN -->
 <main class="main">
   <div class="welcome" id="welcomeMsg"></div>
-  <button class="cta-btn" onclick="alert('Booking flow coming soon!')">Book Now</button>
+<a href="booknow.html" class="cta-btn">Book Now</a>
 
   <!-- SERVICES -->
   <h3 class="services-title">Top Services</h3>
@@ -235,7 +235,7 @@ services.forEach(s=>servicesTrack.insertAdjacentHTML('beforeend',`
     </div>
     <div class="svc-right">
       <p class="svc-price">${s.price}</p>
-      <a href="#" class="book-link" onclick="alert('Booking flow coming soon!')">Book Now</a>
+<a href="booknow.html" class="book-link">Book Now</a>
     </div>
   </div>`));
 
