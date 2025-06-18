@@ -37,7 +37,7 @@ body{display:flex;flex-direction:column}   ::-webkit-scrollbar{display:none}
 .svc-points{font-size:11px;color:#ccc;margin-top:6px}
 .svc-right{display:flex;flex-direction:column;align-items:flex-end}
 .svc-price{font-size:25px;font-weight:800;color:var(--accent);margin:0}
-.book-link{font-size:12px;font-weight:700;color:var(--accent);text-decoration:none;margin-top:26px}  /* lowered vertically */
+.book-link{font-size:12px;font-weight:700;color:var(--accent);text-decoration:none;margin-top:29px}  /* lowered vertically */
 .book-link:hover{text-decoration:underline}
 
 /* ARROWS */
@@ -243,7 +243,7 @@ services.forEach(s=>servicesTrack.insertAdjacentHTML('beforeend',`
 auth.onAuthStateChanged(u=>{
   if(!u){location.href='index.html';return;}
   profileIcon.textContent=(u.displayName||'U')[0].toUpperCase();
-  welcomeMsg.textContent=`Hello ${(u.displayName||'there')}, ready to book?`;
+  welcomeMsg.textContent=`Hello ${(u.displayName||'there')}, you're all set – ready to book your next session?`;
   pointsBadge.textContent="120 points";
   displayNameIn.value=u.displayName||''; emailIn.value=u.email||''; phoneIn.value=localStorage.getItem('phone_'+u.uid)||'';
 });
