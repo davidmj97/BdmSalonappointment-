@@ -8,7 +8,7 @@
 :root {
   --bg: #000;
   --fg: #fff;
-  --accent: #ffcf33;
+  --accent: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
   --border-color: #444;
 }
 
@@ -34,7 +34,7 @@ body {
   padding: 16px 24px;
   background: #111;
   border-radius: 12px;
-  margin: 16px;
+  margin: 24px 16px 16px;
   position: relative;
 }
 
@@ -67,7 +67,7 @@ body {
 .progress-step.completed .step-number {
   background: var(--accent);
   border-color: var(--accent);
-  color: #000;
+  color: #fff;
 }
 
 .progress-step.active,
@@ -75,18 +75,27 @@ body {
   color: var(--accent);
 }
 
-/* Responsive adjustments */
+/* Mobile Progress Tracker */
 @media (max-width: 900px) {
   .progress-bar {
     padding: 12px 16px;
-    margin: 12px;
-    flex-wrap: wrap;
-    gap: 8px;
+    margin: 16px 8px 12px;
+    gap: 12px;
   }
   
   .progress-step {
-    flex: 0 1 48%; /* Two items per row on mobile */
+    flex: 0 1 48%;
     font-size: 10px;
+  }
+  
+  .progress-step.completed {
+    font-size: 12px;
+    flex: 0 1 24%;
+  }
+  
+  .progress-step:not(.completed) {
+    font-size: 8px;
+    flex: 0 1 16%;
   }
   
   .step-number {
@@ -123,7 +132,10 @@ body {
 
 .next-btn {
   background: var(--accent);
-  color: #000;
+  color: #fff;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .btn-prev:disabled,
@@ -159,14 +171,15 @@ body {
 .service-card {
   background: #111;
   border-radius: 10px;
-  padding: 20px;
+  padding: 18px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
   border: 2px solid transparent;
   transition: all 0.3s ease;
   cursor: pointer;
   position: relative;
+  margin-top: 16px;
 }
 
 .service-card:hover {
@@ -179,13 +192,13 @@ body {
 }
 
 .service-name {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   margin: 0;
 }
 
 .service-desc {
-  font-size: 14px;
+  font-size: 12px;
   color: #ccc;
   line-height: 1.4;
   margin: 0;
@@ -194,22 +207,25 @@ body {
 /* Price Position */
 .service-price {
   position: absolute;
-  bottom: 20px;
-  right: 20px;
+  bottom: 18px;
+  right: 18px;
   font-size: 24px;
   font-weight: 800;
   color: var(--accent);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 /* Info Container */
 .service-info {
-  display: flex;
-  gap: 20px;
+    display: flex;
+  gap: 16px;
   align-items: flex-end;
 }
 
 .service-points {
-  font-size: 13px;
+  font-size: 12px;
   color: #ccc;
   margin: 0;
 }
@@ -217,30 +233,31 @@ body {
 /* Mobile adjustments for service cards */
 @media (max-width: 900px) {
   .service-card {
-    padding: 16px;
+    padding: 14px;
+    margin-top: 12px;
   }
   
   .service-name {
-      font-size: 16px;
-}
-
-.service-desc {
-  font-size: 12px;
-}
-
-.service-price {
-  bottom: 16px;
-  right: 16px;
-  font-size: 20px;
-}
-
-.service-info {
-  gap: 16px;
-}
-
-.service-points {
-  font-size: 12px;
-}
+    font-size: 14px;
+  }
+  
+  .service-desc {
+    font-size: 11px;
+  }
+  
+  .service-price {
+    bottom: 14px;
+    right: 14px;
+    font-size: 22px;
+  }
+  
+  .service-info {
+    gap: 12px;
+  }
+  
+  .service-points {
+    font-size: 10px;
+  }
 }
 
 /* Hide scrollbar */
@@ -289,53 +306,73 @@ body {
   </div>
 </div>
 
+<!-- Firebase config -->
+<script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-database-compat.js"></script>
 <script>
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyAmimDsjW_pF2NGw-w-40QzTsgmf1tdqyI",
+  authDomain: "bdmsalonappointment.firebaseapp.com",
+  databaseURL: "https://bdmsalonappointment-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "bdmsalonappointment",
+  storageBucket: "bdmsalonappointment.firebasestorage.app",
+  messagingSenderId: "123933913893",
+  appId: "1:123933913893:web:c1f57caf4dc2a5440ba0cc",
+  measurementId: "G-Q0FVZRVS64"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+
 // DOM refs
 const servicesGrid = document.getElementById('servicesGrid');
 const nextBtn = document.getElementById('nextBtn');
 
 // Services data
 const services = [
-  { name: "Haircut", desc: "Classic cut & style", time: "30 min", points: 30, price: "$25" },
-  { name: "Hair Color", desc: "Full colour service", time: "60 min", points: 70, price: "$60" },
-  { name: "Beard Trim", desc: "Shape & line-up", time: "20 min", points: 20, price: "$15" },
-  { name: "Facial", desc: "Deep cleansing facial", time: "45 min", points: 45, price: "$40" },
-  { name: "Manicure", desc: "Clean & polish nails", time: "30 min", points: 28, price: "$22" },
-  { name: "Pedicure", desc: "Spa pedicure treatment", time: "40 min", points: 34, price: "$28" },
-  { name: "Make-up", desc: "Event/party glam look", time: "60 min", points: 65, price: "$55" },
-  { name: "Blow-dry", desc: "Quick styling session", time: "25 min", points: 22, price: "$18" },
-  { name: "Hair Spa", desc: "Nourishing mask therapy", time: "50 min", points: 60, price: "$50" },
-  { name: "Nail Art", desc: "Creative nail designs", time: "45 min", points: 35, price: "$30" },
-  { name: "Eyebrow Wax", desc: "Precision shaping", time: "15 min", points: 15, price: "$12" },
-  { name: "Eyelash Extension", desc: "Natural look", time: "60 min", points: 50, price: "$70" },
-  { name: "Eyebrow Tint", desc: "Enhance your brows", time: "20 min", points: 18, price: "$15" },
-  { name: "Eyelash Tint", desc: "Enhance your lashes", time: "20 min", points: 18, price: "$15" },
-  { name: "Full Body Massage", desc: "Relaxing therapy", time: "90 min", points: 80, price: "$80" }
+  { id: '1', name: "Haircut", desc: "Classic cut & style", time: "30 min", points: 30, price: "$25" },
+  { id: '2', name: "Hair Color", desc: "Full colour service", time: "60 min", points: 70, price: "$60" },
+  { id: '3', name: "Beard Trim", desc: "Shape & line-up", time: "20 min", points: 20, price: "$15" },
+  { id: '4', name: "Facial", desc: "Deep cleansing facial", time: "45 min", points: 45, price: "$40" },
+  { id: '5', name: "Manicure", desc: "Clean & polish nails", time: "30 min", points: 28, price: "$22" },
+  { id: '6', name: "Pedicure", desc: "Spa pedicure treatment", time: "40 min", points: 34, price: "$28" },
+  { id: '7', name: "Make-up", desc: "Event/party glam look", time: "60 min", points: 65, price: "$55" },
+  { id: '8', name: "Blow-dry", desc: "Quick styling session", time: "25 min", points: 22, price: "$18" },
+  { id: '9', name: "Hair Spa", desc: "Nourishing mask therapy", time: "50 min", points: 60, price: "$50" },
+  { id: '10', name: "Nail Art", desc: "Creative nail designs", time: "45 min", points: 35, price: "$30" },
+  { id: '11', name: "Eyebrow Wax", desc: "Precision shaping", time: "15 min", points: 15, price: "$12" },
+  { id: '12', name: "Eyelash Extension", desc: "Natural look", time: "60 min", points: 50, price: "$70" },
+  { id: '13', name: "Eyebrow Tint", desc: "Enhance your brows", time: "20 min", points: 18, price: "$15" },
+  { id: '14', name: "Eyelash Tint", desc: "Enhance your lashes", time: "20 min", points: 18, price: "$15" },
+  { id: '15', name: "Full Body Massage", desc: "Relaxing therapy", time: "90 min", points: 80, price: "$80" }
 ];
 
 // Selected services
 let selectedServices = [];
 
 // Initialize UI
-services.forEach(service => {
-  const card = document.createElement('div');
-  card.className = 'service-card';
-  card.innerHTML = `
-    <strong class="service-name">${service.name}</strong>
-    <p class="service-desc">${service.desc}</p>
-    <div class="service-info">
-      <span class="service-time">${service.time}</span>
-      <span class="service-points">${service.points} points</span>
-    </div>
-    <span class="service-price">${service.price}</span>
-  `;
-  card.onclick = () => toggleServiceSelection(service, card);
-  servicesGrid.appendChild(card);
-});
+function initializeUI() {
+  services.forEach(service => {
+    const card = document.createElement('div');
+    card.className = 'service-card';
+    card.innerHTML = `
+      <strong class="service-name">${service.name}</strong>
+      <p class="service-desc">${service.desc}</p>
+      <div class="service-info">
+        <span class="service-time">${service.time}</span>
+        <span class="service-points">${service.points} points</span>
+      </div>
+      <span class="service-price">${service.price}</span>
+    `;
+    card.onclick = () => toggleServiceSelection(service, card);
+    servicesGrid.appendChild(card);
+  });
+}
 
 // Toggle service selection
 function toggleServiceSelection(service, card) {
-  const index = selectedServices.findIndex(s => s.name === service.name);
+  const index = selectedServices.findIndex(s => s.id === service.id);
   if (index === -1) {
     selectedServices.push(service);
   } else {
@@ -343,7 +380,7 @@ function toggleServiceSelection(service, card) {
   }
   
   // Update card appearance
-  card.classList.toggle('selected', selectedServices.some(s => s.name === service.name));
+  card.classList.toggle('selected', selectedServices.some(s => s.id === service.id));
   
   // Enable/disable next button
   updateNextButton();
@@ -355,15 +392,25 @@ function updateNextButton() {
 }
 
 // Next button handler
-nextBtn.onclick = () => {
+nextBtn.onclick = async () => {
   if (selectedServices.length === 0) return;
   
-  // Store selected services in localStorage
-  localStorage.setItem('selectedServices', JSON.stringify(selectedServices));
+  // Create booking in Firebase
+  const bookingRef = firebase.database().ref('bookings').push();
+  
+  // Store selected services
+  await bookingRef.set({
+    services: selectedServices,
+    status: 'pending',
+    timestamp: Date.now()
+  });
   
   // Redirect to Pick Stylist page
   window.location.href = 'pick-stylist.html';
 };
+
+// Initialize the UI
+initializeUI();
 </script>
 </body>
 </html>
