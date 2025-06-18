@@ -9,7 +9,6 @@
   --bg: #000;
   --fg: #fff;
   --accent: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
-  --border-color: #444;
 }
 
 * {
@@ -23,102 +22,53 @@ body {
   background: var(--bg);
   color: var(--fg);
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
 }
 
-/* Progress Tracker */
-.progress-bar {
+/* Step Header */
+.step-header {
   display: flex;
   align-items: center;
-  padding: 16px 24px;
+  padding: 20px 15px;
   background: #111;
-  border-radius: 12px;
-  margin: 24px 16px 16px;
-  position: relative;
-}
-
-.progress-step {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  color: #ccc;
-  font-size: 11px;
-  flex: 1;
-  z-index: 2;
+  border-bottom: 2px solid #444;
 }
 
 .step-number {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
-  background: #111;
-  border: 2px solid #444;
+  background: var(--accent);
+  border: 2px solid var(--accent);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
-}
-
-.progress-step.active .step-number,
-.progress-step.completed .step-number {
-  background: var(--accent);
-  border-color: var(--accent);
   color: #fff;
+  margin-right: 10px;
 }
 
-.progress-step.active,
-.progress-step.completed {
+.step-title {
+  font-size: 16px;
+  font-weight: 700;
   color: var(--accent);
-}
-
-/* Mobile Progress Tracker */
-@media (max-width: 900px) {
-  .progress-bar {
-    padding: 12px 16px;
-    margin: 16px 8px 12px;
-    gap: 12px;
-  }
-  
-  .progress-step {
-    flex: 0 1 48%;
-    font-size: 10px;
-  }
-  
-  .progress-step.completed {
-    font-size: 12px;
-    flex: 0 1 24%;
-  }
-  
-  .progress-step:not(.completed) {
-    font-size: 8px;
-    flex: 0 1 16%;
-  }
-  
-  .step-number {
-    width: 24px;
-    height: 24px;
-    font-size: 11px;
-  }
 }
 
 /* Navigation Buttons */
 .btn-container {
   display: flex;
-  gap: 16px;
-  margin: 16px 0;
-  padding: 0 16px;
+  gap: 15px;
+  padding: 15px;
+  background: #111;
+  border-bottom: 2px solid #444;
 }
 
 .btn-prev,
 .next-btn {
   flex: 1;
-  padding: 12px 24px;
+  padding: 10px 20px;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -133,9 +83,6 @@ body {
 .next-btn {
   background: var(--accent);
   color: #fff;
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
 }
 
 .btn-prev:disabled,
@@ -144,42 +91,21 @@ body {
   cursor: not-allowed;
 }
 
-/* Main Container */
-.container {
-  flex: 1;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Services Grid */
+/* Services Container */
 .services-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  overflow-y: auto;
-}
-
-.services-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 16px;
+  padding: 15px;
 }
 
 /* Service Card */
 .service-card {
   background: #111;
-  border-radius: 10px;
-  padding: 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 15px;
   border: 2px solid transparent;
   transition: all 0.3s ease;
   cursor: pointer;
   position: relative;
-  margin-top: 16px;
 }
 
 .service-card:hover {
@@ -192,7 +118,7 @@ body {
 }
 
 .service-name {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
   margin: 0;
 }
@@ -200,95 +126,45 @@ body {
 .service-desc {
   font-size: 12px;
   color: #ccc;
-  line-height: 1.4;
-  margin: 0;
+  margin: 5px 0 10px;
 }
 
-/* Price Position */
+.service-info {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.service-time,
+.service-points {
+  font-size: 11px;
+  color: #ccc;
+}
+
 .service-price {
   position: absolute;
-  bottom: 18px;
-  right: 18px;
-  font-size: 24px;
-  font-weight: 800;
+  bottom: 15px;
+  right: 15px;
+  font-size: 20px;
+  font-weight: 700;
   color: var(--accent);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-/* Info Container */
-.service-info {
-    display: flex;
-  gap: 16px;
-  align-items: flex-end;
-}
-
-.service-points {
-  font-size: 12px;
-  color: #ccc;
-  margin: 0;
-}
-
-/* Mobile adjustments for service cards */
-@media (max-width: 900px) {
-  .service-card {
-    padding: 14px;
-    margin-top: 12px;
-  }
-  
-  .service-name {
-    font-size: 14px;
-  }
-  
-  .service-desc {
-    font-size: 11px;
-  }
-  
-  .service-price {
-    bottom: 14px;
-    right: 14px;
-    font-size: 22px;
-  }
-  
-  .service-info {
-    gap: 12px;
-  }
-  
-  .service-points {
-    font-size: 10px;
-  }
-}
-
 /* Hide scrollbar */
 ::-webkit-scrollbar {
   display: none;
+}
 </style>
 </head>
 <body>
 
-<!-- Progress Tracker -->
-<div class="progress-bar">
-  <div class="progress-step completed">
-    <div class="step-number">1</div>
-    <span>Choose Service</span>
-  </div>
-  <div class="progress-step">
-    <div class="step-number">2</div>
-    <span>Pick Stylist</span>
-  </div>
-  <div class="progress-step">
-    <div class="step-number">3</div>
-    <span>Select Date & Time</span>
-  </div>
-  <div class="progress-step">
-    <div class="step-number">4</div>
-    <span>Add Details</span>
-  </div>
-  <div class="progress-step">
-    <div class="step-number">5</div>
-    <span>Confirm</span>
-  </div>
+<!-- Step Header -->
+<div class="step-header">
+  <div class="step-number">1</div>
+  <div class="step-title">Choose Service</div>
 </div>
 
 <!-- Navigation Buttons -->
@@ -297,13 +173,9 @@ body {
   <button class="next-btn" id="nextBtn" disabled>Next</button>
 </div>
 
-<!-- Main Container -->
-<div class="container">
-  <div class="services-container">
-    <div class="services-grid" id="servicesGrid">
-      <!-- Services will be inserted here via JavaScript -->
-    </div>
-  </div>
+<!-- Services Container -->
+<div class="services-container" id="servicesGrid">
+  <!-- Services will be inserted here via JavaScript -->
 </div>
 
 <!-- Firebase config -->
@@ -395,21 +267,32 @@ function updateNextButton() {
 nextBtn.onclick = async () => {
   if (selectedServices.length === 0) return;
   
-  // Create booking in Firebase
-  const bookingRef = firebase.database().ref('bookings').push();
-  
-  // Store selected services
-  await bookingRef.set({
-    services: selectedServices,
-    status: 'pending',
-    timestamp: Date.now()
-  });
+  // Store selected services in localStorage
+  localStorage.setItem('selectedServices', JSON.stringify(selectedServices));
   
   // Redirect to Pick Stylist page
   window.location.href = 'pick-stylist.html';
 };
 
-// Initialize the UI
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+
+// Load services from Firebase
+firebase.database().ref('services').once('value')
+  .then(snapshot => {
+    snapshot.forEach(childSnapshot => {
+      const service = childSnapshot.val();
+      service.id = childSnapshot.key;
+      services.push(service);
+    });
+    initializeUI();
+  })
+  .catch(error => {
+    console.error('Error loading services:', error);
+    initializeUI(); // Fallback to local services if needed
+  });
+
+// Initialize UI with local services as fallback
 initializeUI();
 </script>
 </body>
