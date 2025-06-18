@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Dashboard – BDM Salon</title>
 
-<!-- Font-Awesome (brand icons + stars) -->
+<!-- Font-Awesome for icons -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 
 <style>
@@ -35,9 +35,9 @@ body{display:flex;flex-direction:column}   ::-webkit-scrollbar{display:none}
 .svc-name{font-size:14px;font-weight:700;margin:0}
 .svc-desc{font-size:11px;color:#ccc;line-height:1.3;max-height:2.6em;overflow:hidden}
 .svc-points{font-size:11px;color:#ccc;margin-top:6px}
-.svc-right{display:flex;flex-direction:column;align-items:flex-end;justify-content:flex-start;gap:6px}
+.svc-right{display:flex;flex-direction:column;align-items:flex-end}
 .svc-price{font-size:25px;font-weight:800;color:var(--accent);margin:0}
-.book-link{font-size:12px;font-weight:700;color:var(--accent);text-decoration:none}
+.book-link{font-size:12px;font-weight:700;color:var(--accent);text-decoration:none;margin-top:14px}  /* lowered vertically */
 .book-link:hover{text-decoration:underline}
 
 /* ARROWS */
@@ -53,8 +53,13 @@ body{display:flex;flex-direction:column}   ::-webkit-scrollbar{display:none}
 .testimonial-card{min-width:240px;background:#111;border-radius:10px;padding:14px;font-size:13px;color:#fff;flex-shrink:0}
 .stars{color:var(--accent);margin-top:6px;font-size:12px}
 
-/* SPECIAL OFFERS */
+/* SPECIAL OFFERS & INFO */
 .info-card{background:#111;border-radius:12px;padding:12px;color:#fff;font-size:11px;}
+
+/* HOURS & MAP */
+.hours-card{background:#111;border-radius:12px;padding:14px;color:#fff;font-size:12px;margin-top:26px}
+.hours-card h4{margin:0 0 8px;font-size:14px}
+.map{width:100%;height:200px;border:0;border-radius:10px;margin:12px 0}
 
 /* SOCIAL */
 .social-row{display:flex;align-items:center;gap:18px;margin-top:12px}
@@ -143,6 +148,26 @@ body{display:flex;flex-direction:column}   ::-webkit-scrollbar{display:none}
     <button class="arrow right" onclick="scrollByTrack('testiTrack',1)"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6" stroke="#fff" stroke-width="2"/></svg></button>
   </div>
 
+  <!-- OPENING HOURS & LOCATION -->
+  <div class="hours-card">
+    <h4>Opening Hours</h4>
+    <p style="margin:0">Monday – Friday: <strong>09:00 AM – 07:00 PM</strong><br>
+    Saturday: <strong>Holiday</strong><br>
+    Sunday: <strong>11:00 AM – 05:00 PM</strong></p>
+
+    <h4 style="margin-top:14px;">Address</h4>
+    <p style="margin:0 0 6px;">123 Main Street, Cityville, Country</p>
+
+    <iframe class="map" loading="lazy"
+      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3153.01951861969!2d-122.40135048467774!3d37.77902677975805!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8085808c5d49fd5f%3A0xcea0e2251c06b9d1!2s123%20Main%20St%2C%20San%20Francisco%2C%20CA%2094105!5e0!3m2!1sen!2sus!4v1600000000000!5m2!1sen!2sus">
+    </iframe>
+
+    <div style="display:flex;gap:10px;">
+      <a href="https://www.google.com/maps/dir/?api=1&destination=123+Main+Street+Cityville" target="_blank" style="flex:1;text-align:center;padding:10px 0;background:var(--accent);color:#000;font-weight:700;border-radius:8px;text-decoration:none;">Google Maps</a>
+      <a href="https://maps.apple.com/?q=123+Main+Street+Cityville" target="_blank" style="flex:1;text-align:center;padding:10px 0;background:#fff;color:#000;font-weight:700;border-radius:8px;text-decoration:none;">Apple Maps</a>
+    </div>
+  </div>
+
   <!-- SOCIAL -->
   <h3 class="services-title" style="margin-top:30px;">Follow us on</h3>
   <div class="social-row">
@@ -198,7 +223,7 @@ const profileIcon=document.getElementById('profileIcon'),
       sendResetBtn=document.getElementById('sendResetBtn'),
       saveBtn=document.getElementById('saveBtn');
 
-/* Services */
+/* SERVICES */
 const services=[{name:"Haircut",price:"$25",desc:"Classic cut & style",points:30},{name:"Hair Coloring",price:"$60",desc:"Full colour service",points:70},{name:"Beard Trim",price:"$15",desc:"Shape & line-up",points:20},{name:"Facial",price:"$40",desc:"Deep cleansing facial",points:45},{name:"Manicure",price:"$22",desc:"Clean & polish nails",points:28},{name:"Pedicure",price:"$28",desc:"Spa pedicure treatment",points:34},{name:"Make-up",price:"$55",desc:"Event/party glam look",points:65},{name:"Blow-dry",price:"$18",desc:"Quick styling session",points:22},{name:"Hair Spa",price:"$50",desc:"Nourishing mask therapy",points:60},{name:"Nail Art",price:"$30",desc:"Creative nail designs",points:35}];
 const servicesTrack=document.getElementById('servicesTrack');
 services.forEach(s=>servicesTrack.insertAdjacentHTML('beforeend',`
@@ -214,16 +239,16 @@ services.forEach(s=>servicesTrack.insertAdjacentHTML('beforeend',`
     </div>
   </div>`));
 
-/* Auth */
+/* Auth state */
 auth.onAuthStateChanged(u=>{
   if(!u){location.href='index.html';return;}
   profileIcon.textContent=(u.displayName||'U')[0].toUpperCase();
-  welcomeMsg.textContent= `Hello ${(u.displayName||'there')}, you're all set – ready to book your next session?`;
+  welcomeMsg.textContent=`Hello ${(u.displayName||'there')}, ready to book?`;
   pointsBadge.textContent="120 points";
   displayNameIn.value=u.displayName||''; emailIn.value=u.email||''; phoneIn.value=localStorage.getItem('phone_'+u.uid)||'';
 });
 
-/* Sheet */
+/* Sheet interactions */
 profileIcon.onclick=()=>sheet.classList.add('open');
 closeSheetX.onclick=()=>sheet.classList.remove('open');
 saveBtn.onclick=async()=>{
