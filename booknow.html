@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Book Appointment - BDM Salon</title>
+<style>
+:root{--bg:#000;--fg:#fff;--accent:#ffcf33;}
+html,body{margin:0;padding:0;width:100%;min-height:100vh;background:var(--bg);color:var(--fg);font-family:'Helvetica Neue',Arial,sans-serif;}
+body{display:flex;flex-direction:column}   ::-webkit-scrollbar{display:none}
+
+/* Progress Bar */
+.progress-bar{display:flex;gap:12px;padding:12px 16px;background:#111;border-radius:12px;margin:16px 16px 24px;}
+.progress-step{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;color:#ccc;font-size:11px;}
+.progress-step.active{color:var(--accent)}
+.progress-step.active .step-dot{background:var(--accent)}
+.step-dot{width:12px;height:12px;border-radius:50%;background:#111;border:2px solid #ccc}
+
+/* Main Content */
+.main{flex:1;display:flex;flex-direction:column;padding:0 16px;}
+.step-header{font-size:18px;font-weight:700;margin-bottom:12px;}
+.step-desc{font-size:13px;color:#ccc;margin-bottom:24px;}
+
+/* Step 1: Services */
+.service-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;}
+.service-card{background:#111;border-radius:12px;padding:14px;color:#fff;cursor:pointer;transition:transform .2s;}
+.service-card:hover{transform:translateY(-2px);}
+.service-card.selected{background:var(--accent);color:#000;}
+.service-name{font-size:15px;font-weight:700;margin:0 0 4px;}
+.service-desc{font-size:12px;color:#ccc;margin:0 0 6px;}
+.service-details{display:flex;justify-content:space-between;font-size:12px;color:#ccc;}
+.service-time{color:var(--accent);}
+
+/* Step 2: Stylists */
+.stylist-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;}
+.stylist-card{background:#111;border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;color:#fff;cursor:pointer;transition:transform .2s;}
+.stylist-card:hover{transform:translateY(-2px);}
+.stylist-card.selected{background:var(--accent);color:#000;}
+.stylist-img{width:80px;height:80px;border-radius:50%;margin:0 auto;background:#333;}
+.stylist-name{font-size:15px;font-weight:700;text-align:center;}
+.stylist-info{font-size:12px;color:#ccc;text-align:center;}
+
+/* Step 3: Date & Time */
+.date-time{display:flex;flex-direction:column;gap:16px;}
+.date-time input{width:100%;padding:12px;border:1.2px solid #ccc;border-radius:8px;font-size:14px;}
+.date-time select{width:100%;padding:12px;border:1.2px solid #ccc;border-radius:8px;font-size:14px;}
+
+/* Step 4: Details */
+.details-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;}
+.details-card{background:#111;border-radius:12px;padding:14px;color:#fff;}
+.details-label{font-size:13px;color:#ccc;margin-bottom:4px;}
+.details-input{width:100%;padding:10px;border:1.2px solid #ccc;border-radius:6px;font-size:14px;}
+.edit-btn{width:100%;padding:12px;border:none;border-radius:8px;background:#fff;color:#000;font-size:14px;font-weight:700;margin-top:12px;cursor:pointer;}
+
+/* Step 5: Confirm */
+.confirm-section{display:flex;flex-direction:column;gap:16px;}
+.confirm-item{background:#111;border-radius:12px;padding:14px;color:#fff;display:flex;justify-content:space-between;font-size:13px;}
+.confirm-item strong{color:var(--accent);}
+
+/* Buttons */
+.btn-container{display:flex;gap:12px;margin-top:24px;padding:0 16px;}
+.btn-prev{flex:1;background:#111;color:#fff;border:none;border-radius:8px;padding:12px;font-size:14px;cursor:pointer;}
+.btn-next{flex:1;background:var(--accent);color:#000;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;}
+.btn-next.disabled{opacity:.5;cursor:not-allowed;}
+
+/* Success Screen */
+.success-screen{display:none;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;}
+.success-header{font-size:20px;font-weight:700;}
+.success-message{font-size:14px;color:#ccc;text-align:center;}
+.success-btn{width:180px;padding:14px;border-radius:10px;background:var(--accent);color:#000;font-size:15px;font-weight:700;margin-top:16px;cursor:pointer;}
+
+/* Bottom Nav */
+.menu{position:fixed;bottom:0;left:0;right:0;height:58px;background:#000;border-top:1px solid #fff2;display:flex;justify-content:space-around;z-index:80;}
+.menu-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:12px;color:#fff;opacity:.8;border:none;background:none;}
+.menu-btn.active{opacity:1;color:var(--accent);}
+.menu-btn svg{width:20px;height:20px;margin-bottom:2px;stroke:currentColor;fill:none;}
+</style>
+</head>
+<body>
+
+<!-- Progress Bar -->
+<div class="progress-bar">
+  <div class="progress-step active">
+    <div class="step-dot"></div>
+    <span>Choose Service</span>
+  </div>
+  <div class="progress-step">
+    <div class="step-dot"></div>
+    <span>Pick Stylist</span>
+  </div>
+  <div class="progress-step">
+    <div class="step-dot"></div>
+    <span>Select Date & Time</span>
+  </div>
+  <div class="progress-step">
+    <div class="step-dot"></div>
+    <span>Add Details</span>
+  </div>
+  <div class="progress-step">
+    <div class="step-dot"></div>
+    <span>Confirm</span>
+  </div>
+</div>
+
+<!-- Main Content -->
+<main class="main">
+  <!-- Step 1: Services -->
+  <div class="step-content" id="step1">
+    <h2 class="step-header">What would you like to book?</h2>
+    <p class="step-desc">Select one or more services you'd like to schedule.</p>
+    
+    <div class="service-grid" id="servicesGrid">
+      <!-- Services will be inserted here via JavaScript -->
+    </div>
+  </div>
+
+  <!-- Step 2: Stylists -->
+  <div class="step-content" id="step2" style="display:none;">
+    <h2 class="step-header">Choose your stylist</h2>
+    <p class="step-desc">Select a preferred stylist or let us assign one for you.</p>
+    
+    <div class="stylist-grid" id="stylistsGrid">
+      <!-- Stylists will be inserted here via JavaScript -->
+    </div>
+  </div>
+
+  <!-- Step 3: Date & Time -->
+  <div class="step-content" id="step3" style="display:none;">
+    <h2 class="step-header">When works best for you?</h2>
+    <p class="step-desc">Pick a date and time that fits your schedule.</p>
+    
+    <div class="date-time">
+      <input type="date" id="bookingDate" required>
+      <select id="bookingTime" required>
+        <option value="">Select time</option>
+        <option value="09:00">09:00 AM</option>
+        <option value="10:00">10:00 AM</option>
+        <option value="11:00">11:00 AM</option>
+        <option value="12:00">12:00 PM</option>
+        <option value="13:00">01:00 PM</option>
+        <option value="14:00">02:00 PM</option>
+        <option value="15:00">03:00 PM</option>
+        <option value="16:00">04:00 PM</option>
+        <option value="17:00">05:00 PM</option>
+        <option value="18:00">06:00 PM</option>
+        <option value="19:00">07:00 PM</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Step 4: Details -->
+  <div class="step-content" id="step4" style="display:none;">
+    <h2 class="step-header">Tell us about you</h2>
+    <p class="step-desc">Enter your name and contact info so we can confirm your appointment.</p>
+    
+    <div class="details-grid">
+      <div class="details-card">
+        <label class="details-label">Name</label>
+        <input type="text" id="bookingName" class="details-input">
+      </div>
+      <div class="details-card">
+        <label class="details-label">Phone Number</label>
+        <input type="tel" id="bookingPhone" class="details-input">
+      </div>
+      <div class="details-card">
+        <label class="details-label">Email</label>
+        <input type="email" id="bookingEmail" class="details-input">
+      </div>
+      <button class="edit-btn" onclick="editProfile()">Edit Profile</button>
+    </div>
+  </div>
+
+  <!-- Step 5: Confirm -->
+  <div class="step-content" id="step5" style="display:none;">
+    <h2 class="step-header">Review & Confirm</h2>
+    <p class="step-desc">Check your appointment details and tap confirm to book.</p>
+    
+    <div class="confirm-section" id="confirmSection">
+      <!-- Confirmation details will be inserted here via JavaScript -->
+    </div>
+  </div>
+
+  <!-- Success Screen -->
+  <div class="success-screen" id="successScreen">
+    <h2 class="success-header">You're all set!</h2>
+    <p class="success-message">Your appointment is confirmed. See you soon!</p>
+    <button class="success-btn" onclick="addToCalendar()">Add to Calendar</button>
+    <button class="success-btn" style="background:#111;color:#fff;margin-top:12px;" onclick="backToHome()">Back to Home</button>
+  </div>
+</main>
+
+<!-- Bottom Nav -->
+<nav class="menu">
+  <button class="menu-btn active" onclick="scrollToTop()">
+    <svg viewBox="0 0 24 24"><path d="M4 12 12 5l8 7" stroke-width="2"/><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7" stroke-width="2"/></svg>
+    Home
+  </button>
+  <button class="menu-btn" onclick="alert('Bookings coming soon!')">
+    <svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2" stroke-width="2"/><path d="M16 3v4M8 3v4M3 11h18" stroke-width="2"/></svg>
+    Bookings
+  </button>
+  <button class="menu-btn" onclick="alert('About coming soon!')">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 16v-4" stroke-width="2"/><circle cx="12" cy="8" r="1" stroke-width="2"/></svg>
+    About
+  </button>
+</nav>
+
+<script>
+// Firebase initialization
+firebase.initializeApp({apiKey:"AIzaSyAmimDsjW_pF2NGw-w-40QzTsgmf1tdqyI",authDomain:"bdmsalonappointment.firebaseapp.com",projectId:"bdmsalonappointment"});
+const auth=firebase.auth();
+const db=firebase.firestore();
+
+// DOM refs
+const servicesGrid=document.getElementById('servicesGrid');
+const stylistsGrid=document.getElementById('stylistsGrid');
+const confirmSection=document.getElementById('confirmSection');
+const successScreen=document.getElementById('successScreen');
+
+  // DOM refs for buttons
+const btnPrev = document.querySelector('.btn-prev');
+const btnNext = document.querySelector('.btn-next');
+const bookingDate = document.getElementById('bookingDate');
+const bookingTime = document.getElementById('bookingTime');
+const bookingName = document.getElementById('bookingName');
+const bookingPhone = document.getElementById('bookingPhone');
+const bookingEmail = document.getElementById('bookingEmail');
+
+// Booking data storage
+let selectedServices = [];
+let selectedStylist = null;
+let currentStep = 1;
+let userData = null;
+
+// Initialize Firebase auth state
+auth.onAuthStateChanged(async (user) => {
+  if (!user) {
+    window.location.href = 'index.html';
+    return;
+  }
+  
+  // Get user data from Firestore
+  const userDoc = await db.collection('users').doc(user.uid).get();
+  userData = userDoc.exists ? userDoc.data() : {
+    name: user.displayName || '',
+    email: user.email,
+    phone: localStorage.getItem('phone_' + user.uid) || ''
+  };
+  
+  // Pre-fill booking details
+  bookingName.value = userData.name;
+  bookingEmail.value = userData.email;
+  bookingPhone.value = userData.phone;
+});
+
+// Services data
+const services = [
+  { name: "Haircut", desc: "Classic cut & style", time: "30 min", points: 30, price: "$25" },
+  { name: "Hair Color", desc: "Full colour service", time: "60 min", points: 70, price: "$60" },
+  { name: "Beard Trim", desc: "Shape & line-up", time: "20 min", points: 20, price: "$15" },
+  { name: "Facial", desc: "Deep cleansing facial", time: "45 min", points: 45, price: "$40" },
+  { name: "Manicure", desc: "Clean & polish nails", time: "30 min", points: 28, price: "$22" },
+  { name: "Pedicure", desc: "Spa pedicure treatment", time: "40 min", points: 34, price: "$28" },
+  { name: "Make-up", desc: "Event/party glam look", time: "60 min", points: 65, price: "$55" },
+  { name: "Blow-dry", desc: "Quick styling session", time: "25 min", points: 22, price: "$18" },
+  { name: "Hair Spa", desc: "Nourishing mask therapy", time: "50 min", points: 60, price: "$50" },
+  { name: "Nail Art", desc: "Creative nail designs", time: "45 min", points: 35, price: "$30" },
+  { name: "Eyebrow Wax", desc: "Precision shaping", time: "15 min", points: 15, price: "$12" },
+  { name: "Eyelash Extension", desc: "Natural look", time: "60 min", points: 50, price: "$70" },
+  { name: "Eyebrow Tint", desc: "Enhance your brows", time: "20 min", points: 18, price: "$15" },
+  { name: "Eyelash Tint", desc: "Enhance your lashes", time: "20 min", points: 18, price: "$15" },
+  { name: "Full Body Massage", desc: "Relaxing therapy", time: "90 min", points: 80, price: "$80" }
+];
+
+// Stylists data
+const stylists = [
+  { name: "Sarah Johnson", img: "https://via.placeholder.com/80", info: "10+ years experience" },
+  { name: "Mike Thompson", img: "https://via.placeholder.com/80", info: "Specializes in hair color" },
+  { name: "Emily Chen", img: "https://via.placeholder.com/80", info: "Nail art specialist" },
+  { name: "David Lee", img: "https://via.placeholder.com/80", info: "Facial expert" },
+  { name: "Lisa Martinez", img: "https://via.placeholder.com/80", info: "Massage therapist" }
+];
+
+// Initialize UI
+function initUI() {
+  // Add services to grid
+  services.forEach(service => {
+    const card = document.createElement('div');
+    card.className = 'service-card';
+    card.innerHTML = `
+      <strong class="service-name">${service.name}</strong>
+      <p class="service-desc">${service.desc}</p>
+      <div class="service-details">
+        <span>${service.time}</span>
+        <span class="service-time">${service.points} pts</span>
+        <span>${service.price}</span>
+      </div>
+    `;
+    card.onclick = () => toggleServiceSelection(service);
+    servicesGrid.appendChild(card);
+  });
+
+  // Add stylists to grid
+  stylists.forEach(stylist => {
+    const card = document.createElement('div');
+    card.className = 'stylist-card';
+    card.innerHTML = `
+      <div class="stylist-img" style="background-image:url('${stylist.img}')"></div>
+      <strong class="stylist-name">${stylist.name}</strong>
+      <p class="stylist-info">${stylist.info}</p>
+    `;
+    card.onclick = () => selectStylist(stylist);
+    stylistsGrid.appendChild(card);
+  });
+
+  // Add button handlers
+  btnPrev.onclick = () => goToPreviousStep();
+  btnNext.onclick = () => goToNextStep();
+}
+
+// Toggle service selection
+function toggleServiceSelection(service) {
+  const index = selectedServices.findIndex(s => s.name === service.name);
+  if (index === -1) {
+    selectedServices.push(service);
+  } else {
+    selectedServices.splice(index, 1);
+  }
+  updateServiceCards();
+  updateNextButton();
+}
+
+// Update service cards appearance
+function updateServiceCards() {
+  servicesGrid.querySelectorAll('.service-card').forEach(card => {
+    const serviceName = card.querySelector('.service-name').textContent;
+    const isSelected = selectedServices.some(s => s.name === serviceName);
+    card.classList.toggle('selected', isSelected);
+  });
+}
+
+// Select a stylist
+function selectStylist(stylist) {
+  selectedStylist = stylist;
+  stylistsGrid.querySelectorAll('.stylist-card').forEach(card => {
+    const stylistName = card.querySelector('.stylist-name').textContent;
+    card.classList.toggle('selected', stylistName === stylist.name);
+  });
+  updateNextButton();
+}
+
+// Update next button state
+function updateNextButton() {
+  const isValid = () => {
+    switch (currentStep) {
+      case 1: return selectedServices.length > 0;
+      case 2: return selectedStylist !== null;
+      case 3: return bookingDate.value && bookingTime.value;
+      case 4: return bookingName.value && bookingPhone.value && bookingEmail.value;
+      case 5: return true;
+      default: return false;
+    }
+  };
+  
+  btnNext.disabled = !isValid();
+}
+
+// Navigation between steps
+function goToPreviousStep() {
+  if (currentStep > 1) {
+    currentStep--;
+    updateStep();
+  }
+}
+
+function goToNextStep() {
+  if (currentStep < 5 && btnNext.disabled) return;
+  
+  switch (currentStep) {
+    case 1:
+      if (selectedServices.length === 0) return;
+      break;
+    case 2:
+      if (!selectedStylist) return;
+      break;
+    case 3:
+      if (!bookingDate.value || !bookingTime.value) return;
+      break;
+    case 4:
+      if (!bookingName.value || !bookingPhone.value || !bookingEmail.value) return;
+      break;
+    case 5:
+      saveBooking();
+      return;
+  }
+  
+  currentStep++;
+  updateStep();
+}
+
+// Update UI for current step
+function updateStep() {
+  // Update progress bar
+  document.querySelectorAll('.progress-step').forEach((step, index) => {
+    step.classList.toggle('active', index < currentStep);
+  });
+  
+  // Show/hide step content
+  document.querySelectorAll('.step-content').forEach(content => {
+    content.style.display = content.id === `step${currentStep}` ? 'block' : 'none';
+  });
+  
+  // Update button text
+  btnPrev.style.display = currentStep === 1 ? 'none' : 'flex';
+  btnNext.textContent = currentStep === 5 ? 'Confirm Booking' : 'Next';
+  
+  // Update confirmation section
+  if (currentStep === 5) {
+    updateConfirmation();
+  }
+}
+
+// Update confirmation section
+function updateConfirmation() {
+  confirmSection.innerHTML = `
+    <div class="confirm-item">
+      <span>Services</span>
+      <span><strong>${selectedServices.map(s => s.name).join(', ')}</strong></span>
+    </div>
+    <div class="confirm-item">
+      <span>Stylist</span>
+      <span><strong>${selectedStylist.name}</strong></span>
+
+
+        </div>
+    <div class="confirm-item">
+      <span>Date & Time</span>
+      <span><strong>${bookingDate.value} ${bookingTime.value}</strong></span>
+    </div>
+    <div class="confirm-item">
+      <span>Name</span>
+      <span><strong>${bookingName.value}</strong></span>
+    </div>
+    <div class="confirm-item">
+      <span>Phone</span>
+      <span><strong>${bookingPhone.value}</strong></span>
+    </div>
+    <div class="confirm-item">
+      <span>Email</span>
+      <span><strong>${bookingEmail.value}</strong></span>
+    </div>
+    <div class="confirm-item">
+      <span>Total Points</span>
+      <span><strong>${selectedServices.reduce((sum, s) => sum + s.points, 0)} pts</strong></span>
+    </div>
+    <div class="confirm-item">
+      <span>Total Price</span>
+      <span><strong>$${selectedServices.reduce((sum, s) => sum + parseInt(s.price.slice(1)), 0)}</strong></span>
+    </div>
+  `;
+}
+
+// Save booking to Firestore
+async function saveBooking() {
+  try {
+    const booking = {
+      userId: auth.currentUser.uid,
+      services: selectedServices,
+      stylist: selectedStylist.name,
+      date: bookingDate.value,
+      time: bookingTime.value,
+      customerName: bookingName.value,
+      customerPhone: bookingPhone.value,
+      customerEmail: bookingEmail.value,
+      points: selectedServices.reduce((sum, s) => sum + s.points, 0),
+      price: selectedServices.reduce((sum, s) => sum + parseInt(s.price.slice(1)), 0),
+      status: 'confirmed',
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    // Save to Firestore
+    await db.collection('bookings').add(booking);
+
+    // Update user points
+    await db.collection('users').doc(auth.currentUser.uid).update({
+      points: firebase.firestore.FieldValue.increment(booking.points)
+    });
+
+    // Show success screen
+    showSuccessScreen();
+  } catch (error) {
+    alert('Error saving booking: ' + error.message);
+  }
+}
+
+// Show success screen
+function showSuccessScreen() {
+  document.querySelectorAll('.step-content').forEach(content => content.style.display = 'none');
+  successScreen.style.display = 'flex';
+}
+
+// Add to calendar
+function addToCalendar() {
+  const startDate = new Date(bookingDate.value + 'T' + bookingTime.value);
+  const endDate = new Date(startDate.getTime() + (60 * 60 * 1000)); // Add 1 hour
+  const summary = selectedServices.map(s => s.name).join(', ');
+  const description = `Stylist: ${selectedStylist.name}\nPrice: $${booking.price}\nPoints: ${booking.points} pts`;
+
+  // Create Google Calendar URL
+  const googleUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(summary)}&dates=${startDate.toISOString().split('T')[0]}T${startDate.toISOString().split('T')[1].split('.')[0]}/${endDate.toISOString().split('T')[0]}T${endDate.toISOString().split('T')[1].split('.')[0]}&details=${encodeURIComponent(description)}&location=BDM Salon`;
+  
+  // Create Apple Calendar URL
+  const appleUrl = `webcal://www.google.com/calendar/event?action=TEMPLATE&text=${encodeURIComponent(summary)}&dates=${startDate.toISOString().split('T')[0]}T${startDate.toISOString().split('T')[1].split('.')[0]}/${endDate.toISOString().split('T')[0]}T${endDate.toISOString().split('T')[1].split('.')[0]}&details=${encodeURIComponent(description)}&location=BDM Salon`;
+  
+  // Open in new tab
+  window.open(googleUrl, '_blank');
+}
+
+// Back to home
+function backToHome() {
+  window.location.href = 'customer-dashboard.html';
+}
+
+// Edit profile
+async function editProfile() {
+  const newName = prompt('Enter your new name:', bookingName.value);
+  const newPhone = prompt('Enter your new phone number:', bookingPhone.value);
+  
+  if (newName) {
+    try {
+      await db.collection('users').doc(auth.currentUser.uid).update({
+        name: newName
+      });
+      userData.name = newName;
+      bookingName.value = newName;
+    } catch (error) {
+      alert('Error updating name: ' + error.message);
+    }
+  }
+
+  if (newPhone) {
+    try {
+      await db.collection('users').doc(auth.currentUser.uid).update({
+        phone: newPhone
+      });
+      localStorage.setItem('phone_' + auth.currentUser.uid, newPhone);
+      userData.phone = newPhone;
+      bookingPhone.value = newPhone;
+    } catch (error) {
+      alert('Error updating phone: ' + error.message);
+    }
+  }
+}
+
+// Initialize the app
+initUI();
+</script>
+</body>
+</html>
