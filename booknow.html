@@ -9,6 +9,7 @@
   --bg: #000;
   --fg: #fff;
   --accent: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+  --border-color: #444;
 }
 
 * {
@@ -22,53 +23,35 @@ body {
   background: var(--bg);
   color: var(--fg);
   min-height: 100vh;
-}
-
-/* Step Header */
-.step-header {
   display: flex;
-  align-items: center;
-  padding: 20px 15px;
-  background: #111;
-  border-bottom: 2px solid #444;
+  flex-direction: column;
 }
 
-.step-number {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
+/* Step Heading */
+.step-heading {
+  text-align: center;
+  margin: 20px 0;
+  font-size: 24px;
   background: var(--accent);
-  border: 2px solid var(--accent);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  font-weight: 700;
-  color: #fff;
-  margin-right: 10px;
-}
-
-.step-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--accent);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 /* Navigation Buttons */
 .btn-container {
   display: flex;
-  gap: 15px;
-  padding: 15px;
-  background: #111;
-  border-bottom: 2px solid #444;
+  gap: 16px;
+  margin: 16px 0;
+  padding: 0 16px;
 }
 
 .btn-prev,
 .next-btn {
   flex: 1;
-  padding: 10px 20px;
+  padding: 12px 24px;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -91,17 +74,37 @@ body {
   cursor: not-allowed;
 }
 
-/* Services Container */
+/* Main Container */
+.container {
+  flex: 1;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Services Grid */
 .services-container {
-  padding: 15px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
 }
 
 /* Service Card */
 .service-card {
   background: #111;
-  border-radius: 8px;
-  padding: 15px;
-  margin-bottom: 15px;
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   border: 2px solid transparent;
   transition: all 0.3s ease;
   cursor: pointer;
@@ -118,7 +121,7 @@ body {
 }
 
 .service-name {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
   margin: 0;
 }
@@ -126,31 +129,63 @@ body {
 .service-desc {
   font-size: 12px;
   color: #ccc;
-  margin: 5px 0 10px;
+  line-height: 1.4;
+  margin: 0;
 }
 
+/* Price Position */
+.service-price {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  font-size: 24px;
+  font-weight: 800;
+  background: var(--accent);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Info Container */
 .service-info {
   display: flex;
-  gap: 12px;
+  gap: 16px;
   align-items: flex-end;
 }
 
-.service-time,
 .service-points {
-  font-size: 11px;
+  font-size: 12px;
   color: #ccc;
+  margin: 0;
 }
 
-.service-price {
-  position: absolute;
-  bottom: 15px;
-  right: 15px;
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--accent);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+/* Mobile adjustments for service cards */
+@media (max-width: 900px) {
+  .service-card {
+    padding: 12px;
+  }
+  
+  .service-name {
+    font-size: 14px;
+  }
+  
+  .service-desc {
+    font-size: 11px;
+  }
+  
+  .service-price {
+    bottom: 12px;
+    right: 12px;
+    font-size: 18px;
+  }
+  
+  .service-info {
+    gap: 12px;
+  }
+  
+  .service-points {
+    font-size: 10px;
+  }
 }
 
 /* Hide scrollbar */
@@ -161,11 +196,8 @@ body {
 </head>
 <body>
 
-<!-- Step Header -->
-<div class="step-header">
-  <div class="step-number">1</div>
-  <div class="step-title">Choose Service</div>
-</div>
+<!-- Step Heading -->
+<h1 class="step-heading">Step 1: Choose Service</h1>
 
 <!-- Navigation Buttons -->
 <div class="btn-container">
@@ -173,30 +205,16 @@ body {
   <button class="next-btn" id="nextBtn" disabled>Next</button>
 </div>
 
-<!-- Services Container -->
-<div class="services-container" id="servicesGrid">
-  <!-- Services will be inserted here via JavaScript -->
+<!-- Main Container -->
+<div class="container">
+  <div class="services-container">
+    <div class="services-grid" id="servicesGrid">
+      <!-- Services will be inserted here via JavaScript -->
+    </div>
+  </div>
 </div>
 
-<!-- Firebase config -->
-<script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-database-compat.js"></script>
 <script>
-// Firebase config
-const firebaseConfig = {
-  apiKey: "AIzaSyAmimDsjW_pF2NGw-w-40QzTsgmf1tdqyI",
-  authDomain: "bdmsalonappointment.firebaseapp.com",
-  databaseURL: "https://bdmsalonappointment-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "bdmsalonappointment",
-  storageBucket: "bdmsalonappointment.firebasestorage.app",
-  messagingSenderId: "123933913893",
-  appId: "1:123933913893:web:c1f57caf4dc2a5440ba0cc",
-  measurementId: "G-Q0FVZRVS64"
-};
-
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-
 // DOM refs
 const servicesGrid = document.getElementById('servicesGrid');
 const nextBtn = document.getElementById('nextBtn');
@@ -224,23 +242,21 @@ const services = [
 let selectedServices = [];
 
 // Initialize UI
-function initializeUI() {
-  services.forEach(service => {
-    const card = document.createElement('div');
-    card.className = 'service-card';
-    card.innerHTML = `
-      <strong class="service-name">${service.name}</strong>
-      <p class="service-desc">${service.desc}</p>
-      <div class="service-info">
-        <span class="service-time">${service.time}</span>
-        <span class="service-points">${service.points} points</span>
-      </div>
-      <span class="service-price">${service.price}</span>
-    `;
-    card.onclick = () => toggleServiceSelection(service, card);
-    servicesGrid.appendChild(card);
-  });
-}
+services.forEach(service => {
+  const card = document.createElement('div');
+  card.className = 'service-card';
+  card.innerHTML = `
+    <strong class="service-name">${service.name}</strong>
+    <p class="service-desc">${service.desc}</p>
+    <div class="service-info">
+      <span class="service-time">${service.time}</span>
+      <span class="service-points">${service.points} points</span>
+    </div>
+    <span class="service-price">${service.price}</span>
+  `;
+  card.onclick = () => toggleServiceSelection(service, card);
+  servicesGrid.appendChild(card);
+});
 
 // Toggle service selection
 function toggleServiceSelection(service, card) {
@@ -264,7 +280,7 @@ function updateNextButton() {
 }
 
 // Next button handler
-nextBtn.onclick = async () => {
+nextBtn.onclick = () => {
   if (selectedServices.length === 0) return;
   
   // Store selected services in localStorage
@@ -273,27 +289,6 @@ nextBtn.onclick = async () => {
   // Redirect to Pick Stylist page
   window.location.href = 'pick-stylist.html';
 };
-
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-
-// Load services from Firebase
-firebase.database().ref('services').once('value')
-  .then(snapshot => {
-    snapshot.forEach(childSnapshot => {
-      const service = childSnapshot.val();
-      service.id = childSnapshot.key;
-      services.push(service);
-    });
-    initializeUI();
-  })
-  .catch(error => {
-    console.error('Error loading services:', error);
-    initializeUI(); // Fallback to local services if needed
-  });
-
-// Initialize UI with local services as fallback
-initializeUI();
 </script>
 </body>
 </html>
