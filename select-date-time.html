@@ -95,6 +95,37 @@ body {
   padding: 0 8px;
 }
 
+/* Month Header */
+.month-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding: 0 8px;
+}
+
+.month-title {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.month-nav {
+  display: flex;
+  gap: 10px;
+}
+
+.nav-arrow {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+}
+
 /* Date Card */
 .date-card {
   background: #111;
@@ -229,7 +260,12 @@ body {
   <div class="cards-container">
     <!-- Date Selection -->
     <div>
-      <div class="section-title">Select Date</div>
+      <div class="month-header">
+        <button class="nav-arrow" id="prevWeekBtn">‹</button>
+        <div class="month-title" id="currentMonth">June 2025</div>
+        <button class="nav-arrow" id="nextWeekBtn">›</button>
+      </div>
+      
       <div class="cards-grid" id="datesGrid">
         <!-- Dates will be inserted here via JavaScript -->
       </div>
@@ -250,12 +286,16 @@ body {
 const datesGrid = document.getElementById('datesGrid');
 const timesGrid = document.getElementById('timesGrid');
 const nextBtn = document.getElementById('nextBtn');
+const prevWeekBtn = document.getElementById('prevWeekBtn');
+const nextWeekBtn = document.getElementById('nextWeekBtn');
+const currentMonthEl = document.getElementById('currentMonth');
 
 // Selected values
 let selectedDate = null;
 let selectedTime = null;
+let currentWeekStart = new Date(); // Start with today
 
-// Booked times simulation (in a real app, this would come from a database)
+// Booked times simulation
 const bookedTimes = {
   "2025-06-23": ["10:00 AM", "2:30 PM", "4:00 PM"],
   "2025-06-24": ["9:00 AM", "11:30 AM", "3:00 PM"],
@@ -266,18 +306,46 @@ const bookedTimes = {
 renderDates();
 renderTimes();
 
+// Set current month display
+updateMonthDisplay();
+
+// Navigation event listeners
+prevWeekBtn.addEventListener('click', () => {
+  currentWeekStart.setDate(currentWeekStart.getDate() - 7);
+  renderDates();
+  updateMonthDisplay();
+});
+
+nextWeekBtn.addEventListener('click', () => {
+  currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+  renderDates();
+  updateMonthDisplay();
+});
+
+// Update month display
+function updateMonthDisplay() {
+  currentMonthEl.textContent = currentWeekStart.toLocaleString('default', {
+    month: 'long',
+    year: 'numeric'
+  });
+}
+
 // Render date cards
 function renderDates() {
   datesGrid.innerHTML = '';
   
-  // Generate dates for next 7 days
-  const today = new Date();
+  // Set to Sunday of current week
+  const startDate = new Date(currentWeekStart);
+  startDate.setDate(startDate.getDate() - startDate.getDay());
   
+  // Generate dates for the week
   for (let i = 0; i < 7; i++) {
-    const date = new Date(today);
-    date.setDate(today.getDate() + i);
+    const date = new Date(startDate);
+    date.setDate(startDate.getDate() + i);
     
     const dateStr = date.toISOString().split('T')[0];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
     
     const dateCard = document.createElement('div');
     dateCard.classList.add('date-card');
@@ -290,8 +358,8 @@ function renderDates() {
       <div class="date-month">${date.toLocaleString('default', { month: 'short' })}</div>
     `;
     
-    // Only allow future dates
-    if (i > 0) {
+    // Only allow future dates and today
+    if (date >= today) {
       dateCard.addEventListener('click', () => {
         // Remove previous selection
         document.querySelectorAll('.date-card.selected').forEach(el => {
@@ -382,8 +450,8 @@ nextBtn.addEventListener('click', () => {
   localStorage.setItem('appointmentDate', selectedDate);
   localStorage.setItem('appointmentTime', selectedTime);
   
-  // Redirect to confirmation page
-  window.location.href = 'confirm.html';
+  // Redirect to Add Details page
+  window.location.href = 'add-details.html';
 });
 </script>
 </body>
