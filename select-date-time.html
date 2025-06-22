@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Select Date & Time – BDM Salon</title>
+<style>
+:root {
+  --bg: #000;
+  --fg: #fff;
+  --accent: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+  --border-color: #444;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Step Heading */
+.step-heading {
+  text-align: center;
+  margin: 20px 0;
+  font-size: 24px;
+  color: white;
+}
+
+/* Navigation Buttons */
+.btn-container {
+  display: flex;
+  gap: 16px;
+  margin: 16px;
+  padding: 0 16px;
+}
+
+.btn-prev,
+.next-btn {
+  flex: 1;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-prev {
+  background: #444;
+  color: #fff;
+}
+
+.next-btn {
+  background: var(--accent);
+  color: white;
+}
+
+.btn-prev:disabled,
+.next-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Main Container */
+.container {
+  flex: 1;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Cards Container */
+.cards-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  overflow-y: auto;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  padding: 0 8px;
+}
+
+/* Date Card */
+.date-card {
+  background: #111;
+  border-radius: 10px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+}
+
+.date-day {
+  font-size: 14px;
+  color: #ccc;
+  margin-bottom: 6px;
+}
+
+.date-number {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.date-month {
+  font-size: 14px;
+  color: #aaa;
+}
+
+.date-card .selection-icon {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: white;
+}
+
+.date-card.selected .selection-icon {
+  background: var(--accent);
+}
+
+.date-card.selected .selection-icon::before {
+  content: "✓";
+}
+
+/* Time Card */
+.time-card {
+  background: #111;
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+  position: relative;
+  cursor: pointer;
+}
+
+.time-card .selection-icon {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: white;
+}
+
+.time-card.selected .selection-icon {
+  background: var(--accent);
+}
+
+.time-card.selected .selection-icon::before {
+  content: "✓";
+}
+
+.time-card.unavailable {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Cards Grid */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 16px;
+}
+
+/* Mobile adjustments */
+@media (max-width: 900px) {
+  .date-card {
+    padding: 16px;
+  }
+  
+  .date-number {
+    font-size: 24px;
+  }
+  
+  .time-card {
+    padding: 12px;
+  }
+}
+
+/* Hide scrollbar */
+::-webkit-scrollbar {
+  display: none;
+}
+</style>
+</head>
+<body>
+
+<!-- Step Heading -->
+<h1 class="step-heading">Step 3: Select Date & Time</h1>
+
+<!-- Navigation Buttons -->
+<div class="btn-container">
+  <button class="btn-prev" onclick="window.history.back()">Back</button>
+  <button class="next-btn" id="nextBtn" disabled>Next</button>
+</div>
+
+<!-- Main Container -->
+<div class="container">
+  <div class="cards-container">
+    <!-- Date Selection -->
+    <div>
+      <div class="section-title">Select Date</div>
+      <div class="cards-grid" id="datesGrid">
+        <!-- Dates will be inserted here via JavaScript -->
+      </div>
+    </div>
+    
+    <!-- Time Selection -->
+    <div>
+      <div class="section-title">Select Time</div>
+      <div class="cards-grid" id="timesGrid">
+        <!-- Times will be inserted here via JavaScript -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// DOM refs
+const datesGrid = document.getElementById('datesGrid');
+const timesGrid = document.getElementById('timesGrid');
+const nextBtn = document.getElementById('nextBtn');
+
+// Selected values
+let selectedDate = null;
+let selectedTime = null;
+
+// Booked times simulation (in a real app, this would come from a database)
+const bookedTimes = {
+  "2025-06-23": ["10:00 AM", "2:30 PM", "4:00 PM"],
+  "2025-06-24": ["9:00 AM", "11:30 AM", "3:00 PM"],
+  "2025-06-25": ["1:00 PM", "5:30 PM"]
+};
+
+// Initialize date and time cards
+renderDates();
+renderTimes();
+
+// Render date cards
+function renderDates() {
+  datesGrid.innerHTML = '';
+  
+  // Generate dates for next 7 days
+  const today = new Date();
+  
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(today);
+    date.setDate(today.getDate() + i);
+    
+    const dateStr = date.toISOString().split('T')[0];
+    
+    const dateCard = document.createElement('div');
+    dateCard.classList.add('date-card');
+    dateCard.dataset.date = dateStr;
+    
+    dateCard.innerHTML = `
+      <div class="selection-icon"></div>
+      <div class="date-day">${date.toLocaleString('default', { weekday: 'short' })}</div>
+      <div class="date-number">${date.getDate()}</div>
+      <div class="date-month">${date.toLocaleString('default', { month: 'short' })}</div>
+    `;
+    
+    // Only allow future dates
+    if (i > 0) {
+      dateCard.addEventListener('click', () => {
+        // Remove previous selection
+        document.querySelectorAll('.date-card.selected').forEach(el => {
+          el.classList.remove('selected');
+        });
+        
+        // Add selection to clicked date
+        dateCard.classList.add('selected');
+        selectedDate = dateStr;
+        
+        // Clear time selection and re-render times
+        selectedTime = null;
+        renderTimes();
+        updateNextButton();
+      });
+    } else {
+      dateCard.style.opacity = '0.5';
+      dateCard.style.cursor = 'not-allowed';
+    }
+    
+    datesGrid.appendChild(dateCard);
+  }
+}
+
+// Render time cards
+function renderTimes() {
+  timesGrid.innerHTML = '';
+  
+  // Only render times if a date is selected
+  if (!selectedDate) return;
+  
+  // Generate time slots (every 30 minutes from 9:00 AM to 6:00 PM)
+  const startHour = 9;
+  const endHour = 18;
+  const times = [];
+  
+  for (let hour = startHour; hour < endHour; hour++) {
+    for (let minute = 0; minute < 60; minute += 30) {
+      const period = hour >= 12 ? 'PM' : 'AM';
+      const displayHour = hour > 12 ? hour - 12 : hour;
+      const displayMinute = minute < 10 ? '0' + minute : minute;
+      
+      const timeStr = `${displayHour === 0 ? 12 : displayHour}:${displayMinute} ${period}`;
+      times.push(timeStr);
+    }
+  }
+  
+  times.forEach(time => {
+    const timeCard = document.createElement('div');
+    timeCard.classList.add('time-card');
+    timeCard.textContent = time;
+    timeCard.dataset.time = time;
+    
+    // Check if this time is booked
+    const isBooked = bookedTimes[selectedDate] && 
+                     bookedTimes[selectedDate].includes(time);
+    
+    if (isBooked) {
+      timeCard.classList.add('unavailable');
+    } else {
+      timeCard.addEventListener('click', () => {
+        // Remove previous selection
+        document.querySelectorAll('.time-card.selected').forEach(el => {
+          el.classList.remove('selected');
+        });
+        
+        // Add selection to clicked time
+        timeCard.classList.add('selected');
+        selectedTime = time;
+        updateNextButton();
+      });
+    }
+    
+    timesGrid.appendChild(timeCard);
+  });
+}
+
+// Update next button state
+function updateNextButton() {
+  nextBtn.disabled = !(selectedDate && selectedTime);
+}
+
+// Next button handler
+nextBtn.addEventListener('click', () => {
+  if (!selectedDate || !selectedTime) return;
+  
+  // Store selected date and time in localStorage
+  localStorage.setItem('appointmentDate', selectedDate);
+  localStorage.setItem('appointmentTime', selectedTime);
+  
+  // Redirect to confirmation page
+  window.location.href = 'confirm.html';
+});
+</script>
+</body>
+</html>
