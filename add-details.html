@@ -183,15 +183,23 @@ const emailInput = document.getElementById('emailInput');
 
 // Load user details from localStorage
 const loadUserDetails = () => {
-  // Try to get user details from localStorage
-  const userDetails = JSON.parse(localStorage.getItem('userDetails') || '{}');
-  
-  console.log('Loaded user details:', userDetails);
-  
-  // Set values from localStorage if they exist
-  if (userDetails.name) nameInput.value = userDetails.name;
-  if (userDetails.phone) phoneInput.value = userDetails.phone;
-  if (userDetails.email) emailInput.value = userDetails.email;
+  try {
+    // Get user details from localStorage
+    const userDetails = JSON.parse(localStorage.getItem('userDetails'));
+    
+    console.log('[DEBUG] Loaded user details:', userDetails);
+    
+    // Set values from localStorage if they exist
+    if (userDetails) {
+      if (userDetails.name) nameInput.value = userDetails.name;
+      if (userDetails.phone) phoneInput.value = userDetails.phone;
+      if (userDetails.email) emailInput.value = userDetails.email;
+    } else {
+      console.log('[DEBUG] No user details found in localStorage');
+    }
+  } catch (e) {
+    console.error('[ERROR] Failed to load user details:', e);
+  }
 };
 
 // Save user details to localStorage
@@ -201,8 +209,9 @@ const saveUserDetails = () => {
     phone: phoneInput.value,
     email: emailInput.value
   };
+  
   localStorage.setItem('userDetails', JSON.stringify(userDetails));
-  console.log('Saved user details:', userDetails);
+  console.log('[DEBUG] Saved user details:', userDetails);
 };
 
 // Form validation
