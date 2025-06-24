@@ -29,7 +29,7 @@ body {
   padding-top: 150px; /* Space for fixed header */
 }
 
-/* Fixed Header - Matching Step 4 Style */
+/* Fixed Header - Matching Step 4 */
 .header-container {
   position: fixed;
   top: 0;
@@ -191,7 +191,15 @@ body {
       <div class="booking-grid">
         <div class="booking-item">
           <div class="item-label">Service</div>
-          <div class="item-value" id="serviceValue">Haircut & Styling</div>
+          <div class="item-value" id="serviceValue">Loading...</div>
+        </div>
+        <div class="booking-item">
+          <div class="item-label">Price</div>
+          <div class="item-value" id="servicePrice">Loading...</div>
+        </div>
+        <div class="booking-item">
+          <div class="item-label">Duration</div>
+          <div class="item-value" id="serviceDuration">Loading...</div>
         </div>
       </div>
     </div>
@@ -202,7 +210,11 @@ body {
       <div class="booking-grid">
         <div class="booking-item">
           <div class="item-label">Stylist</div>
-          <div class="item-value" id="stylistValue">Jane Smith</div>
+          <div class="item-value" id="stylistValue">Loading...</div>
+        </div>
+        <div class="booking-item">
+          <div class="item-label">Specialty</div>
+          <div class="item-value" id="stylistSpecialty">Loading...</div>
         </div>
       </div>
     </div>
@@ -213,11 +225,15 @@ body {
       <div class="booking-grid">
         <div class="booking-item">
           <div class="item-label">Date</div>
-          <div class="item-value" id="dateValue">June 30, 2025</div>
+          <div class="item-value" id="dateValue">Loading...</div>
         </div>
         <div class="booking-item">
           <div class="item-label">Time</div>
-          <div class="item-value" id="timeValue">2:30 PM</div>
+          <div class="item-value" id="timeValue">Loading...</div>
+        </div>
+        <div class="booking-item">
+          <div class="item-label">Location</div>
+          <div class="item-value">BDM Salon, Main Street</div>
         </div>
       </div>
     </div>
@@ -228,15 +244,15 @@ body {
       <div class="booking-grid">
         <div class="booking-item">
           <div class="item-label">Name</div>
-          <div class="item-value" id="nameValue">John Doe</div>
+          <div class="item-value" id="nameValue">Loading...</div>
         </div>
         <div class="booking-item">
           <div class="item-label">Phone</div>
-          <div class="item-value" id="phoneValue">(123) 456-7890</div>
+          <div class="item-value" id="phoneValue">Loading...</div>
         </div>
         <div class="booking-item">
           <div class="item-label">Email</div>
-          <div class="item-value" id="emailValue">john@example.com</div>
+          <div class="item-value" id="emailValue">Loading...</div>
         </div>
       </div>
     </div>
@@ -246,7 +262,10 @@ body {
 <script>
 // DOM Elements
 const serviceValue = document.getElementById('serviceValue');
+const servicePrice = document.getElementById('servicePrice');
+const serviceDuration = document.getElementById('serviceDuration');
 const stylistValue = document.getElementById('stylistValue');
+const stylistSpecialty = document.getElementById('stylistSpecialty');
 const dateValue = document.getElementById('dateValue');
 const timeValue = document.getElementById('timeValue');
 const nameValue = document.getElementById('nameValue');
@@ -259,14 +278,17 @@ const loadBookingDetails = () => {
   try {
     // Load service details
     const selectedService = JSON.parse(localStorage.getItem('selectedService'));
-    if (selectedService && selectedService.name) {
-      serviceValue.textContent = selectedService.name;
+    if (selectedService) {
+      if (selectedService.name) serviceValue.textContent = selectedService.name;
+      if (selectedService.price) servicePrice.textContent = selectedService.price;
+      if (selectedService.duration) serviceDuration.textContent = selectedService.duration;
     }
     
     // Load stylist details
     const selectedStylist = JSON.parse(localStorage.getItem('selectedStylist'));
-    if (selectedStylist && selectedStylist.name) {
-      stylistValue.textContent = selectedStylist.name;
+    if (selectedStylist) {
+      if (selectedStylist.name) stylistValue.textContent = selectedStylist.name;
+      if (selectedStylist.specialty) stylistSpecialty.textContent = selectedStylist.specialty;
     }
     
     // Load date and time
@@ -301,6 +323,15 @@ const loadBookingDetails = () => {
     }
   } catch (e) {
     console.error('Error loading booking details:', e);
+    
+    // Show error messages if data fails to load
+    serviceValue.textContent = 'Data not found';
+    stylistValue.textContent = 'Data not found';
+    dateValue.textContent = 'Data not found';
+    timeValue.textContent = 'Data not found';
+    nameValue.textContent = 'Data not found';
+    phoneValue.textContent = 'Data not found';
+    emailValue.textContent = 'Data not found';
   }
 };
 
