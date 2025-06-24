@@ -183,14 +183,15 @@ const emailInput = document.getElementById('emailInput');
 
 // Load user details from localStorage
 const loadUserDetails = () => {
-  const userDetails = JSON.parse(localStorage.getItem('userDetails'));
+  // Try to get user details from localStorage
+  const userDetails = JSON.parse(localStorage.getItem('userDetails') || '{}');
   
-  // Only set values if they exist in localStorage
-  if (userDetails) {
-    if (userDetails.name) nameInput.value = userDetails.name;
-    if (userDetails.phone) phoneInput.value = userDetails.phone;
-    if (userDetails.email) emailInput.value = userDetails.email;
-  }
+  console.log('Loaded user details:', userDetails);
+  
+  // Set values from localStorage if they exist
+  if (userDetails.name) nameInput.value = userDetails.name;
+  if (userDetails.phone) phoneInput.value = userDetails.phone;
+  if (userDetails.email) emailInput.value = userDetails.email;
 };
 
 // Save user details to localStorage
@@ -201,6 +202,7 @@ const saveUserDetails = () => {
     email: emailInput.value
   };
   localStorage.setItem('userDetails', JSON.stringify(userDetails));
+  console.log('Saved user details:', userDetails);
 };
 
 // Form validation
