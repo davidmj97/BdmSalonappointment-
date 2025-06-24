@@ -95,37 +95,6 @@ body {
   padding: 0 8px;
 }
 
-/* Month Header */
-.month-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16px;
-  padding: 0 8px;
-}
-
-.month-title {
-  font-size: 18px;
-  font-weight: 700;
-}
-
-.month-nav {
-  display: flex;
-  gap: 10px;
-}
-
-.nav-arrow {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: #333;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 18px;
-}
-
 /* Date Card */
 .date-card {
   background: #111;
@@ -155,27 +124,15 @@ body {
   color: #aaa;
 }
 
+/* Removed selection icon from date card */
 .date-card .selection-icon {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: #333;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
+  display: none;
+}
+
+/* Updated selected date styling */
+.date-card.selected {
+  background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
   color: white;
-}
-
-.date-card.selected .selection-icon {
-  background: var(--accent);
-}
-
-.date-card.selected .selection-icon::before {
-  content: "✓";
 }
 
 /* Time Card */
@@ -216,11 +173,56 @@ body {
   cursor: not-allowed;
 }
 
+/* Selected time card styling */
+.time-card.selected {
+  background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+  color: white;
+}
+
+.time-card.selected .selection-icon {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid white;
+}
+
 /* Cards Grid */
 .cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 16px;
+}
+
+/* Month Navigation */
+.month-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding: 0 8px;
+}
+
+.month-title {
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+  flex: 1;
+}
+
+.nav-arrow {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+  transition: background 0.2s ease;
+}
+
+.nav-arrow:hover {
+  background: #444;
 }
 
 /* Mobile adjustments */
@@ -261,11 +263,10 @@ body {
     <!-- Date Selection -->
     <div>
       <div class="month-header">
-        <button class="nav-arrow" id="prevWeekBtn">‹</button>
+        <button class="nav-arrow" id="prevMonthBtn">‹</button>
         <div class="month-title" id="currentMonth">June 2025</div>
-        <button class="nav-arrow" id="nextWeekBtn">›</button>
+        <button class="nav-arrow" id="nextMonthBtn">›</button>
       </div>
-      
       <div class="cards-grid" id="datesGrid">
         <!-- Dates will be inserted here via JavaScript -->
       </div>
@@ -286,99 +287,108 @@ body {
 const datesGrid = document.getElementById('datesGrid');
 const timesGrid = document.getElementById('timesGrid');
 const nextBtn = document.getElementById('nextBtn');
-const prevWeekBtn = document.getElementById('prevWeekBtn');
-const nextWeekBtn = document.getElementById('nextWeekBtn');
+const prevMonthBtn = document.getElementById('prevMonthBtn');
+const nextMonthBtn = document.getElementById('nextMonthBtn');
 const currentMonthEl = document.getElementById('currentMonth');
 
 // Selected values
 let selectedDate = null;
 let selectedTime = null;
-let currentWeekStart = new Date(); // Start with today
+let currentMonth = new Date().getMonth();
+let currentYear = new Date().getFullYear();
 
 // Booked times simulation
 const bookedTimes = {
-  "2025-06-23": ["10:00 AM", "2:30 PM", "4:00 PM"],
-  "2025-06-24": ["9:00 AM", "11:30 AM", "3:00 PM"],
-  "2025-06-25": ["1:00 PM", "5:30 PM"]
+  "2025-06-25": ["1:00 PM", "5:30 PM"],
+  "2025-06-26": ["9:00 AM", "11:30 AM"],
+  "2025-06-27": ["10:00 AM", "2:30 PM"],
+  "2025-06-28": ["3:00 PM", "4:30 PM"],
+  "2025-07-01": ["10:00 AM", "2:00 PM"],
+  "2025-07-02": ["11:00 AM", "3:30 PM"]
 };
 
 // Initialize date and time cards
 renderDates();
 renderTimes();
-
-// Set current month display
 updateMonthDisplay();
 
-// Navigation event listeners
-prevWeekBtn.addEventListener('click', () => {
-  currentWeekStart.setDate(currentWeekStart.getDate() - 7);
+// Month navigation
+prevMonthBtn.addEventListener('click', () => {
+  if (currentMonth === 0) {
+    currentMonth = 11;
+    currentYear--;
+  } else {
+    currentMonth--;
+  }
   renderDates();
   updateMonthDisplay();
 });
 
-nextWeekBtn.addEventListener('click', () => {
-  currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+nextMonthBtn.addEventListener('click', () => {
+  if (currentMonth === 11) {
+    currentMonth = 0;
+    currentYear++;
+  } else {
+    currentMonth++;
+  }
   renderDates();
   updateMonthDisplay();
 });
 
 // Update month display
 function updateMonthDisplay() {
-  currentMonthEl.textContent = currentWeekStart.toLocaleString('default', {
-    month: 'long',
-    year: 'numeric'
-  });
+  const monthNames = ["January", "February", "March", "April", "May", "June",
+                      "July", "August", "September", "October", "November", "December"];
+  currentMonthEl.textContent = `${monthNames[currentMonth]} ${currentYear}`;
 }
 
-// Render date cards
+// Render date cards for current month
 function renderDates() {
   datesGrid.innerHTML = '';
   
-  // Set to Sunday of current week
-  const startDate = new Date(currentWeekStart);
-  startDate.setDate(startDate.getDate() - startDate.getDay());
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
   
-  // Generate dates for the week
-  for (let i = 0; i < 7; i++) {
-    const date = new Date(startDate);
-    date.setDate(startDate.getDate() + i);
+  // Get first day of month
+  const firstDay = new Date(currentYear, currentMonth, 1);
+  
+  // Get last day of month
+  const lastDay = new Date(currentYear, currentMonth + 1, 0);
+  
+  // Generate dates for the month
+  for (let i = 0; i < lastDay.getDate(); i++) {
+    const date = new Date(currentYear, currentMonth, i + 1);
+    
+    // Skip dates before today
+    if (date < today) continue;
     
     const dateStr = date.toISOString().split('T')[0];
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
     
     const dateCard = document.createElement('div');
     dateCard.classList.add('date-card');
     dateCard.dataset.date = dateStr;
     
     dateCard.innerHTML = `
-      <div class="selection-icon"></div>
       <div class="date-day">${date.toLocaleString('default', { weekday: 'short' })}</div>
       <div class="date-number">${date.getDate()}</div>
       <div class="date-month">${date.toLocaleString('default', { month: 'short' })}</div>
     `;
     
-    // Only allow future dates and today
-    if (date >= today) {
-      dateCard.addEventListener('click', () => {
-        // Remove previous selection
-        document.querySelectorAll('.date-card.selected').forEach(el => {
-          el.classList.remove('selected');
-        });
-        
-        // Add selection to clicked date
-        dateCard.classList.add('selected');
-        selectedDate = dateStr;
-        
-        // Clear time selection and re-render times
-        selectedTime = null;
-        renderTimes();
-        updateNextButton();
+    dateCard.addEventListener('click', () => {
+      // Remove previous selection
+      document.querySelectorAll('.date-card.selected').forEach(el => {
+        el.classList.remove('selected');
       });
-    } else {
-      dateCard.style.opacity = '0.5';
-      dateCard.style.cursor = 'not-allowed';
-    }
+      
+      // Add selection to clicked date
+      dateCard.classList.add('selected');
+      selectedDate = dateStr;
+      
+      // Clear time selection and re-render times
+      selectedTime = null;
+      renderTimes();
+      updateNextButton();
+    });
     
     datesGrid.appendChild(dateCard);
   }
