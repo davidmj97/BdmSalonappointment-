@@ -25,14 +25,26 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  padding-top: 130px; /* Space for fixed header */
 }
 
-/* Step Heading */
+/* Fixed Header */
+.header-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #000;
+  z-index: 100;
+  padding: 10px 0;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
 .step-heading {
   text-align: center;
-  margin: 20px 0;
-  font-size: 24px;
-  color: white; /* Changed to white */
+  margin: 10px 0;
+  font-size: 20px;
+  color: white;
 }
 
 /* Category Dropdown */
@@ -54,8 +66,8 @@ body {
 .btn-container {
   display: flex;
   gap: 16px;
-  margin: 16px 0;
-  padding: 0 16px;
+  margin: 0 16px 10px;
+  padding: 0;
 }
 
 .btn-prev,
@@ -118,6 +130,7 @@ body {
   flex-direction: column;
   gap: 12px;
   position: relative;
+  cursor: pointer;
 }
 
 .service-name {
@@ -140,31 +153,18 @@ body {
   right: 16px;
   font-size: 24px;
   font-weight: 800;
-  color: white; /* Changed to white */
-}
-
-/* Selection Icon */
-.selection-icon {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: #333;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
   color: white;
 }
 
-.service-card.selected .selection-icon {
-  background: var(--accent);
+/* Updated selected service card */
+.service-card.selected {
+  background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+  color: white;
 }
 
-.service-card.selected .selection-icon::before {
-  content: "✓";
+.service-card.selected .service-desc,
+.service-card.selected .service-points {
+  color: rgba(255, 255, 255, 0.9);
 }
 
 /* Info Container */
@@ -182,6 +182,10 @@ body {
 
 /* Mobile adjustments for service cards */
 @media (max-width: 900px) {
+  body {
+    padding-top: 110px;
+  }
+  
   .service-card {
     padding: 12px;
   }
@@ -217,21 +221,23 @@ body {
 </head>
 <body>
 
-<!-- Step Heading -->
-<h1 class="step-heading">Step 1: Choose Service</h1>
-
-<!-- Category Dropdown -->
-<div class="category-filter">
-  <select class="category-select" id="categorySelect">
-    <option value="all">All Categories</option>
-    <!-- Categories will be populated by JavaScript -->
-  </select>
-</div>
-
-<!-- Navigation Buttons -->
-<div class="btn-container">
-  <button class="btn-prev" onclick="window.history.back()">Back</button>
-  <button class="next-btn" id="nextBtn" disabled>Next</button>
+<!-- Fixed Header -->
+<div class="header-container">
+  <h1 class="step-heading">Step 1: Choose Service</h1>
+  
+  <!-- Category Dropdown -->
+  <div class="category-filter">
+    <select class="category-select" id="categorySelect">
+      <option value="all">All Categories</option>
+      <!-- Categories will be populated by JavaScript -->
+    </select>
+  </div>
+  
+  <!-- Navigation Buttons -->
+  <div class="btn-container">
+    <button class="btn-prev" onclick="window.history.back()">Back</button>
+    <button class="next-btn" id="nextBtn" disabled>Next</button>
+  </div>
 </div>
 
 <!-- Main Container -->
@@ -302,7 +308,6 @@ function renderServices(servicesToRender) {
     const card = document.createElement('div');
     card.className = `service-card ${isSelected ? 'selected' : ''}`;
     card.innerHTML = `
-      <div class="selection-icon"></div>
       <strong class="service-name">${service.name}</strong>
       <p class="service-desc">${service.desc}</p>
       <div class="service-info">
