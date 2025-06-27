@@ -4,6 +4,31 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Add Details - BDM Salon</title>
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="auth.js"></script>
+<script>
+  // Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyAmimDsjW_pF2NGw-w-40QzTsgmf1tdqyI",
+    authDomain: "bdmsalonappointment.firebaseapp.com",
+    projectId: "bdmsalonappointment"
+  };
+  
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  
+  // Auth state listener
+  firebase.auth().onAuthStateChanged(function(user) {
+    if (user) {
+      localStorage.setItem('isLoggedIn', 'true');
+    } else {
+      localStorage.removeItem('isLoggedIn');
+      window.location.href = 'index.html';
+    }
+  });
+</script>
 <style>
 :root {
   --bg: #000;
