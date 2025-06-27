@@ -253,7 +253,7 @@ nextBtn.addEventListener('click', () => {
   localStorage.setItem('selectedDate', selectedDate);
   localStorage.setItem('selectedTime', selectedTime);
   
-  // NEW: Also store formatted date for display
+  // Also store formatted date for display
   const dateObj = new Date(selectedDate);
   const formattedDate = dateObj.toLocaleDateString('en-US', {
     weekday: 'long',
