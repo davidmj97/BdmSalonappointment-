@@ -4,12 +4,232 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Choose Services - BDM Salon</title>
-<!-- Firebase SDKs -->
+<!-- AUTHENTICATION ADDITIONS START -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="auth.js"></script>
+<!-- AUTHENTICATION ADDITIONS END -->
 <style>
-/* ... (all your existing styles remain unchanged) ... */
+:root {
+  --bg: #000;
+  --fg: #fff;
+  --accent: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+  --border-color: #444;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding-top: 150px; /* Increased space below header */
+}
+
+/* Fixed Header */
+.header-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #000;
+  z-index: 100;
+  padding: 15px 0; /* Increased vertical padding */
+  box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+.step-heading {
+  text-align: center;
+  margin: 5px 0 15px; /* Adjusted spacing */
+  font-size: 20px;
+  color: white;
+}
+
+/* Category Dropdown */
+.category-filter {
+  margin: 0 16px 10px; /* Reduced bottom margin */
+}
+
+.category-select {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  background: #111;
+  color: white;
+  border: 1px solid #444;
+  font-size: 16px;
+}
+
+/* Navigation Buttons */
+.btn-container {
+  display: flex;
+  gap: 16px;
+  margin: 0 16px;
+  padding: 0;
+}
+
+.btn-prev,
+.next-btn {
+  flex: 1;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-prev {
+  background: #444;
+  color: #fff;
+}
+
+.next-btn {
+  background: var(--accent);
+  color: #fff;
+}
+
+.btn-prev:disabled,
+.next-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Main Container */
+.container {
+  flex: 1;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Services Grid */
+.services-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+/* Service Card */
+.service-card {
+  background: #111;
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+  cursor: pointer;
+}
+
+.service-name {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.service-desc {
+  font-size: 12px;
+  color: #ccc;
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* Price Position */
+.service-price {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  font-size: 24px;
+  font-weight: 800;
+  color: white;
+}
+
+/* Updated selected service card */
+.service-card.selected {
+  background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+  color: white;
+}
+
+.service-card.selected .service-desc,
+.service-card.selected .service-points {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Info Container */
+.service-info {
+  display: flex;
+  gap: 16px;
+  align-items: flex-end;
+}
+
+.service-points {
+  font-size: 12px;
+  color: #ccc;
+  margin: 0;
+}
+
+/* Mobile adjustments for service cards */
+@media (max-width: 900px) {
+  body {
+    padding-top: 140px; /* Increased space on mobile */
+  }
+  
+  .header-container {
+    padding: 12px 0; /* Adjusted for mobile */
+  }
+  
+  .step-heading {
+    margin: 3px 0 10px; /* Tighter spacing on mobile */
+  }
+  
+  .service-card {
+    padding: 12px;
+  }
+  
+  .service-name {
+    font-size: 14px;
+  }
+  
+  .service-desc {
+    font-size: 11px;
+  }
+  
+  .service-price {
+    bottom: 12px;
+    right: 12px;
+    font-size: 18px;
+  }
+  
+  .service-info {
+    gap: 12px;
+  }
+  
+  .service-points {
+    font-size: 10px;
+  }
+}
+
+/* Hide scrollbar */
+::-webkit-scrollbar {
+  display: none;
+}
 </style>
 </head>
 <body>
@@ -42,10 +262,9 @@
   </div>
 </div>
 
-<script src="auth.js"></script>
-
+<!-- AUTHENTICATION ADDITIONS START -->
 <script>
-// Firebase configuration (same as customerdashboard)
+// Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyAmimDsjW_pF2NGw-w-40QzTsgmf1tdqyI",
   authDomain: "bdmsalonappointment.firebaseapp.com",
@@ -58,14 +277,12 @@ firebase.initializeApp(firebaseConfig);
 // Firebase auth state listener
 firebase.auth().onAuthStateChanged(function(user) {
   if (user) {
-    // User is signed in
     localStorage.setItem('isLoggedIn', 'true');
-    console.log("User is authenticated:", user.email);
   } else {
-    // User is signed out
     localStorage.removeItem('isLoggedIn');
-    console.log("User signed out");
-    window.location.href = 'index.html';
+    if (!window.location.href.includes('index.html')) {
+      window.location.href = 'index.html';
+    }
   }
 });
 
@@ -73,7 +290,10 @@ firebase.auth().onAuthStateChanged(function(user) {
 if (!auth.isAuthenticated()) {
   window.location.href = 'index.html';
 }
+</script>
+<!-- AUTHENTICATION ADDITIONS END -->
 
+<script>
 // DOM refs
 const servicesGrid = document.getElementById('servicesGrid');
 const nextBtn = document.getElementById('nextBtn');
@@ -176,11 +396,6 @@ nextBtn.onclick = () => {
   // Redirect to Pick Stylist page
   window.location.href = 'pick-stylist.html';
 };
-
-// Logout functionality (optional)
-function logout() {
-  auth.logout();
-}
 </script>
 </body>
 </html>
