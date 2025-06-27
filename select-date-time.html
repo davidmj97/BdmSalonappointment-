@@ -503,13 +503,22 @@ nextBtn.addEventListener('click', () => {
   localStorage.setItem('selectedTime', selectedTime);
   
   // Also store formatted date for display
-  const dateObj = new Date(selectedDate);
+  // FIX: Use UTC methods to avoid timezone offset issues
+  const dateParts = selectedDate.split('-');
+  const dateObj = new Date(Date.UTC(
+    parseInt(dateParts[0]),
+    parseInt(dateParts[1]) - 1,  // months are 0-indexed
+    parseInt(dateParts[2])
+  ));
+  
   const formattedDate = dateObj.toLocaleDateString('en-US', {
     weekday: 'long',
     month: 'long',
     day: 'numeric',
-    year: 'numeric'
+    year: 'numeric',
+    timeZone: 'UTC'  // Keep consistent with date selection
   });
+  
   localStorage.setItem('formattedDate', formattedDate);
   
   // Redirect to Add Details page
