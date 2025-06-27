@@ -393,6 +393,16 @@ nextBtn.onclick = () => {
   // Store selected services in localStorage
   localStorage.setItem('selectedServices', JSON.stringify(selectedServices));
   
+  // Store the first selected service separately for confirmation page
+  if (selectedServices.length > 0) {
+    const selectedService = selectedServices[0];
+    localStorage.setItem('selectedService', JSON.stringify({
+      name: selectedService.name,
+      price: selectedService.price,
+      duration: selectedService.time
+    }));
+  }
+  
   // Redirect to Pick Stylist page
   window.location.href = 'pick-stylist.html';
 };
