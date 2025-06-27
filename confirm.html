@@ -275,80 +275,107 @@ const confirmBtn = document.getElementById('confirmBtn');
 
 // Load booking details from localStorage
 const loadBookingDetails = () => {
-  // Service details
-  const serviceData = JSON.parse(localStorage.getItem('selectedService') || '{}');
-  serviceValue.textContent = serviceData.name || "Not selected";
-  servicePrice.textContent = serviceData.price || "Not selected";
-  serviceDuration.textContent = serviceData.duration || "Not selected";
+  console.log("Loading booking details from localStorage...");
   
-  // Stylist details
-  const stylistData = JSON.parse(localStorage.getItem('selectedStylist') || '{}');
-  stylistValue.textContent = stylistData.name || "Not selected";
-  stylistSpecialty.textContent = stylistData.specialty || "Not specified";
-  
-  // Date and time - fixed to work with different storage formats
-  const selectedDate = localStorage.getItem('selectedDate');
-  const selectedTime = localStorage.getItem('selectedTime');
-  
-  // Handle date - accepts both ISO strings and formatted dates
-  if (selectedDate) {
+  // Service details - ensure compatibility with booknow.html
+  const serviceData = localStorage.getItem('selectedService');
+  if (serviceData) {
     try {
-      // Try parsing as ISO string first
-      const dateObj = new Date(selectedDate);
-      if (!isNaN(dateObj.getTime())) {
-        dateValue.textContent = dateObj.toLocaleDateString('en-US', {
-          month: 'long',
-          day: 'numeric',
-          year: 'numeric'
-        });
-      } else {
-        // If not ISO, use the raw value
-        dateValue.textContent = selectedDate;
-      }
+      const service = JSON.parse(serviceData);
+      console.log("Service data:", service);
+      serviceValue.textContent = service.name || "Not selected";
+      servicePrice.textContent = service.price || "Not selected";
+      serviceDuration.textContent = service.duration || "Not selected";
     } catch (e) {
-      dateValue.textContent = selectedDate;
+      console.error("Error parsing service data:", e);
+      serviceValue.textContent = "Error loading service";
+      servicePrice.textContent = "Error loading price";
+      serviceDuration.textContent = "Error loading duration";
     }
   } else {
+    console.warn("No service data found in localStorage");
+    serviceValue.textContent = "Not selected";
+    servicePrice.textContent = "Not selected";
+    serviceDuration.textContent = "Not selected";
+  }
+  
+  // Stylist details
+  const stylistData = localStorage.getItem('selectedStylist');
+  if (stylistData) {
+    try {
+      const stylist = JSON.parse(stylistData);
+      console.log("Stylist data:", stylist);
+      stylistValue.textContent = stylist.name || "Not selected";
+      stylistSpecialty.textContent = stylist.specialty || "Not specified";
+    } catch (e) {
+      console.error("Error parsing stylist data:", e);
+      stylistValue.textContent = "Error loading stylist";
+      stylistSpecialty.textContent = "Error loading specialty";
+    }
+  } else {
+    console.warn("No stylist data found in localStorage");
+    stylistValue.textContent = "Not selected";
+    stylistSpecialty.textContent = "Not specified";
+  }
+  
+  // Date and time
+  const selectedDate = localStorage.getItem('selectedDate');
+  if (selectedDate) {
+    console.log("Selected date:", selectedDate);
+    dateValue.textContent = selectedDate;
+  } else {
+    console.warn("No date found in localStorage");
     dateValue.textContent = "Not selected";
   }
   
-  // Handle time - accepts both 24h and 12h formats
+  const selectedTime = localStorage.getItem('selectedTime');
   if (selectedTime) {
-    try {
-      // Handle both "HH:MM" and "HH:MM:SS" formats
-      const [hours, minutes] = selectedTime.split(':');
-      const hourNum = parseInt(hours);
-      
-      if (!isNaN(hourNum)) {
-        const period = hourNum >= 12 ? 'PM' : 'AM';
-        const hour12 = hourNum % 12 || 12;
-        timeValue.textContent = `${hour12}:${minutes} ${period}`;
-      } else {
-        timeValue.textContent = selectedTime;
-      }
-    } catch (e) {
-      timeValue.textContent = selectedTime;
-    }
+    console.log("Selected time:", selectedTime);
+    timeValue.textContent = selectedTime;
   } else {
+    console.warn("No time found in localStorage");
     timeValue.textContent = "Not selected";
   }
   
   // Personal details
-  const userDetails = JSON.parse(localStorage.getItem('userDetails') || '{}');
-  nameValue.textContent = userDetails.name || "Not provided";
-  phoneValue.textContent = userDetails.phone || "Not provided";
-  emailValue.textContent = userDetails.email || "Not provided";
+  const userDetails = localStorage.getItem('userDetails');
+  if (userDetails) {
+    try {
+      const user = JSON.parse(userDetails);
+      console.log("User details:", user);
+      nameValue.textContent = user.name || "Not provided";
+      phoneValue.textContent = user.phone || "Not provided";
+      emailValue.textContent = user.email || "Not provided";
+    } catch (e) {
+      console.error("Error parsing user details:", e);
+      nameValue.textContent = "Error loading name";
+      phoneValue.textContent = "Error loading phone";
+      emailValue.textContent = "Error loading email";
+    }
+  } else {
+    console.warn("No user details found in localStorage");
+    nameValue.textContent = "Not provided";
+    phoneValue.textContent = "Not provided";
+    emailValue.textContent = "Not provided";
+  }
+  
+  // Log all localStorage contents for debugging
+  console.log("All localStorage contents:");
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    console.log(`${key}: ${localStorage.getItem(key)}`);
+  }
 };
 
 // Handle booking confirmation
 const confirmBooking = () => {
   // Collect all booking data
   const bookingData = {
-    service: JSON.parse(localStorage.getItem('selectedService') || '{}'),
-    stylist: JSON.parse(localStorage.getItem('selectedStylist') || '{}'),
+    service: localStorage.getItem('selectedService'),
+    stylist: localStorage.getItem('selectedStylist'),
     date: localStorage.getItem('selectedDate'),
     time: localStorage.getItem('selectedTime'),
-    user: JSON.parse(localStorage.getItem('userDetails') || '{}')
+    user: localStorage.getItem('userDetails')
   };
   
   // Show success message
