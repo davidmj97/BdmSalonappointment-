@@ -143,6 +143,24 @@ body {
   font-weight: 500;
 }
 
+/* Service item styling */
+.service-item {
+  background: #222;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+
+.service-property {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.service-name {
+  font-weight: 600;
+}
+
 /* Mobile adjustments */
 @media (max-width: 900px) {
   body {
@@ -188,19 +206,8 @@ body {
     <!-- Service Section -->
     <div class="booking-section">
       <h2 class="section-title">Service Details</h2>
-      <div class="booking-grid">
-        <div class="booking-item">
-          <div class="item-label">Service</div>
-          <div class="item-value" id="serviceValue"></div>
-        </div>
-        <div class="booking-item">
-          <div class="item-label">Price</div>
-          <div class="item-value" id="servicePrice"></div>
-        </div>
-        <div class="booking-item">
-          <div class="item-label">Duration</div>
-          <div class="item-value" id="serviceDuration"></div>
-        </div>
+      <div id="servicesContainer">
+        <!-- Services will be inserted here via JavaScript -->
       </div>
     </div>
     
@@ -261,9 +268,7 @@ body {
 
 <script>
 // DOM Elements
-const serviceValue = document.getElementById('serviceValue');
-const servicePrice = document.getElementById('servicePrice');
-const serviceDuration = document.getElementById('serviceDuration');
+const servicesContainer = document.getElementById('servicesContainer');
 const stylistValue = document.getElementById('stylistValue');
 const stylistSpecialty = document.getElementById('stylistSpecialty');
 const dateValue = document.getElementById('dateValue');
@@ -277,26 +282,43 @@ const confirmBtn = document.getElementById('confirmBtn');
 const loadBookingDetails = () => {
   console.log("Loading booking details from localStorage...");
   
-  // Service details - ensure compatibility with booknow.html
-  const serviceData = localStorage.getItem('selectedService');
-  if (serviceData) {
+  // Service details - multiple services
+  const servicesData = localStorage.getItem('selectedServices');
+  if (servicesData) {
     try {
-      const service = JSON.parse(serviceData);
-      console.log("Service data:", service);
-      serviceValue.textContent = service.name || "Not selected";
-      servicePrice.textContent = service.price || "Not selected";
-      serviceDuration.textContent = service.duration || "Not selected";
+      const services = JSON.parse(servicesData);
+      console.log("Service data:", services);
+      
+      // Clear previous services
+      servicesContainer.innerHTML = '';
+      
+      // Render each service
+      services.forEach(service => {
+        const serviceItem = document.createElement('div');
+        serviceItem.classList.add('service-item');
+        serviceItem.innerHTML = `
+          <div class="service-property">
+            <span class="service-name">${service.name || "Not selected"}</span>
+            <span>${service.price || "Not selected"}</span>
+          </div>
+          <div class="service-property">
+            <span>Duration:</span>
+            <span>${service.time || "Not selected"}</span>
+          </div>
+          <div class="service-property">
+            <span>Points:</span>
+            <span>${service.points || "Not selected"}</span>
+          </div>
+        `;
+        servicesContainer.appendChild(serviceItem);
+      });
     } catch (e) {
       console.error("Error parsing service data:", e);
-      serviceValue.textContent = "Error loading service";
-      servicePrice.textContent = "Error loading price";
-      serviceDuration.textContent = "Error loading duration";
+      servicesContainer.innerHTML = '<div class="booking-item">Error loading services</div>';
     }
   } else {
     console.warn("No service data found in localStorage");
-    serviceValue.textContent = "Not selected";
-    servicePrice.textContent = "Not selected";
-    serviceDuration.textContent = "Not selected";
+    servicesContainer.innerHTML = '<div class="booking-item">No services selected</div>';
   }
   
   // Stylist details
@@ -319,12 +341,12 @@ const loadBookingDetails = () => {
   }
   
   // Date and time
-  const selectedDate = localStorage.getItem('selectedDate');
-  if (selectedDate) {
-    console.log("Selected date:", selectedDate);
-    dateValue.textContent = selectedDate;
+  const formattedDate = localStorage.getItem('formattedDate');
+  if (formattedDate) {
+    console.log("Formatted date:", formattedDate);
+    dateValue.textContent = formattedDate;
   } else {
-    console.warn("No date found in localStorage");
+    console.warn("No formatted date found in localStorage");
     dateValue.textContent = "Not selected";
   }
   
@@ -371,7 +393,7 @@ const loadBookingDetails = () => {
 const confirmBooking = () => {
   // Collect all booking data
   const bookingData = {
-    service: localStorage.getItem('selectedService'),
+    services: localStorage.getItem('selectedServices'),
     stylist: localStorage.getItem('selectedStylist'),
     date: localStorage.getItem('selectedDate'),
     time: localStorage.getItem('selectedTime'),
@@ -382,10 +404,13 @@ const confirmBooking = () => {
   alert('Your appointment has been booked successfully!');
   
   // Clear booking data from localStorage
+  localStorage.removeItem('selectedServices');
   localStorage.removeItem('selectedService');
   localStorage.removeItem('selectedStylist');
   localStorage.removeItem('selectedDate');
+  localStorage.removeItem('formattedDate');
   localStorage.removeItem('selectedTime');
+  localStorage.removeItem('userDetails');
   
   // Redirect to home page
   window.location.href = 'index.html';
