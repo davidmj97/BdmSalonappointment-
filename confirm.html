@@ -275,88 +275,69 @@ const confirmBtn = document.getElementById('confirmBtn');
 
 // Load booking details from localStorage
 const loadBookingDetails = () => {
-  try {
-    // Load service details
-    const selectedService = JSON.parse(localStorage.getItem('selectedService'));
-    if (selectedService) {
-      serviceValue.textContent = selectedService.name || "Not selected";
-      servicePrice.textContent = selectedService.price || "Not selected";
-      serviceDuration.textContent = selectedService.duration || "Not selected";
-    } else {
-      serviceValue.textContent = "Not selected";
-      servicePrice.textContent = "Not selected";
-      serviceDuration.textContent = "Not selected";
-    }
-    
-    // Load stylist details
-    const selectedStylist = JSON.parse(localStorage.getItem('selectedStylist'));
-    if (selectedStylist) {
-      stylistValue.textContent = selectedStylist.name || "Not selected";
-      stylistSpecialty.textContent = selectedStylist.specialty || "Not specified";
-    } else {
-      stylistValue.textContent = "Not selected";
-      stylistSpecialty.textContent = "Not specified";
-    }
-    
-    // Load date and time
-    const selectedDate = localStorage.getItem('selectedDate');
-    const selectedTime = localStorage.getItem('selectedTime');
-    
-    if (selectedDate) {
-      // Format date as "Month Day, Year"
-      const dateObj = new Date(selectedDate);
+  // Service details
+  const serviceData = JSON.parse(localStorage.getItem('selectedService') || '{}');
+  serviceValue.textContent = serviceData.name || "Not selected";
+  servicePrice.textContent = serviceData.price || "Not selected";
+  serviceDuration.textContent = serviceData.duration || "Not selected";
+  
+  // Stylist details
+  const stylistData = JSON.parse(localStorage.getItem('selectedStylist') || '{}');
+  stylistValue.textContent = stylistData.name || "Not selected";
+  stylistSpecialty.textContent = stylistData.specialty || "Not specified";
+  
+  // Date and time
+  const selectedDate = localStorage.getItem('selectedDate');
+  const selectedTime = localStorage.getItem('selectedTime');
+  
+  if (selectedDate) {
+    const dateObj = new Date(selectedDate);
+    if (!isNaN(dateObj.getTime())) {
       dateValue.textContent = dateObj.toLocaleDateString('en-US', {
         month: 'long',
         day: 'numeric',
         year: 'numeric'
       });
     } else {
-      dateValue.textContent = "Not selected";
+      dateValue.textContent = selectedDate;
     }
-    
-    if (selectedTime) {
-      // Format time as "HH:MM AM/PM"
-      const [hours, minutes] = selectedTime.split(':');
-      const hourNum = parseInt(hours);
+  } else {
+    dateValue.textContent = "Not selected";
+  }
+  
+  if (selectedTime) {
+    const [hours, minutes] = selectedTime.split(':');
+    const hourNum = parseInt(hours);
+    if (!isNaN(hourNum)) {
       const period = hourNum >= 12 ? 'PM' : 'AM';
-      const hour12 = hourNum % 12 || 12; // Convert 0 to 12
+      const hour12 = hourNum % 12 || 12;
       timeValue.textContent = `${hour12}:${minutes} ${period}`;
     } else {
-      timeValue.textContent = "Not selected";
+      timeValue.textContent = selectedTime;
     }
-    
-    // Load personal details
-    const userDetails = JSON.parse(localStorage.getItem('userDetails'));
-    if (userDetails) {
-      nameValue.textContent = userDetails.name || "Not provided";
-      phoneValue.textContent = userDetails.phone || "Not provided";
-      emailValue.textContent = userDetails.email || "Not provided";
-    } else {
-      nameValue.textContent = "Not provided";
-      phoneValue.textContent = "Not provided";
-      emailValue.textContent = "Not provided";
-    }
-  } catch (e) {
-    console.error('Error loading booking details:', e);
-    
-    // Set fallback values
-    serviceValue.textContent = "Error loading";
-    servicePrice.textContent = "Error loading";
-    serviceDuration.textContent = "Error loading";
-    stylistValue.textContent = "Error loading";
-    stylistSpecialty.textContent = "Error loading";
-    dateValue.textContent = "Error loading";
-    timeValue.textContent = "Error loading";
-    nameValue.textContent = "Error loading";
-    phoneValue.textContent = "Error loading";
-    emailValue.textContent = "Error loading";
+  } else {
+    timeValue.textContent = "Not selected";
   }
+  
+  // Personal details
+  const userDetails = JSON.parse(localStorage.getItem('userDetails') || '{}');
+  nameValue.textContent = userDetails.name || "Not provided";
+  phoneValue.textContent = userDetails.phone || "Not provided";
+  emailValue.textContent = userDetails.email || "Not provided";
 };
 
 // Handle booking confirmation
 const confirmBooking = () => {
-  // In a real app, this would send data to your backend
-  // For now, we'll just show an alert and redirect
+  // Collect all booking data
+  const bookingData = {
+    service: JSON.parse(localStorage.getItem('selectedService') || '{}'),
+    stylist: JSON.parse(localStorage.getItem('selectedStylist') || '{}'),
+    date: localStorage.getItem('selectedDate'),
+    time: localStorage.getItem('selectedTime'),
+    user: JSON.parse(localStorage.getItem('userDetails') || '{}')
+  };
+  
+  // Show success message
   alert('Your appointment has been booked successfully!');
   
   // Clear booking data from localStorage
