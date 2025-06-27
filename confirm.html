@@ -286,33 +286,47 @@ const loadBookingDetails = () => {
   stylistValue.textContent = stylistData.name || "Not selected";
   stylistSpecialty.textContent = stylistData.specialty || "Not specified";
   
-  // Date and time
+  // Date and time - fixed to work with different storage formats
   const selectedDate = localStorage.getItem('selectedDate');
   const selectedTime = localStorage.getItem('selectedTime');
   
+  // Handle date - accepts both ISO strings and formatted dates
   if (selectedDate) {
-    const dateObj = new Date(selectedDate);
-    if (!isNaN(dateObj.getTime())) {
-      dateValue.textContent = dateObj.toLocaleDateString('en-US', {
-        month: 'long',
-        day: 'numeric',
-        year: 'numeric'
-      });
-    } else {
+    try {
+      // Try parsing as ISO string first
+      const dateObj = new Date(selectedDate);
+      if (!isNaN(dateObj.getTime())) {
+        dateValue.textContent = dateObj.toLocaleDateString('en-US', {
+          month: 'long',
+          day: 'numeric',
+          year: 'numeric'
+        });
+      } else {
+        // If not ISO, use the raw value
+        dateValue.textContent = selectedDate;
+      }
+    } catch (e) {
       dateValue.textContent = selectedDate;
     }
   } else {
     dateValue.textContent = "Not selected";
   }
   
+  // Handle time - accepts both 24h and 12h formats
   if (selectedTime) {
-    const [hours, minutes] = selectedTime.split(':');
-    const hourNum = parseInt(hours);
-    if (!isNaN(hourNum)) {
-      const period = hourNum >= 12 ? 'PM' : 'AM';
-      const hour12 = hourNum % 12 || 12;
-      timeValue.textContent = `${hour12}:${minutes} ${period}`;
-    } else {
+    try {
+      // Handle both "HH:MM" and "HH:MM:SS" formats
+      const [hours, minutes] = selectedTime.split(':');
+      const hourNum = parseInt(hours);
+      
+      if (!isNaN(hourNum)) {
+        const period = hourNum >= 12 ? 'PM' : 'AM';
+        const hour12 = hourNum % 12 || 12;
+        timeValue.textContent = `${hour12}:${minutes} ${period}`;
+      } else {
+        timeValue.textContent = selectedTime;
+      }
+    } catch (e) {
       timeValue.textContent = selectedTime;
     }
   } else {
