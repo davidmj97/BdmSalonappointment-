@@ -334,13 +334,13 @@
       const adminOrders = JSON.parse(localStorage.getItem('adminOrders') || []);
       adminOrders.push(bookingDetails);
       localStorage.setItem('adminOrders', JSON.stringify(adminOrders));
-      
+
       // Clear booking data
       localStorage.removeItem('selectedServices');
       localStorage.removeItem('selectedStylist');
       localStorage.removeItem('formattedDate');
       localStorage.removeItem('selectedTime');
-      
+
       // Redirect to confirmation page
       window.location.href = 'booking-confirmation.html';
     };
