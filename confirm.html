@@ -321,26 +321,23 @@
 
     // ONLY THIS PART IS NEW!
     const confirmBooking = () => {
-      // Save booking to orders for orders.html
-      const bookingDetails = {
-        services: JSON.parse(localStorage.getItem('selectedServices') || '[]'),
-        stylist: JSON.parse(localStorage.getItem('selectedStylist') || '{}'),
-        date: localStorage.getItem('formattedDate') || "",
-        time: localStorage.getItem('selectedTime') || "",
-        user: JSON.parse(localStorage.getItem('userDetails') || '{}'),
-        status: "pending",
-        id: Date.now()
-      };
+  const bookingDetails = {
+    services: JSON.parse(localStorage.getItem('selectedServices') || '[]'),
+    stylist: JSON.parse(localStorage.getItem('selectedStylist') || '{}'),
+    date: localStorage.getItem('formattedDate') || "",
+    time: localStorage.getItem('selectedTime') || "",
+    user: JSON.parse(localStorage.getItem('userDetails') || '{}'),
+    status: "pending",
+    id: Date.now()
+  };
 
-      const orders = JSON.parse(localStorage.getItem('orders') || '[]');
-      orders.push(bookingDetails);
-      localStorage.setItem('orders', JSON.stringify(orders));
+  const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+  orders.push(bookingDetails);
+  localStorage.setItem('orders', JSON.stringify(orders));
+  window.location.href = 'booking-confirmation.html';
+};
 
-      // Redirect to confirmation page
-      window.location.href = 'booking-confirmation.html';
-    };
-
-    confirmBtn.addEventListener('click', confirmBooking);
+confirmBtn.addEventListener('click', confirmBooking);
     window.addEventListener('DOMContentLoaded', loadBookingDetails);
   </script>
 </body>
