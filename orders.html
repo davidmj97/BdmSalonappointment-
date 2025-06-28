@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orders - BDM Salon</title>
+  <style>
+    :root {
+      --bg: #000;
+      --fg: #fff;
+      --accent: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+      --border-color: #444;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 20px;
+    }
+    .header h1 {
+      font-size: 24px;
+    }
+    .back-btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .orders-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .order-card {
+      background: #111;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 24px rgba(0,0,0,0.25);
+    }
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .order-id {
+      font-size: 18px;
+      font-weight: bold;
+      color: #90caf9;
+    }
+    .order-status {
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .status-pending {
+      background: #ff9800;
+      color: #000;
+    }
+    .status-confirmed {
+      background: #4caf50;
+      color: #fff;
+    }
+    .status-cancelled {
+      background: #f44336;
+      color: #fff;
+    }
+    .order-details-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+    .detail-item {
+      background: #222;
+      border-radius: 10px;
+      padding: 12px;
+    }
+    .detail-label {
+      font-size: 12px;
+      color: #bbb;
+      margin-bottom: 5px;
+    }
+    .detail-value {
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .services-list {
+      margin-top: 15px;
+    }
+    .service-item {
+      background: #1a237e;
+      color: #fff;
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+    }
+    .service-name {
+      font-weight: bold;
+      font-size: 14px;
+    }
+    .service-price {
+      font-size: 13px;
+    }
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    .action-btn {
+      flex: 1;
+      padding: 8px 15px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+    }
+    .accept-btn {
+      background: #4caf50;
+      color: white;
+    }
+    .cancel-btn {
+      background: #f44336;
+      color: white;
+    }
+    .no-orders {
+      text-align: center;
+      padding: 40px 20px;
+      font-size: 18px;
+    }
+    @media (max-width: 600px) {
+      .order-details-grid {
+        grid-template-columns: 1fr;
+      }
+      .action-buttons {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Orders</h1>
+    <button class="back-btn" onclick="window.location.href='customer-dashboard.html'">Back to Dashboard</button>
+  </div>
+  
+  <div class="orders-container" id="ordersContainer">
+    <!-- Orders will be inserted here -->
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const ordersContainer = document.getElementById('ordersContainer');
+      const adminOrders = JSON.parse(localStorage.getItem('adminOrders') || []);
+      
+      if (adminOrders.length === 0) {
+        ordersContainer.innerHTML = `
+          <div class="no-orders">
+            <p>No orders found</p>
+            <button class="back-btn" onclick="window.location.href='index.html'">Book Appointment</button>
+          </div>
+        `;
+        return;
+      }
+      
+      adminOrders.forEach(order => {
+        const orderCard = document.createElement('div');
+        orderCard.className = 'order-card';
+        
+        // Format date and time
+        const formattedDate = order.date || 'Not specified';
+        const formattedTime = order.time || 'Not specified';
+        
+        // Determine status
+        const statusClass = `status-${order.status}`;
+        const statusText = order.status.charAt(0).toUpperCase() + order.status.slice(1);
+        
+        orderCard.innerHTML = `
+          <div class="order-header">
+            <div class="order-id">Order #${order.id}</div>
+            <div class="order-status ${statusClass}">${statusText}</div>
+          </div>
+          
+          <div class="order-details-grid">
+            <div class="detail-item">
+              <div class="detail-label">Date</div>
+              <div class="detail-value">${formattedDate}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Time</div>
+              <div class="detail-value">${formattedTime}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Stylist</div>
+              <div class="detail-value">${order.stylist.name || 'Not specified'}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Customer</div>
+              <div class="detail-value">${order.user.name || 'Not specified'}</div>
+            </div>
+          </div>
+          
+          <div class="services-list">
+            <div class="detail-label">Services</div>
+            ${order.services.map(service => `
+              <div class="service-item">
+                <div class="service-name">${service.name || 'Not specified'}</div>
+                <div class="service-price">${service.price || 'Not specified'} | ${service.time || 'Not specified'}</div>
+              </div>
+            `).join('')}
+          </div>
+          
+          <div class="action-buttons">
+            <button class="action-btn accept-btn">Accept</button>
+            <button class="action-btn cancel-btn">Cancel</button>
+          </div>
+        `;
+        
+        ordersContainer.appendChild(orderCard);
+      });
+    });
+  </script>
+</body>
+</html>
