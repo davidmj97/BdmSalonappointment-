@@ -1,408 +1,333 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Confirm Booking - BDM Salon</title>
-<style>
-:root {
-  --bg: #000;
-  --fg: #fff;
-  --accent: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
-  --card-bg: #111;
-  --card-border: #333;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Helvetica Neue', Arial, sans-serif;
-  background: var(--bg);
-  color: var(--fg);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  padding-top: 150px;
-}
-
-.header-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  background: #000;
-  z-index: 100;
-  padding: 15px 0;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-}
-
-.step-heading {
-  text-align: center;
-  margin: 5px 0 15px;
-  font-size: 20px;
-  color: white;
-}
-
-.btn-container {
-  display: flex;
-  gap: 16px;
-  margin: 0 16px;
-  padding: 0;
-}
-
-.btn-prev,
-.confirm-btn {
-  flex: 1;
-  padding: 12px 24px;
-  border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-prev {
-  background: #444;
-  color: #fff;
-}
-
-.confirm-btn {
-  background: var(--accent);
-  color: white;
-}
-
-.container {
-  flex: 1;
-  padding: 30px 20px;
-  display: flex;
-  flex-direction: column;
-  max-width: 800px;
-  margin: 0 auto;
-  width: 100%;
-}
-
-.booking-card {
-  background: var(--card-bg);
-  border-radius: 16px;
-  padding: 30px;
-  border: 1px solid var(--card-border);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-}
-
-.booking-section {
-  margin-bottom: 30px;
-}
-
-.section-title {
-  font-size: 18px;
-  margin-bottom: 20px;
-  color: #bbb;
-  position: relative;
-  padding-bottom: 10px;
-}
-
-.section-title::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 50px;
-  height: 2px;
-  background: linear-gradient(90deg, #1a237e, #0d47a1);
-  border-radius: 2px;
-}
-
-.booking-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
-}
-
-.booking-item {
-  background: #1a1a1a;
-  border-radius: 10px;
-  padding: 15px;
-}
-
-.item-label {
-  font-size: 14px;
-  color: #999;
-  margin-bottom: 8px;
-}
-
-.item-value {
-  font-size: 16px;
-  font-weight: 500;
-}
-
-.service-item {
-  background: #222;
-  border-radius: 8px;
-  padding: 12px;
-  margin-bottom: 10px;
-}
-
-.service-property {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 5px;
-}
-
-.service-name {
-  font-weight: 600;
-}
-
-@media (max-width: 900px) {
-  body {
-    padding-top: 140px;
-  }
-  
-  .container {
-    padding: 20px 10px;
-  }
-  
-  .booking-card {
-    padding: 20px;
-  }
-  
-  .booking-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-::-webkit-scrollbar {
-  display: none;
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Confirm Booking – BDM Salon</title>
+  <style>
+    :root {
+      --bg: #000;
+      --fg: #fff;
+      --accent: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+      --border-color: #444;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding-top: 120px;
+    }
+    .header-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: #000;
+      z-index: 100;
+      padding: 10px 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    }
+    .step-heading {
+      text-align: center;
+      margin: 10px 0;
+      font-size: 20px;
+      color: white;
+    }
+    .btn-container {
+      display: flex;
+      gap: 16px;
+      margin: 0 16px 10px;
+      padding: 0;
+    }
+    .btn-prev,
+    .confirm-btn {
+      flex: 1;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-prev {
+      background: #444;
+      color: #fff;
+    }
+    .confirm-btn {
+      background: var(--accent);
+      color: white;
+    }
+    .btn-prev:disabled,
+    .confirm-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .container {
+      flex: 1;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+    }
+    .booking-card {
+      background: #111;
+      border-radius: 16px;
+      margin: 0 auto;
+      margin-top: 30px;
+      padding: 32px 20px;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 2px 24px rgba(0,0,0,0.25);
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+    .booking-section {
+      margin-bottom: 20px;
+    }
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      padding: 0 8px;
+      color: #90caf9;
+    }
+    .booking-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: space-between;
+    }
+    .booking-item {
+      background: #222;
+      border-radius: 10px;
+      padding: 16px 14px;
+      min-width: 120px;
+      flex: 1 1 40%;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.09);
+    }
+    .item-label {
+      font-size: 13px;
+      color: #bbb;
+      margin-bottom: 8px;
+    }
+    .item-value {
+      font-size: 16px;
+      font-weight: 500;
+      color: #fff;
+      word-break: break-word;
+    }
+    .service-item {
+      background: #1a237e;
+      color: #fff;
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      box-shadow: 0 1px 6px rgba(26,35,126,0.12);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .service-property {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 2px;
+      font-size: 14px;
+    }
+    .service-name {
+      font-weight: bold;
+      font-size: 15px;
+    }
+    @media (max-width: 600px) {
+      .booking-card {
+        padding: 12px 6px;
+        max-width: 99vw;
+        margin-top: 10px;
+      }
+      .booking-item {
+        min-width: 100px;
+        padding: 10px 7px;
+      }
+      .section-title {
+        font-size: 16px;
+      }
+      .service-property {
+        font-size: 13px;
+      }
+      .service-name {
+        font-size: 14px;
+      }
+    }
+    /* Hide scrollbar for this design */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+  </style>
 </head>
 <body>
-
-<!-- Fixed Header -->
-<div class="header-container">
-  <h1 class="step-heading">Step 5: Confirm Booking</h1>
-  
-  <div class="btn-container">
-    <button class="btn-prev" onclick="window.history.back()">Back</button>
-    <button class="confirm-btn" id="confirmBtn">Confirm and Book Appointment</button>
+  <div class="header-container">
+    <h1 class="step-heading">Step 5: Confirm Booking</h1>
+    <div class="btn-container">
+      <button class="btn-prev" onclick="window.history.back()">Back</button>
+      <button class="confirm-btn" id="confirmBtn">Confirm and Book Appointment</button>
+    </div>
   </div>
-</div>
-
-<!-- Main Container -->
-<div class="container">
-  <div class="booking-card">
-    <!-- Service Section -->
-    <div class="booking-section">
-      <h2 class="section-title">Service Details</h2>
-      <div id="servicesContainer"></div>
-    </div>
-    
-    <!-- Stylist Section -->
-    <div class="booking-section">
-      <h2 class="section-title">Stylist</h2>
-      <div class="booking-grid">
-        <div class="booking-item">
-          <div class="item-label">Stylist</div>
-          <div class="item-value" id="stylistValue"></div>
-        </div>
-        <div class="booking-item">
-          <div class="item-label">Specialty</div>
-          <div class="item-value" id="stylistSpecialty"></div>
+  <div class="container">
+    <div class="booking-card">
+      <div class="booking-section">
+        <h2 class="section-title">Service Details</h2>
+        <div id="servicesContainer"></div>
+      </div>
+      <div class="booking-section">
+        <h2 class="section-title">Stylist</h2>
+        <div class="booking-grid">
+          <div class="booking-item">
+            <div class="item-label">Stylist</div>
+            <div class="item-value" id="stylistValue"></div>
+          </div>
+          <div class="booking-item">
+            <div class="item-label">Specialty</div>
+            <div class="item-value" id="stylistSpecialty"></div>
+          </div>
         </div>
       </div>
-    </div>
-    
-    <!-- Date & Time Section -->
-    <div class="booking-section">
-      <h2 class="section-title">Date & Time</h2>
-      <div class="booking-grid">
-        <div class="booking-item">
-          <div class="item-label">Date</div>
-          <div class="item-value" id="dateValue"></div>
-        </div>
-        <div class="booking-item">
-          <div class="item-label">Time</div>
-          <div class="item-value" id="timeValue"></div>
-        </div>
-        <div class="booking-item">
-          <div class="item-label">Location</div>
-          <div class="item-value">BDM Salon, Main Street</div>
+      <div class="booking-section">
+        <h2 class="section-title">Date & Time</h2>
+        <div class="booking-grid">
+          <div class="booking-item">
+            <div class="item-label">Date</div>
+            <div class="item-value" id="dateValue"></div>
+          </div>
+          <div class="booking-item">
+            <div class="item-label">Time</div>
+            <div class="item-value" id="timeValue"></div>
+          </div>
+          <div class="booking-item">
+            <div class="item-label">Location</div>
+            <div class="item-value">BDM Salon, Main Street</div>
+          </div>
         </div>
       </div>
-    </div>
-    
-    <!-- Personal Details Section -->
-    <div class="booking-section">
-      <h2 class="section-title">Personal Details</h2>
-      <div class="booking-grid">
-        <div class="booking-item">
-          <div class="item-label">Name</div>
-          <div class="item-value" id="nameValue"></div>
-        </div>
-        <div class="booking-item">
-          <div class="item-label">Phone</div>
-          <div class="item-value" id="phoneValue"></div>
-        </div>
-        <div class="booking-item">
-          <div class="item-label">Email</div>
-          <div class="item-value" id="emailValue"></div>
+      <div class="booking-section">
+        <h2 class="section-title">Personal Details</h2>
+        <div class="booking-grid">
+          <div class="booking-item">
+            <div class="item-label">Name</div>
+            <div class="item-value" id="nameValue"></div>
+          </div>
+          <div class="booking-item">
+            <div class="item-label">Phone</div>
+            <div class="item-value" id="phoneValue"></div>
+          </div>
+          <div class="booking-item">
+            <div class="item-label">Email</div>
+            <div class="item-value" id="emailValue"></div>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
-
-<script>
-// DOM Elements
-const servicesContainer = document.getElementById('servicesContainer');
-const stylistValue = document.getElementById('stylistValue');
-const stylistSpecialty = document.getElementById('stylistSpecialty');
-const dateValue = document.getElementById('dateValue');
-const timeValue = document.getElementById('timeValue');
-const nameValue = document.getElementById('nameValue');
-const phoneValue = document.getElementById('phoneValue');
-const emailValue = document.getElementById('emailValue');
-const confirmBtn = document.getElementById('confirmBtn');
-
-// Load booking details from localStorage
-const loadBookingDetails = () => {
-  // Service details
-  const servicesData = localStorage.getItem('selectedServices');
-  if (servicesData) {
-    try {
-      const services = JSON.parse(servicesData);
-      servicesContainer.innerHTML = '';
-      services.forEach(service => {
-        const serviceItem = document.createElement('div');
-        serviceItem.classList.add('service-item');
-        serviceItem.innerHTML = `
-          <div class="service-property">
-            <span class="service-name">${service.name || "Not selected"}</span>
-            <span>${service.price || "Not selected"}</span>
-          </div>
-          <div class="service-property">
-            <span>Duration:</span>
-            <span>${service.time || "Not selected"}</span>
-          </div>
-          <div class="service-property">
-            <span>Points:</span>
-            <span>${service.points || "Not selected"}</span>
-          </div>
-        `;
-        servicesContainer.appendChild(serviceItem);
-      });
-    } catch (e) {
-      servicesContainer.innerHTML = '<div class="booking-item">Error loading services</div>';
-    }
-  } else {
-    servicesContainer.innerHTML = '<div class="booking-item">No services selected</div>';
-  }
-  
-  // Stylist details
-  const stylistData = localStorage.getItem('selectedStylist');
-  if (stylistData) {
-    try {
-      const stylist = JSON.parse(stylistData);
-      stylistValue.textContent = stylist.name || "Not selected";
-      stylistSpecialty.textContent = stylist.specialty || "Not specified";
-    } catch (e) {
-      stylistValue.textContent = "Error loading stylist";
-      stylistSpecialty.textContent = "Error loading specialty";
-    }
-  } else {
-    stylistValue.textContent = "Not selected";
-    stylistSpecialty.textContent = "Not specified";
-  }
-  
-  // FIXED DATE FORMATTING - MATHEMATICAL SOLUTION
-  const selectedDate = localStorage.getItem('selectedDate');
-  if (selectedDate) {
-    const dateParts = selectedDate.split('-');
-    const year = parseInt(dateParts[0]);
-    const month = parseInt(dateParts[1]); // 1-12
-    const day = parseInt(dateParts[2]);
-    
-    // Month names
-    const monthNames = [
-      "January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December"
-    ];
-    
-    // Weekday names
-    const weekdayNames = [
-      "Sunday", "Monday", "Tuesday", "Wednesday", 
-      "Thursday", "Friday", "Saturday"
-    ];
-    
-    // Calculate weekday using Zeller's Congruence
-    const q = day;
-    const m = month < 3 ? month + 12 : month;
-    const Y = month < 3 ? year - 1 : year;
-    
-    // Calculate weekday index (0=Saturday, 1=Sunday, ..., 6=Friday)
-    const h = (q + Math.floor((13*(m+1))/5) + Y + Math.floor(Y/4) - Math.floor(Y/100) + Math.floor(Y/400)) % 7;
-    
-    // Adjust to 0=Sunday, 1=Monday, ..., 6=Saturday
-    const weekdayIndex = (h + 5) % 7;
-    
-    // Format date manually
-    const formattedDate = `${weekdayNames[weekdayIndex]}, ${monthNames[month-1]} ${day}, ${year}`;
-    
-    dateValue.textContent = formattedDate;
-  } else {
-    dateValue.textContent = "Not selected";
-  }
-  
-  // Time display
-  const selectedTime = localStorage.getItem('selectedTime');
-  timeValue.textContent = selectedTime || "Not selected";
-  
-  // Personal details
-  const userDetails = localStorage.getItem('userDetails');
-  if (userDetails) {
-    try {
-      const user = JSON.parse(userDetails);
-      nameValue.textContent = user.name || "Not provided";
-      phoneValue.textContent = user.phone || "Not provided";
-      emailValue.textContent = user.email || "Not provided";
-    } catch (e) {
-      nameValue.textContent = "Error loading name";
-      phoneValue.textContent = "Error loading phone";
-      emailValue.textContent = "Error loading email";
-    }
-  } else {
-    nameValue.textContent = "Not provided";
-    phoneValue.textContent = "Not provided";
-    emailValue.textContent = "Not provided";
-  }
-};
-
-// Handle booking confirmation
-const confirmBooking = () => {
-  alert('Your appointment has been booked successfully!');
-  
-  // Clear booking data
-  localStorage.removeItem('selectedServices');
-  localStorage.removeItem('selectedService');
-  localStorage.removeItem('selectedStylist');
-  localStorage.removeItem('selectedDate');
-  localStorage.removeItem('formattedDate');
-  localStorage.removeItem('selectedTime');
-  localStorage.removeItem('userDetails');
-  
-  // Redirect to home page
-  window.location.href = 'index.html';
-};
-
-// Set up event listeners
-confirmBtn.addEventListener('click', confirmBooking);
-
-// Initialize page
-window.addEventListener('DOMContentLoaded', loadBookingDetails);
-</script>
+  <script>
+    const servicesContainer = document.getElementById('servicesContainer');
+    const stylistValue = document.getElementById('stylistValue');
+    const stylistSpecialty = document.getElementById('stylistSpecialty');
+    const dateValue = document.getElementById('dateValue');
+    const timeValue = document.getElementById('timeValue');
+    const nameValue = document.getElementById('nameValue');
+    const phoneValue = document.getElementById('phoneValue');
+    const emailValue = document.getElementById('emailValue');
+    const confirmBtn = document.getElementById('confirmBtn');
+    const loadBookingDetails = () => {
+      const servicesData = localStorage.getItem('selectedServices');
+      if (servicesData) {
+        try {
+          const services = JSON.parse(servicesData);
+          servicesContainer.innerHTML = '';
+          services.forEach(service => {
+            const serviceItem = document.createElement('div');
+            serviceItem.classList.add('service-item');
+            serviceItem.innerHTML = `
+              <div class="service-property">
+                <span class="service-name">${service.name || "Not selected"}</span>
+                <span>${service.price || "Not selected"}</span>
+              </div>
+              <div class="service-property">
+                <span>Duration:</span>
+                <span>${service.time || "Not selected"}</span>
+              </div>
+              <div class="service-property">
+                <span>Points:</span>
+                <span>${service.points || "Not selected"}</span>
+              </div>
+            `;
+            servicesContainer.appendChild(serviceItem);
+          });
+        } catch (e) {
+          servicesContainer.innerHTML = '<div class="booking-item">Error loading services</div>';
+        }
+      } else {
+        servicesContainer.innerHTML = '<div class="booking-item">No services selected</div>';
+      }
+      const stylistData = localStorage.getItem('selectedStylist');
+      if (stylistData) {
+        try {
+          const stylist = JSON.parse(stylistData);
+          stylistValue.textContent = stylist.name || "Not selected";
+          stylistSpecialty.textContent = stylist.specialty || "Not specified";
+        } catch (e) {
+          stylistValue.textContent = "Error loading stylist";
+          stylistSpecialty.textContent = "Error loading specialty";
+        }
+      } else {
+        stylistValue.textContent = "Not selected";
+        stylistSpecialty.textContent = "Not specified";
+      }
+      const formattedDate = localStorage.getItem('formattedDate');
+      dateValue.textContent = formattedDate || "Not selected";
+      const selectedTime = localStorage.getItem('selectedTime');
+      timeValue.textContent = selectedTime || "Not selected";
+      const userDetails = localStorage.getItem('userDetails');
+      if (userDetails) {
+        try {
+          const user = JSON.parse(userDetails);
+          nameValue.textContent = user.name || "Not provided";
+          phoneValue.textContent = user.phone || "Not provided";
+          emailValue.textContent = user.email || "Not provided";
+        } catch (e) {
+          nameValue.textContent = "Error loading name";
+          phoneValue.textContent = "Error loading phone";
+          emailValue.textContent = "Error loading email";
+        }
+      } else {
+        nameValue.textContent = "Not provided";
+        phoneValue.textContent = "Not provided";
+        emailValue.textContent = "Not provided";
+      }
+    };
+    const confirmBooking = () => {
+      alert('Your appointment has been booked successfully!');
+      localStorage.removeItem('selectedServices');
+      localStorage.removeItem('selectedService');
+      localStorage.removeItem('selectedStylist');
+      localStorage.removeItem('selectedDate');
+      localStorage.removeItem('formattedDate');
+      localStorage.removeItem('selectedTime');
+      localStorage.removeItem('userDetails');
+      window.location.href = 'index.html';
+    };
+    confirmBtn.addEventListener('click', confirmBooking);
+    window.addEventListener('DOMContentLoaded', loadBookingDetails);
+  </script>
 </body>
 </html>
