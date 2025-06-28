@@ -502,16 +502,37 @@ nextBtn.addEventListener('click', () => {
   localStorage.setItem('selectedDate', selectedDate);
   localStorage.setItem('selectedTime', selectedTime);
   
-  // Also store formatted date for display
-  // FIX: Create date object in local timezone
-  const dateObj = new Date(selectedDate + 'T12:00:00');  // Set to noon to avoid timezone shift
+  // MANUAL DATE FORMATTING WITHOUT DATE OBJECT
+  const dateParts = selectedDate.split('-');
+  const year = parseInt(dateParts[0]);
+  const month = parseInt(dateParts[1]); // 1-12
+  const day = parseInt(dateParts[2]);
   
-  const formattedDate = dateObj.toLocaleDateString('en-US', {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric'
-  });
+  // Month names array
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+  
+  // Weekday names array
+  const weekdayNames = [
+    "Sunday", "Monday", "Tuesday", "Wednesday", 
+    "Thursday", "Friday", "Saturday"
+  ];
+  
+  // Zeller's Congruence algorithm for weekday calculation
+  const q = day;
+  const m = month < 3 ? month + 12 : month; // Adjust months: March=3, April=4, ..., Feb=14
+  const Y = month < 3 ? year - 1 : year; // Adjust year if Jan or Feb
+  
+  // Calculate weekday index (0=Saturday, 1=Sunday, ..., 6=Friday)
+  const h = (q + Math.floor((13*(m+1))/5) + Y + Math.floor(Y/4) - Math.floor(Y/100) + Math.floor(Y/400)) % 7;
+  
+  // Adjust to 0=Sunday, 1=Monday, ..., 6=Saturday
+  const weekdayIndex = (h + 5) % 7;
+  
+  // Format date manually
+  const formattedDate = `${weekdayNames[weekdayIndex]}, ${monthNames[month-1]} ${day}, ${year}`;
   
   localStorage.setItem('formattedDate', formattedDate);
   
