@@ -72,7 +72,7 @@
       cursor: not-allowed;
     }
     .container {
-      flex: 1;
+      flex: 极;
       padding: 16px;
       display: flex;
       flex-direction: column;
@@ -114,12 +114,13 @@
       flex: 1 1 40%;
       display: flex;
       flex-direction: column;
+      align-items: flex-start;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.09);
     }
     .item-label {
-      font-size: 14px;
-      color: #90caf9;
-      margin-bottom: 4px;
-      font-weight: 600;
+      font-size: 13px;
+      color: #bbb;
+      margin-bottom: 8px;
     }
     .item-value {
       font-size: 16px;
@@ -237,7 +238,6 @@
     </div>
   </div>
   <script>
-    // Get DOM elements
     const servicesContainer = document.getElementById('servicesContainer');
     const stylistValue = document.getElementById('stylistValue');
     const stylistSpecialty = document.getElementById('stylistSpecialty');
@@ -248,7 +248,6 @@
     const emailValue = document.getElementById('emailValue');
     const confirmBtn = document.getElementById('confirmBtn');
     
-    // Load booking details from localStorage
     const loadBookingDetails = () => {
       const servicesData = localStorage.getItem('selectedServices');
       if (servicesData) {
@@ -257,66 +256,92 @@
           servicesContainer.innerHTML = '';
           services.forEach(service => {
             const serviceItem = document.createElement('div');
-            serviceItem.className = 'service-item';
+            serviceItem.classList.add('service-item');
             serviceItem.innerHTML = `
-              <div class="service-name">${service.name}</div>
-              <div class="service-property"><span>Duration</span><span>${service.duration}</span></div>
-              <div class="service-property"><span>Price</span><span>${service.price}</span></div>
+              <div class="service-property">
+                <span class="service-name">${service.name || "Not selected"}</span>
+                <span>${service.price || "Not selected"}</span>
+              </div>
+              <div class="service-property">
+                <span>Duration:</span>
+                <span>${service.time || "Not selected"}</span>
+              </div>
+              <div class="service-property">
+                <span>Points:</span>
+                <span>${service.points || "Not selected"}</span>
+              </div>
             `;
             servicesContainer.appendChild(serviceItem);
           });
-        } catch (error) {
-          servicesContainer.textContent = 'Failed to load services.';
+        } catch (e) {
+          servicesContainer.innerHTML = '<div class="booking-item">Error loading services</div>';
         }
+      } else {
+        servicesContainer.innerHTML = '<div class="booking-item">No services selected</div>';
       }
-      stylistValue.textContent = localStorage.getItem('selectedStylist') || '';
-      stylistSpecialty.textContent = localStorage.getItem('selectedStylistSpecialty') || '';
-      dateValue.textContent = localStorage.getItem('selectedDate') || '';
-      timeValue.textContent = localStorage.getItem('selectedTime') || '';
-      nameValue.textContent = localStorage.getItem('customerName') || '';
-      phoneValue.textContent = localStorage.getItem('customerPhone') || '';
-      emailValue.textContent = localStorage.getItem('customerEmail') || '';
+      
+      const stylistData = localStorage.getItem('selectedStylist');
+      if (stylistData) {
+        try {
+          const stylist = JSON.parse(stylistData);
+          stylistValue.textContent = stylist.name || "Not selected";
+          stylistSpecialty.textContent = stylist.specialty || "Not specified";
+        } catch (e) {
+          stylistValue.textContent = "Error loading stylist";
+          stylistSpecialty.textContent = "Error loading specialty";
+        }
+      } else {
+        stylistValue.textContent = "Not selected";
+        stylistSpecialty.textContent = "Not specified";
+      }
+      
+      const formattedDate = localStorage.getItem('formattedDate');
+      dateValue.textContent = formattedDate || "Not selected";
+      const selectedTime = localStorage.getItem('selectedTime');
+      timeValue.textContent = selectedTime || "Not selected";
+      
+      const userDetails = localStorage.getItem('userDetails');
+      if (userDetails) {
+        try {
+          const user = JSON.parse(userDetails);
+          nameValue.textContent = user.name || "Not provided";
+          phoneValue.textContent = user.phone || "Not provided";
+          emailValue.textContent = user.email || "Not provided";
+        } catch (e) {
+          nameValue.textContent = "Error loading name";
+          phoneValue.textContent = "Error loading phone";
+          emailValue.textContent = "Error loading email";
+        }
+      } else {
+        nameValue.textContent = "Not provided";
+        phoneValue.textContent = "Not provided";
+        emailValue.textContent = "Not provided";
+      }
     };
 
-    // Save booking as an order and redirect to booking-confirmation.html
-    confirmBtn.addEventListener('click', function() {
-      // Gather booking data
-      const order = {
+    // ONLY THIS PART IS NEW!
+    const confirmBooking = () => {
+      // Save booking to orders for orders.html
+      const bookingDetails = {
         services: JSON.parse(localStorage.getItem('selectedServices') || '[]'),
-        stylist: localStorage.getItem('selectedStylist') || '',
-        stylistSpecialty: localStorage.getItem('selectedStylistSpecialty') || '',
-        date: localStorage.getItem('selectedDate') || '',
-        time: localStorage.getItem('selectedTime') || '',
-        location: 'BDM Salon, Main Street',
-        customerName: localStorage.getItem('customerName') || '',
-        customerPhone: localStorage.getItem('customerPhone') || '',
-        customerEmail: localStorage.getItem('customerEmail') || '',
-        bookedAt: new Date().toISOString()
+        stylist: JSON.parse(localStorage.getItem('selectedStylist') || '{}'),
+        date: localStorage.getItem('formattedDate') || "",
+        time: localStorage.getItem('selectedTime') || "",
+        user: JSON.parse(localStorage.getItem('userDetails') || '{}'),
+        status: "pending",
+        id: Date.now()
       };
 
-      // Get existing orders
       const orders = JSON.parse(localStorage.getItem('orders') || '[]');
-      // Add new order to array
-      orders.push(order);
-      // Save back to localStorage
+      orders.push(bookingDetails);
       localStorage.setItem('orders', JSON.stringify(orders));
-
-      // Optionally, clear booking-specific data (but NOT orders)
-      // localStorage.removeItem('selectedServices');
-      // localStorage.removeItem('selectedStylist');
-      // localStorage.removeItem('selectedStylistSpecialty');
-      // localStorage.removeItem('selectedDate');
-      // localStorage.removeItem('selectedTime');
-      // localStorage.removeItem('customerName');
-      // localStorage.removeItem('customerPhone');
-      // localStorage.removeItem('customerEmail');
 
       // Redirect to confirmation page
       window.location.href = 'booking-confirmation.html';
-    });
+    };
 
-    // On page load
-    window.onload = loadBookingDetails;
+    confirmBtn.addEventListener('click', confirmBooking);
+    window.addEventListener('DOMContentLoaded', loadBookingDetails);
   </script>
 </body>
 </html>
