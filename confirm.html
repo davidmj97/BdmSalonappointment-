@@ -26,10 +26,9 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  padding-top: 150px; /* Space for fixed header */
+  padding-top: 150px;
 }
 
-/* Fixed Header - Matching Step 4 */
 .header-container {
   position: fixed;
   top: 0;
@@ -77,7 +76,6 @@ body {
   color: white;
 }
 
-/* Main Container */
 .container {
   flex: 1;
   padding: 30px 20px;
@@ -88,13 +86,12 @@ body {
   width: 100%;
 }
 
-/* Booking Card */
 .booking-card {
   background: var(--card-bg);
   border-radius: 16px;
   padding: 30px;
   border: 1px solid var(--card-border);
-  box-shadow: 极 10px 30px rgba(0,0,0,0.3);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
 
 .booking-section {
@@ -143,7 +140,6 @@ body {
   font-weight: 500;
 }
 
-/* Service item styling */
 .service-item {
   background: #222;
   border-radius: 8px;
@@ -161,7 +157,6 @@ body {
   font-weight: 600;
 }
 
-/* Mobile adjustments */
 @media (max-width: 900px) {
   body {
     padding-top: 140px;
@@ -180,7 +175,6 @@ body {
   }
 }
 
-/* Hide scrollbar */
 ::-webkit-scrollbar {
   display: none;
 }
@@ -188,11 +182,10 @@ body {
 </head>
 <body>
 
-<!-- Fixed Header - Matching Step 4 -->
+<!-- Fixed Header -->
 <div class="header-container">
   <h1 class="step-heading">Step 5: Confirm Booking</h1>
   
-  <!-- Navigation Buttons -->
   <div class="btn-container">
     <button class="btn-prev" onclick="window.history.back()">Back</button>
     <button class="confirm-btn" id="confirmBtn">Confirm and Book Appointment</button>
@@ -201,14 +194,11 @@ body {
 
 <!-- Main Container -->
 <div class="container">
-  <!-- Booking Details Card -->
-  <div class极="booking-card">
+  <div class="booking-card">
     <!-- Service Section -->
     <div class="booking-section">
       <h2 class="section-title">Service Details</h2>
-      <div id="servicesContainer">
-        <!-- Services will be inserted here via JavaScript -->
-      </div>
+      <div id="servicesContainer"></div>
     </div>
     
     <!-- Stylist Section -->
@@ -280,19 +270,12 @@ const confirmBtn = document.getElementById('confirmBtn');
 
 // Load booking details from localStorage
 const loadBookingDetails = () => {
-  console.log("Loading booking details from localStorage...");
-  
-  // Service details - multiple services
+  // Service details
   const servicesData = localStorage.getItem('selectedServices');
   if (servicesData) {
     try {
       const services = JSON.parse(servicesData);
-      console.log("Service data:", services);
-      
-      // Clear previous services
       servicesContainer.innerHTML = '';
-      
-      // Render each service
       services.forEach(service => {
         const serviceItem = document.createElement('div');
         serviceItem.classList.add('service-item');
@@ -313,11 +296,9 @@ const loadBookingDetails = () => {
         servicesContainer.appendChild(serviceItem);
       });
     } catch (e) {
-      console.error("Error parsing service data:", e);
       servicesContainer.innerHTML = '<div class="booking-item">Error loading services</div>';
     }
   } else {
-    console.warn("No service data found in localStorage");
     servicesContainer.innerHTML = '<div class="booking-item">No services selected</div>';
   }
   
@@ -326,114 +307,85 @@ const loadBookingDetails = () => {
   if (stylistData) {
     try {
       const stylist = JSON.parse(stylistData);
-      console.log("Stylist data:", stylist);
       stylistValue.textContent = stylist.name || "Not selected";
       stylistSpecialty.textContent = stylist.specialty || "Not specified";
     } catch (e) {
-      console.error("Error parsing stylist data:", e);
       stylistValue.textContent = "Error loading stylist";
       stylistSpecialty.textContent = "Error loading specialty";
     }
   } else {
-    console.warn("No stylist data found in localStorage");
     stylistValue.textContent = "Not selected";
     stylistSpecialty.textContent = "Not specified";
   }
   
-  // Date and time - FIXED DATE DISPLAY
+  // FIXED DATE FORMATTING - MATHEMATICAL SOLUTION
   const selectedDate = localStorage.getItem('selectedDate');
   if (selectedDate) {
-    // Parse date string and format manually
     const dateParts = selectedDate.split('-');
-    const year = dateParts[0];
-    const month = dateParts[1];
-    const day = dateParts[2];
+    const year = parseInt(dateParts[0]);
+    const month = parseInt(dateParts[1]); // 1-12
+    const day = parseInt(dateParts[2]);
     
-    // Month names array
+    // Month names
     const monthNames = [
       "January", "February", "March", "April", "May", "June",
       "July", "August", "September", "October", "November", "December"
     ];
     
-    // Weekday names array
+    // Weekday names
     const weekdayNames = [
       "Sunday", "Monday", "Tuesday", "Wednesday", 
       "Thursday", "Friday", "Saturday"
     ];
     
-    // Create date object in UTC to avoid timezone issues
-    const dateObj = new Date(Date.UTC(
-      parseInt(year),
-      parseInt(month),
-      parseInt(day)
-    ));
+    // Calculate weekday using Zeller's Congruence
+    const q = day;
+    const m = month < 3 ? month + 12 : month;
+    const Y = month < 3 ? year - 1 : year;
     
-    // Get weekday index (0=Sunday, 6=Saturday)
-    const weekdayIndex = dateObj.getUTCDay();
+    // Calculate weekday index (0=Saturday, 1=Sunday, ..., 6=Friday)
+    const h = (q + Math.floor((13*(m+1))/5) + Y + Math.floor(Y/4) - Math.floor(Y/100) + Math.floor(Y/400)) % 7;
+    
+    // Adjust to 0=Sunday, 1=Monday, ..., 6=Saturday
+    const weekdayIndex = (h + 5) % 7;
     
     // Format date manually
-    const formattedDate = `${weekdayNames[weekdayIndex]}, ${monthNames[parseInt(month)-1]} ${parseInt(day)}, ${year}`;
+    const formattedDate = `${weekdayNames[weekdayIndex]}, ${monthNames[month-1]} ${day}, ${year}`;
     
     dateValue.textContent = formattedDate;
   } else {
-    console.warn("No date found in localStorage");
     dateValue.textContent = "Not selected";
   }
   
+  // Time display
   const selectedTime = localStorage.getItem('selectedTime');
-  if (selectedTime) {
-    console.log("Selected time:", selectedTime);
-    timeValue.textContent = selectedTime;
-  } else {
-    console.warn("No time found in localStorage");
-    timeValue.textContent = "Not selected";
-  }
+  timeValue.textContent = selectedTime || "Not selected";
   
   // Personal details
   const userDetails = localStorage.getItem('userDetails');
   if (userDetails) {
     try {
       const user = JSON.parse(userDetails);
-      console.log("User details:", user);
       nameValue.textContent = user.name || "Not provided";
       phoneValue.textContent = user.phone || "Not provided";
       emailValue.textContent = user.email || "Not provided";
     } catch (e) {
-      console.error("Error parsing user details:", e);
       nameValue.textContent = "Error loading name";
       phoneValue.textContent = "Error loading phone";
       emailValue.textContent = "Error loading email";
     }
   } else {
-    console.warn("No user details found in localStorage");
     nameValue.textContent = "Not provided";
-    phoneValue.textContent = "极 provided";
+    phoneValue.textContent = "Not provided";
     emailValue.textContent = "Not provided";
-  }
-  
-  // Log all localStorage contents for debugging
-  console.log("All localStorage contents:");
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    console.log(`${key}: ${localStorage.getItem(key)}`);
   }
 };
 
 // Handle booking confirmation
 const confirmBooking = () => {
-  // Collect all booking data
-  const bookingData = {
-    services: localStorage.getItem('selectedServices'),
-    stylist: localStorage.getItem('selectedStylist'),
-    date: localStorage.getItem('selectedDate'),
-    time: localStorage.getItem('selectedTime'),
-    user: localStorage.getItem('userDetails')
-  };
-  
-  // Show success message
   alert('Your appointment has been booked successfully!');
   
-  // Clear booking data from localStorage
+  // Clear booking data
   localStorage.removeItem('selectedServices');
   localStorage.removeItem('selectedService');
   localStorage.removeItem('selectedStylist');
