@@ -174,7 +174,8 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const ordersContainer = document.getElementById('ordersContainer');
-      const adminOrders = JSON.parse(localStorage.getItem('adminOrders') || []);
+      // The key must match what confirm.html uses: 'orders'
+      const adminOrders = JSON.parse(localStorage.getItem('orders') || '[]');
       
       if (adminOrders.length === 0) {
         ordersContainer.innerHTML = `
@@ -196,11 +197,11 @@
         
         // Determine status
         const statusClass = `status-${order.status}`;
-        const statusText = order.status.charAt(0).toUpperCase() + order.status.slice(1);
+        const statusText = order.status ? order.status.charAt(0).toUpperCase() + order.status.slice(1) : "Pending";
         
         orderCard.innerHTML = `
           <div class="order-header">
-            <div class="order-id">Order #${order.id}</div>
+            <div class="order-id">Order #${order.id || ""}</div>
             <div class="order-status ${statusClass}">${statusText}</div>
           </div>
           
@@ -215,17 +216,17 @@
             </div>
             <div class="detail-item">
               <div class="detail-label">Stylist</div>
-              <div class="detail-value">${order.stylist.name || 'Not specified'}</div>
+              <div class="detail-value">${order.stylist && order.stylist.name ? order.stylist.name : 'Not specified'}</div>
             </div>
             <div class="detail-item">
               <div class="detail-label">Customer</div>
-              <div class="detail-value">${order.user.name || 'Not specified'}</div>
+              <div class="detail-value">${order.user && order.user.name ? order.user.name : 'Not specified'}</div>
             </div>
           </div>
           
           <div class="services-list">
             <div class="detail-label">Services</div>
-            ${order.services.map(service => `
+            ${(order.services || []).map(service => `
               <div class="service-item">
                 <div class="service-name">${service.name || 'Not specified'}</div>
                 <div class="service-price">${service.price || 'Not specified'} | ${service.time || 'Not specified'}</div>
