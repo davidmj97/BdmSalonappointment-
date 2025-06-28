@@ -4,11 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Confirm Booking – BDM Salon</title>
-  <!-- Add EmailJS SDK -->
   <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
   <script>
     (function() {
-      emailjs.init("YOUR_USER_ID"); // Initialize with your EmailJS user ID
+      emailjs.init("YOUR_USER_ID");
     })();
   </script>
   <style>
@@ -179,6 +178,24 @@
     ::-webkit-scrollbar {
       display: none;
     }
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 10px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .spinner-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
   </style>
 </head>
 <body>
@@ -326,62 +343,65 @@
       }
     };
     
-    const confirmBooking = () => {
-      // Collect booking details
-      const bookingDetails = {
-        services: JSON.parse(localStorage.getItem('selectedServices') || []),
-        stylist: JSON.parse(localStorage.getItem('selectedStylist') || {}),
-        date: localStorage.getItem('formattedDate') || "",
-        time: localStorage.getItem('selectedTime') || "",
-        user: JSON.parse(localStorage.getItem('userDetails') || {}),
-        status: "pending", // Initial status
-        id: Date.now() // Unique booking ID
-      };
-      
-      // Save booking to admin orders
-      const adminOrders = JSON.parse(localStorage.getItem('adminOrders') || []);
-      adminOrders.push(bookingDetails);
-      localStorage.setItem('adminOrders', JSON.stringify(adminOrders));
-      
-      // Prepare email data
-      const emailData = {
-        to_user: bookingDetails.user.email,
-        to_admin: "admin@salon.com", // Replace with admin email
-        user_name: bookingDetails.user.name,
-        booking_date: bookingDetails.date,
-        booking_time: bookingDetails.time,
-        stylist_name: bookingDetails.stylist.name,
-        services: bookingDetails.services.map(s => s.name).join(", ")
-      };
-      
-      // Send confirmation email to user
-      emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
-        to_email: emailData.to_user,
-        message: `Your appointment is confirmed for ${emailData.booking_date} at ${emailData.booking_time} with ${emailData.stylist_name}. Services: ${emailData.services}`
-      }).then(() => {
-        console.log('User email sent successfully!');
-      }, (error) => {
-        console.error('Failed to send user email:', error);
-      });
-      
-      // Send notification to admin
-      emailjs.send("YOUR_SERVICE_ID", "ADMIN_TEMPLATE_ID", {
-        to_email: emailData.to_admin,
-        message: `New appointment: ${emailData.user_name} on ${emailData.booking_date} at ${emailData.booking_time}`
-      }).then(() => {
-        console.log('Admin email sent successfully!');
-      }, (error) => {
-        console.error('Failed to send admin email:', error);
-      });
-      
-      // Clear booking data
-      localStorage.removeItem('selectedServices');
-      localStorage.removeItem('selectedStylist');
-      localStorage.removeItem('formattedDate');
-      localStorage.removeItem('selectedTime');
-      
-      // Redirect to confirmation page
-      window.location.href = 'booking-confirmation.html';
+    const confirmBooking = async () => {
+      try {
+        confirmBtn.disabled = true;
+        confirmBtn.innerHTML = '<div class="spinner-container"><div class="spinner"></div> Processing...</div>';
+        
+        const bookingDetails = {
+          services: JSON.parse(localStorage.getItem('selectedServices') || []),
+          stylist: JSON.parse(localStorage.getItem('selectedStylist') || {}),
+          date: localStorage.getItem('formattedDate') || "",
+          time: localStorage.getItem('selectedTime') || "",
+          user: JSON.parse(localStorage.getItem('userDetails') || {}),
+          status: "pending",
+          id: Date.now()
+        };
+
+        const adminOrders = JSON.parse(localStorage.getItem('adminOrders') || []);
+        adminOrders.push(bookingDetails);
+        localStorage.setItem('adminOrders', JSON.stringify(adminOrders));
+
+        const emailData = {
+          to_user: bookingDetails.user.email,
+          to_admin: "admin@salon.com",
+          user_name: bookingDetails.user.name,
+          booking_date: bookingDetails.date,
+          booking_time: bookingDetails.time,
+          stylist_name: bookingDetails.stylist.name,
+          services: bookingDetails.services.map(s => s.name).join(", ")
+        };
+
+        await emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
+          to_email: emailData.to_user,
+          user_name: emailData.user_name,
+          booking_date: emailData.booking_date,
+          booking_time: emailData.booking_time,
+          stylist_name: emailData.stylist_name,
+          services: emailData.services
+        });
+
+        await emailjs.send("YOUR_SERVICE_ID", "ADMIN_TEMPLATE_ID", {
+          to_email: emailData.to_admin,
+          user_name: emailData.user_name,
+          booking_date: emailData.booking_date,
+          booking_time: emailData.booking_time,
+          stylist_name: emailData.stylist_name,
+          services: emailData.services
+        });
+
+        localStorage.removeItem('selectedServices');
+        localStorage.removeItem('selectedStylist');
+        localStorage.removeItem('formattedDate');
+        localStorage.removeItem('selectedTime');
+
+        window.location.href = 'booking-confirmation.html';
+      } catch (error) {
+        console.error('Booking confirmation failed:', error);
+        alert('Failed to confirm booking. Please try again.');
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = "Confirm and Book Appointment";
+      }
     };
     
     confirmBtn.addEventListener('click', confirmBooking);
