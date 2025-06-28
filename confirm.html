@@ -72,7 +72,7 @@
       cursor: not-allowed;
     }
     .container {
-      flex: 1;
+      flex: 极;
       padding: 16px;
       display: flex;
       flex-direction: column;
@@ -196,7 +196,7 @@
             <div class="item-value" id="stylistValue"></div>
           </div>
           <div class="booking-item">
-            <极 class="item-label">Specialty</div>
+            <div class="item-label">Specialty</div>
             <div class="item-value" id="stylistSpecialty"></div>
           </div>
         </div>
@@ -238,137 +238,115 @@
     </div>
   </div>
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Get DOM elements
-      const servicesContainer = document.getElementById('servicesContainer');
-      const stylistValue = document.getElementById('stylistValue');
-      const stylistSpecialty = document.getElementById('stylistSpecialty');
-      const dateValue = document.getElementById('dateValue');
-      const timeValue = document.getElementById('timeValue');
-      const nameValue = document.getElementById('nameValue');
-      const phoneValue = document.getElementById('phoneValue');
-      const emailValue = document.getElementById('emailValue');
-      const confirmBtn = document.getElementById('confirmBtn');
-      
-      // Load booking details from localStorage
-      function loadBookingDetails() {
-        // Load services
-        const servicesData = localStorage.getItem('selectedServices');
-        if (servicesData) {
-          try {
-            const services = JSON.parse(servicesData);
-            servicesContainer.innerHTML = '';
-            services.forEach(service => {
-              const serviceItem = document.createElement('div');
-              serviceItem.classList.add('service-item');
-              serviceItem.innerHTML = `
-                <div class="service-property">
-                  <span class="service-name">${service.name || "Not selected"}</span>
-                  <span>${service.price || "Not selected"}</span>
-                </div>
-                <div class="service-property">
-                  <span>Duration:</span>
-                  <span>${service.time || "Not selected"}</span>
-                </div>
-                <div class="service-property">
-                  <span>Points:</span>
-                  <span>${service.points || "Not selected"}</span>
-                </div>
-              `;
-              servicesContainer.appendChild(serviceItem);
-            });
-          } catch (e) {
-            servicesContainer.innerHTML = '<div class="booking-item">Error loading services</div>';
-          }
-        } else {
-          servicesContainer.innerHTML = '<div class="booking-item">No services selected</div>';
-        }
-        
-        // Load stylist
-        const stylistData = localStorage.getItem('selectedStylist');
-        if (stylistData) {
-          try {
-            const stylist = JSON.parse(stylistData);
-            stylistValue.textContent = stylist.name || "Not selected";
-            stylistSpecialty.textContent = stylist.specialty || "Not specified";
-          } catch (e) {
-            stylistValue.textContent = "Error loading stylist";
-            stylistSpecialty.textContent = "Error loading specialty";
-          }
-        } else {
-          stylistValue.textContent = "Not selected";
-          stylistSpecialty.textContent = "Not specified";
-        }
-        
-        // Load date and time
-        const formattedDate = localStorage.getItem('formattedDate');
-        dateValue.textContent = formattedDate || "Not selected";
-        const selectedTime = localStorage.getItem('selectedTime');
-        timeValue.textContent = selectedTime || "Not selected";
-        
-        // Load user details
-        const userDetails = localStorage.getItem('userDetails');
-        if (userDetails) {
-          try {
-            const user = JSON.parse(userDetails);
-            nameValue.textContent = user.name || "Not provided";
-            phoneValue.textContent = user.phone || "Not provided";
-            emailValue.textContent = user.email || "Not provided";
-          } catch (e) {
-            nameValue.textContent = "Error loading name";
-            phoneValue.textContent = "Error loading phone";
-            emailValue.textContent = "Error loading email";
-          }
-        } else {
-          nameValue.textContent = "Not provided";
-          phoneValue.textContent = "Not provided";
-          emailValue.textContent = "Not provided";
-        }
-      }
-      
-      // Confirm booking function
-      function confirmBooking() {
+    const servicesContainer = document.getElementById('servicesContainer');
+    const stylistValue = document.getElementById('stylistValue');
+    const stylistSpecialty = document.getElementById('stylistSpecialty');
+    const dateValue = document.getElementById('dateValue');
+    const timeValue = document.getElementById('timeValue');
+    const nameValue = document.getElementById('nameValue');
+    const phoneValue = document.getElementById('phoneValue');
+    const emailValue = document.getElementById('emailValue');
+    const confirmBtn = document.getElementById('confirmBtn');
+    
+    const loadBookingDetails = () => {
+      const servicesData = localStorage.getItem('selectedServices');
+      if (servicesData) {
         try {
-          // Save booking to admin orders
-          const bookingDetails = {
-            services: JSON.parse(localStorage.getItem('selectedServices') || []),
-            stylist: JSON.parse(localStorage.getItem('selectedStylist') || {}),
-            date: localStorage.getItem('formattedDate') || "",
-            time: localStorage.getItem('selectedTime') || "",
-            user: JSON.parse(localStorage.getItem('userDetails') || {}),
-            status: "pending",
-            id: Date.now()
-          };
-          
-          // Update admin orders
-          const adminOrders = JSON.parse(localStorage.getItem('adminOrders') || []);
-          adminOrders.push(bookingDetails);
-          localStorage.setItem('adminOrders', JSON.stringify(adminOrders));
-          
-          // Clear booking data
-          localStorage.removeItem('selectedServices');
-          localStorage.removeItem('selectedStylist');
-          localStorage.removeItem('formattedDate');
-          localStorage.removeItem('selectedTime');
-          
-          // Redirect to confirmation page
-          window.location.href = 'booking-confirmation.html';
-        } catch (error) {
-          console.error('Booking error:', error);
-          alert('Error confirming booking. Please try again.');
+          const services = JSON.parse(servicesData);
+          servicesContainer.innerHTML = '';
+          services.forEach(service => {
+            const serviceItem = document.createElement('div');
+            serviceItem.classList.add('service-item');
+            serviceItem.innerHTML = `
+              <div class="service-property">
+                <span class="service-name">${service.name || "Not selected"}</span>
+                <span>${service.price || "Not selected"}</span>
+              </div>
+              <div class="service-property">
+                <span>Duration:</span>
+                <span>${service.time || "Not selected"}</span>
+              </div>
+              <div class="service-property">
+                <span>Points:</span>
+                <span>${service.points || "Not selected"}</span>
+              </div>
+            `;
+            servicesContainer.appendChild(serviceItem);
+          });
+        } catch (e) {
+          servicesContainer.innerHTML = '<div class="booking-item">Error loading services</div>';
         }
-      }
-      
-      // Initialize page
-      loadBookingDetails();
-      
-      // Add event listener to button
-      if (confirmBtn) {
-        confirmBtn.addEventListener('click', confirmBooking);
       } else {
-        console.error('Confirm button not found!');
+        servicesContainer.innerHTML = '<div class="booking-item">No services selected</div>';
       }
-    });
+      
+      const stylistData = localStorage.getItem('selectedStylist');
+      if (stylistData) {
+        try {
+          const stylist = JSON.parse(stylistData);
+          stylistValue.textContent = stylist.name || "Not selected";
+          stylistSpecialty.textContent = stylist.specialty || "Not specified";
+        } catch (e) {
+          stylistValue.textContent = "Error loading stylist";
+          stylistSpecialty.textContent = "Error loading specialty";
+        }
+      } else {
+        stylistValue.textContent = "Not selected";
+        stylistSpecialty.textContent = "Not specified";
+      }
+      
+      const formattedDate = localStorage.getItem('formattedDate');
+      dateValue.textContent = formattedDate || "Not selected";
+      const selectedTime = localStorage.getItem('selectedTime');
+      timeValue.textContent = selectedTime || "Not selected";
+      
+      const userDetails = localStorage.getItem('userDetails');
+      if (userDetails) {
+        try {
+          const user = JSON.parse(userDetails);
+          nameValue.textContent = user.name || "Not provided";
+          phoneValue.textContent = user.phone || "Not provided";
+          emailValue.textContent = user.email || "Not provided";
+        } catch (e) {
+          nameValue.textContent = "Error loading name";
+          phoneValue.textContent = "Error loading phone";
+          emailValue.textContent = "Error loading email";
+        }
+      } else {
+        nameValue.textContent = "Not provided";
+        phoneValue.textContent = "Not provided";
+        emailValue.textContent = "Not provided";
+      }
+    };
+    
+    const confirmBooking = () => {
+      // Save booking to admin orders
+      const bookingDetails = {
+        services: JSON.parse(localStorage.getItem('selectedServices') || []),
+        stylist: JSON.parse(localStorage.getItem('selectedStylist') || {}),
+        date: localStorage.getItem('formattedDate') || "",
+        time: localStorage.getItem('selectedTime') || "",
+        user: JSON.parse(localStorage.getItem('userDetails') || {}),
+        status: "pending",
+        id: Date.now()
+      };
+      
+      const adminOrders = JSON.parse(localStorage.getItem('adminOrders') || []);
+      adminOrders.push(bookingDetails);
+      localStorage.setItem('adminOrders', JSON.stringify(adminOrders));
+      
+      // Clear booking data
+      localStorage.removeItem('selectedServices');
+      localStorage.removeItem('selectedStylist');
+      localStorage.removeItem('formattedDate');
+      localStorage.removeItem('selectedTime');
+      
+      // Redirect to confirmation page
+      window.location.href = 'booking-confirmation.html';
+    };
+    
+    confirmBtn.addEventListener('click', confirmBooking);
+    window.addEventListener('DOMContentLoaded', loadBookingDetails);
   </script>
 </body>
 </html>
