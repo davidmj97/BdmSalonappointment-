@@ -4,6 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Confirm Booking – BDM Salon</title>
+  <!-- Add EmailJS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <script>
+    (function() {
+      emailjs.init("YOUR_USER_ID"); // Initialize with your EmailJS user ID
+    })();
+  </script>
   <style>
     :root {
       --bg: #000;
@@ -247,6 +254,7 @@
     const phoneValue = document.getElementById('phoneValue');
     const emailValue = document.getElementById('emailValue');
     const confirmBtn = document.getElementById('confirmBtn');
+    
     const loadBookingDetails = () => {
       const servicesData = localStorage.getItem('selectedServices');
       if (servicesData) {
@@ -278,6 +286,7 @@
       } else {
         servicesContainer.innerHTML = '<div class="booking-item">No services selected</div>';
       }
+      
       const stylistData = localStorage.getItem('selectedStylist');
       if (stylistData) {
         try {
@@ -292,10 +301,12 @@
         stylistValue.textContent = "Not selected";
         stylistSpecialty.textContent = "Not specified";
       }
+      
       const formattedDate = localStorage.getItem('formattedDate');
       dateValue.textContent = formattedDate || "Not selected";
       const selectedTime = localStorage.getItem('selectedTime');
       timeValue.textContent = selectedTime || "Not selected";
+      
       const userDetails = localStorage.getItem('userDetails');
       if (userDetails) {
         try {
@@ -314,17 +325,65 @@
         emailValue.textContent = "Not provided";
       }
     };
+    
     const confirmBooking = () => {
-      alert('Your appointment has been booked successfully!');
+      // Collect booking details
+      const bookingDetails = {
+        services: JSON.parse(localStorage.getItem('selectedServices') || []),
+        stylist: JSON.parse(localStorage.getItem('selectedStylist') || {}),
+        date: localStorage.getItem('formattedDate') || "",
+        time: localStorage.getItem('selectedTime') || "",
+        user: JSON.parse(localStorage.getItem('userDetails') || {}),
+        status: "pending", // Initial status
+        id: Date.now() // Unique booking ID
+      };
+      
+      // Save booking to admin orders
+      const adminOrders = JSON.parse(localStorage.getItem('adminOrders') || []);
+      adminOrders.push(bookingDetails);
+      localStorage.setItem('adminOrders', JSON.stringify(adminOrders));
+      
+      // Prepare email data
+      const emailData = {
+        to_user: bookingDetails.user.email,
+        to_admin: "admin@salon.com", // Replace with admin email
+        user_name: bookingDetails.user.name,
+        booking_date: bookingDetails.date,
+        booking_time: bookingDetails.time,
+        stylist_name: bookingDetails.stylist.name,
+        services: bookingDetails.services.map(s => s.name).join(", ")
+      };
+      
+      // Send confirmation email to user
+      emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
+        to_email: emailData.to_user,
+        message: `Your appointment is confirmed for ${emailData.booking_date} at ${emailData.booking_time} with ${emailData.stylist_name}. Services: ${emailData.services}`
+      }).then(() => {
+        console.log('User email sent successfully!');
+      }, (error) => {
+        console.error('Failed to send user email:', error);
+      });
+      
+      // Send notification to admin
+      emailjs.send("YOUR_SERVICE_ID", "ADMIN_TEMPLATE_ID", {
+        to_email: emailData.to_admin,
+        message: `New appointment: ${emailData.user_name} on ${emailData.booking_date} at ${emailData.booking_time}`
+      }).then(() => {
+        console.log('Admin email sent successfully!');
+      }, (error) => {
+        console.error('Failed to send admin email:', error);
+      });
+      
+      // Clear booking data
       localStorage.removeItem('selectedServices');
-      localStorage.removeItem('selectedService');
       localStorage.removeItem('selectedStylist');
-      localStorage.removeItem('selectedDate');
       localStorage.removeItem('formattedDate');
       localStorage.removeItem('selectedTime');
-      localStorage.removeItem('userDetails');
-      window.location.href = 'index.html';
+      
+      // Redirect to confirmation page
+      window.location.href = 'booking-confirmation.html';
     };
+    
     confirmBtn.addEventListener('click', confirmBooking);
     window.addEventListener('DOMContentLoaded', loadBookingDetails);
   </script>
