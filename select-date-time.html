@@ -529,8 +529,7 @@ nextBtn.addEventListener('click', () => {
   const h = (q + Math.floor((13*(m+1))/5) + Y + Math.floor(Y/4) - Math.floor(Y/100) + Math.floor(Y/400)) % 7;
   
   // Adjust to 0=Sunday, 1=Monday, ..., 6=Saturday
-  const weekdayIndex = (h + 5) % 7;
-  
+const weekdayIndex = (h + 6) % 7;  
   // Format date manually
   const formattedDate = `${weekdayNames[weekdayIndex]}, ${monthNames[month-1]} ${day}, ${year}`;
   
