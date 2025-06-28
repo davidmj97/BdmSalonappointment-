@@ -238,6 +238,7 @@
     </div>
   </div>
   <script>
+    // DOM elements
     const servicesContainer = document.getElementById('servicesContainer');
     const stylistValue = document.getElementById('stylistValue');
     const stylistSpecialty = document.getElementById('stylistSpecialty');
@@ -248,7 +249,9 @@
     const emailValue = document.getElementById('emailValue');
     const confirmBtn = document.getElementById('confirmBtn');
     
+    // Load booking details from localStorage
     const loadBookingDetails = () => {
+      // Load services
       const servicesData = localStorage.getItem('selectedServices');
       if (servicesData) {
         try {
@@ -280,6 +283,7 @@
         servicesContainer.innerHTML = '<div class="booking-item">No services selected</div>';
       }
       
+      // Load stylist
       const stylistData = localStorage.getItem('selectedStylist');
       if (stylistData) {
         try {
@@ -295,11 +299,13 @@
         stylistSpecialty.textContent = "Not specified";
       }
       
+      // Load date and time
       const formattedDate = localStorage.getItem('formattedDate');
       dateValue.textContent = formattedDate || "Not selected";
       const selectedTime = localStorage.getItem('selectedTime');
       timeValue.textContent = selectedTime || "Not selected";
       
+      // Load user details
       const userDetails = localStorage.getItem('userDetails');
       if (userDetails) {
         try {
@@ -319,34 +325,51 @@
       }
     };
     
+    // Confirm booking function
     const confirmBooking = () => {
-      // Save booking to admin orders
-      const bookingDetails = {
-        services: JSON.parse(localStorage.getItem('selectedServices') || []),
-        stylist: JSON.parse(localStorage.getItem('selectedStylist') || {}),
-        date: localStorage.getItem('formattedDate') || "",
-        time: localStorage.getItem('selectedTime') || "",
-        user: JSON.parse(localStorage.getItem('userDetails') || {}),
-        status: "pending",
-        id: Date.now()
-      };
-      
-      const adminOrders = JSON.parse(localStorage.getItem('adminOrders') || []);
-      adminOrders.push(bookingDetails);
-      localStorage.setItem('adminOrders', JSON.stringify(adminOrders));
-
-      // Clear booking data
-      localStorage.removeItem('selectedServices');
-      localStorage.removeItem('selectedStylist');
-      localStorage.removeItem('formattedDate');
-      localStorage.removeItem('selectedTime');
-
-      // Redirect to confirmation page
-      window.location.href = 'booking-confirmation.html';
+      try {
+        // Save booking to admin orders
+        const bookingDetails = {
+          services: JSON.parse(localStorage.getItem('selectedServices') || []),
+          stylist: JSON.parse(localStorage.getItem('selectedStylist') || {}),
+          date: localStorage.getItem('formattedDate') || "",
+          time: localStorage.getItem('selectedTime') || "",
+          user: JSON.parse(localStorage.getItem('userDetails') || {}),
+          status: "pending",
+          id: Date.now()
+        };
+        
+        // Update admin orders
+        const adminOrders = JSON.parse(localStorage.getItem('adminOrders') || []);
+        adminOrders.push(bookingDetails);
+        localStorage.setItem('adminOrders', JSON.stringify(adminOrders));
+        
+        // Clear booking data
+        localStorage.removeItem('selectedServices');
+        localStorage.removeItem('selectedStylist');
+        localStorage.removeItem('formattedDate');
+        localStorage.removeItem('selectedTime');
+        
+        // Redirect to confirmation page
+        window.location.href = 'booking-confirmation.html';
+      } catch (error) {
+        console.error('Booking error:', error);
+        alert('Error confirming booking. Please try again.');
+      }
     };
     
-    confirmBtn.addEventListener('click', confirmBooking);
-    window.addEventListener('DOMContentLoaded', loadBookingDetails);
+    // Initialize after DOM is fully loaded
+    document.addEventListener('DOMContentLoaded', () => {
+      // Load booking details
+      loadBookingDetails();
+      
+      // Add event listener to button
+      if (confirmBtn) {
+        confirmBtn.addEventListener('click', confirmBooking);
+      } else {
+        console.error('Confirm button not found!');
+      }
+    });
   </script>
 </body>
 </html>
