@@ -94,7 +94,7 @@ body {
   border-radius: 16px;
   padding: 30px;
   border: 1px solid var(--card-border);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  box-shadow: 极 10px 30px rgba(0,0,0,0.3);
 }
 
 .booking-section {
@@ -202,7 +202,7 @@ body {
 <!-- Main Container -->
 <div class="container">
   <!-- Booking Details Card -->
-  <div class="booking-card">
+  <div class极="booking-card">
     <!-- Service Section -->
     <div class="booking-section">
       <h2 class="section-title">Service Details</h2>
@@ -340,13 +340,43 @@ const loadBookingDetails = () => {
     stylistSpecialty.textContent = "Not specified";
   }
   
-  // Date and time
-  const formattedDate = localStorage.getItem('formattedDate');
-  if (formattedDate) {
-    console.log("Formatted date:", formattedDate);
+  // Date and time - FIXED DATE DISPLAY
+  const selectedDate = localStorage.getItem('selectedDate');
+  if (selectedDate) {
+    // Parse date string and format manually
+    const dateParts = selectedDate.split('-');
+    const year = dateParts[0];
+    const month = dateParts[1];
+    const day = dateParts[2];
+    
+    // Month names array
+    const monthNames = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+    
+    // Weekday names array
+    const weekdayNames = [
+      "Sunday", "Monday", "Tuesday", "Wednesday", 
+      "Thursday", "Friday", "Saturday"
+    ];
+    
+    // Create date object in UTC to avoid timezone issues
+    const dateObj = new Date(Date.UTC(
+      parseInt(year),
+      parseInt(month) - 1,
+      parseInt(day)
+    ));
+    
+    // Get weekday index (0=Sunday, 6=Saturday)
+    const weekdayIndex = dateObj.getUTCDay();
+    
+    // Format date manually
+    const formattedDate = `${weekdayNames[weekdayIndex]}, ${monthNames[parseInt(month)-1]} ${parseInt(day)}, ${year}`;
+    
     dateValue.textContent = formattedDate;
   } else {
-    console.warn("No formatted date found in localStorage");
+    console.warn("No date found in localStorage");
     dateValue.textContent = "Not selected";
   }
   
@@ -377,7 +407,7 @@ const loadBookingDetails = () => {
   } else {
     console.warn("No user details found in localStorage");
     nameValue.textContent = "Not provided";
-    phoneValue.textContent = "Not provided";
+    phoneValue.textContent = "极 provided";
     emailValue.textContent = "Not provided";
   }
   
