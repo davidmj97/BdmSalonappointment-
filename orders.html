@@ -85,7 +85,28 @@
     .order-summary {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
+    }
+    .order-number {
+      font-weight: bold;
+      color: #90caf9;
+      font-size: 15px;
+    }
+    .customer-name {
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .order-date, .order-time {
+      font-size: 13px;
+      color: #bbb;
+    }
+    .order-services {
+      margin: 5px 0;
+      font-size: 13px;
+      color: #ddd;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .order-info {
       display: flex;
@@ -243,32 +264,70 @@
       const orders = JSON.parse(localStorage.getItem('orders') || '[]');
       displayOrders(orders);
 
-      function displayOrders(orders) {
-        // Clear containers
-        ordersContainer.innerHTML = '';
-        acceptedContainer.innerHTML = '';
-        cancelledContainer.innerHTML = '';
+      function generateOrderNumber(date, index) {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const day = String(today.getDate()).padStart(2, '0');
+      const count = String(index + 1).padStart(2, '0');
+      return `${year}${month}${day}${count}`;
+    }
 
-        orders.forEach(order => {
-          const orderCard = document.createElement('div');
-          orderCard.className = 'order-card';
-          
-          const formattedDate = order.date || 'Not specified';
-          const formattedTime = order.time || 'Not specified';
-          
-          orderCard.innerHTML = `
-            <div class="order-summary">
-              <div class="order-info">
-                <span>${order.user && order.user.name ? order.user.name : 'Not specified'}</span>
-                <span>${formattedDate}</span>
-                <span>${formattedTime}</span>
-              </div>
-              <div class="order-actions">
-                <button class="action-btn accept-btn" onclick="handleOrderAction(this, 'accepted', ${order.id})">Accept</button>
-                <button class="action-btn cancel-btn" onclick="handleOrderAction(this, 'cancelled', ${order.id})">Cancel</button>
-              </div>
+    function displayOrders(orders) {
+      // Clear containers
+      ordersContainer.innerHTML = '';
+      acceptedContainer.innerHTML = '';
+      cancelledContainer.innerHTML = '';
+
+      // Sort orders by date and time
+      const sortedOrders = [...orders].sort((a, b) => {
+        const dateA = new Date(`${a.date} ${a.time}`);
+        const dateB = new Date(`${b.date} ${b.time}`);
+        return dateA - dateB;
+      });
+
+      sortedOrders.forEach((order, index) => {
+        // Generate order number if it doesn't exist
+        if (!order.orderNumber) {
+          order.orderNumber = generateOrderNumber(order.date, index);
+          // Update the order in localStorage
+          const allOrders = JSON.parse(localStorage.getItem('orders') || '[]');
+          const orderIndex = allOrders.findIndex(o => o.id === order.id);
+          if (orderIndex !== -1) {
+            allOrders[orderIndex].orderNumber = order.orderNumber;
+            localStorage.setItem('orders', JSON.stringify(allOrders));
+          }
+        }
+
+        const orderCard = document.createElement('div');
+        orderCard.className = 'order-card';
+        
+        const formattedDate = order.date || 'Not specified';
+        const formattedTime = order.time || 'Not specified';
+        const serviceCount = order.services ? order.services.length : 0;
+        const serviceNames = order.services ? order.services.map(s => s.name).join(', ') : 'No services';
+        
+        orderCard.innerHTML = `
+          <div class="order-summary">
+            <div class="order-info">
+              <span class="order-number">#${order.orderNumber || order.id}</span>
+              <span class="customer-name">${order.user && order.user.name ? order.user.name : 'No Name'}</span>
             </div>
-          `;
+            <div class="order-info">
+              <span class="order-date">${formattedDate}</span>
+              <span class="order-time">${formattedTime}</span>
+            </div>
+            <div class="order-services">
+              <span>${serviceCount} service${serviceCount !== 1 ? 's' : ''}: ${serviceNames}</span>
+            </div>
+            ${order.status === 'pending' ? `
+            <div class="order-actions">
+              <button class="action-btn accept-btn" onclick="event.stopPropagation(); handleOrderAction(this, 'accepted', '${order.id}')">Accept</button>
+              <button class="action-btn cancel-btn" onclick="event.stopPropagation(); handleOrderAction(this, 'cancelled', '${order.id}')">Cancel</button>
+            </div>
+            ` : ''}
+          </div>
+        `;
 
           orderCard.addEventListener('click', () => showPopup(order));
 
@@ -286,8 +345,8 @@
       function showPopup(order) {
         popupDetails.innerHTML = `
           <div class="popup-item">
-            <div class="popup-label">Order ID</div>
-            <div class="popup-value">#${order.id || ""}</div>
+            <div class="popup-label">Order Number</div>
+            <div class="popup-value">#${order.orderNumber || order.id || ""}</div>
           </div>
           <div class="popup-item">
             <div class="popup-label">Date</div>
@@ -305,17 +364,28 @@
             <div class="popup-label">Customer</div>
             <div class="popup-value">${order.user && order.user.name ? order.user.name : 'Not specified'}</div>
           </div>
-          <div class="popup-item">
+          <div class="popup-item" style="grid-column: 1 / -1;">
             <div class="popup-label">Services</div>
             <div class="popup-value">
-              ${order.services.map(service => `
-                <div class="service-item">
-                  <div class="service-name">${service.name || 'Not specified'}</div>
-                  <div class="service-price">${service.price || 'Not specified'} | ${service.time || 'Not specified'}</div>
+              ${order.services ? order.services.map(service => `
+                <div class="service-item" style="background: #1a1a1a; padding: 10px; border-radius: 8px; margin-bottom: 8px;">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span class="service-name" style="font-weight: 600;">${service.name || 'Not specified'}</span>
+                    <span class="service-price" style="color: #90caf9;">${service.price || 'N/A'}</span>
+                  </div>
+                  <div style="font-size: 12px; color: #bbb;">
+                    Duration: ${service.time || 'Not specified'}
+                  </div>
+                  ${service.description ? `<div style="font-size: 12px; margin-top: 5px; color: #999;">${service.description}</div>` : ''}
                 </div>
-              `).join('')}
+              `).join('') : 'No services'}
             </div>
           </div>
+          ${order.status === 'pending' ? `
+          <div class="popup-item" style="grid-column: 1 / -1; display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px;">
+            <button class="action-btn cancel-btn" onclick="handleOrderAction(this, 'cancelled', '${order.id}')">Cancel Order</button>
+            <button class="action-btn accept-btn" onclick="handleOrderAction(this, 'accepted', '${order.id}')">Accept Order</button>
+          </div>` : ''}
         `;
         popup.classList.add('active');
       }
@@ -325,14 +395,35 @@
       }
 
       function handleOrderAction(button, status, orderId) {
+        if (status === 'accepted' && !confirm('Are you sure you want to accept this order?')) {
+          return;
+        }
+        if (status === 'cancelled' && !confirm('Are you sure you want to cancel this order?')) {
+          return;
+        }
+        
         const orders = JSON.parse(localStorage.getItem('orders') || '[]');
-        const orderIndex = orders.findIndex(order => order.id === orderId);
+        const orderIndex = orders.findIndex(order => order.id == orderId);
         
         if (orderIndex !== -1) {
           orders[orderIndex].status = status;
+          // Update the order number if this is the first status change
+          if (!orders[orderIndex].orderNumber) {
+            const today = new Date();
+            const orderDate = new Date(orders[orderIndex].date);
+            const orderCount = orders.filter(o => {
+              const oDate = new Date(o.date);
+              return oDate.toDateString() === orderDate.toDateString();
+            }).length;
+            orders[orderIndex].orderNumber = generateOrderNumber(orders[orderIndex].date, orderCount);
+          }
+          
           localStorage.setItem('orders', JSON.stringify(orders));
           displayOrders(orders);
           closePopup();
+          
+          // Show success message
+          alert(`Order has been ${status} successfully!`);
         }
       }
     });
