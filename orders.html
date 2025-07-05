@@ -4,6 +4,26 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Orders - BDM Salon</title>
+  <!-- Add Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script>
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyAmimDsjW_pF2NGw-w-40QzTsgmf1tdqyI",
+      authDomain: "bdmsalonappointment.firebaseapp.com",
+      projectId: "bdmsalonappointment",
+      storageBucket: "bdmsalonappointment.firebasestorage.app",
+      messagingSenderId: "123933913893",
+      appId: "1:123933913893:web:c1f57caf4dc2a5440ba0cc"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+  </script>
   <style>
     :root {
       --bg: #000;
@@ -240,6 +260,12 @@
       }
     }
   </style>
+  <!-- Add Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="firebase-db.js"></script>
 </head>
 <body>
   <div class="header">
@@ -277,13 +303,49 @@
   </div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Sign in anonymously to access Firebase
+      try {
+        await auth.signInAnonymously();
+        console.log('Signed in anonymously');
+        loadOrders();
+      } catch (error) {
+        console.error('Authentication error:', error);
+        alert('Error connecting to the server. Please refresh the page.');
+      }
       const ordersContainer = document.getElementById('pendingOrders');
       const acceptedContainer = document.getElementById('acceptedOrders');
       const cancelledContainer = document.getElementById('cancelledOrders');
       const popup = document.getElementById('orderPopup');
       const popupDetails = document.getElementById('popupDetails');
       
+      // Load orders from Firebase
+      function loadOrders() {
+        // Real-time listener for pending orders
+        db.collection('bookings').where('status', '==', 'pending')
+          .orderBy('date')
+          .onSnapshot(snapshot => {
+            const container = document.getElementById('pendingOrders');
+            displayOrders(snapshot.docs, container);
+          });
+
+        // Real-time listener for accepted orders
+        db.collection('bookings').where('status', '==', 'accepted')
+          .orderBy('date')
+          .onSnapshot(snapshot => {
+            const container = document.getElementById('acceptedOrders');
+            displayOrders(snapshot.docs, container);
+          });
+
+        // Real-time listener for cancelled orders
+        db.collection('bookings').where('status', '==', 'cancelled')
+          .orderBy('date')
+          .onSnapshot(snapshot => {
+            const container = document.getElementById('cancelledOrders');
+            displayOrders(snapshot.docs, container);
+          });
+      }
+
       // Initialize tabs
       const tabs = document.querySelectorAll('.tab');
       tabs.forEach(tab => {
@@ -297,9 +359,49 @@
         });
       });
 
-      // Load orders
-      const orders = JSON.parse(localStorage.getItem('orders') || '[]');
-      displayOrders(orders);
+      // Load and display orders from Firebase
+      function setupRealtimeListeners() {
+        // Listen for pending orders
+        const pendingUnsubscribe = BookingService.onBookingsUpdate((bookings) => {
+          displayOrders(bookings, 'pending', 'pendingOrders');
+        }, 'pending');
+
+        // Listen for accepted orders
+        const acceptedUnsubscribe = BookingService.onBookingsUpdate((bookings) => {
+          displayOrders(bookings, 'accepted', 'acceptedOrders');
+        }, 'accepted');
+
+        // Listen for cancelled orders
+        const cancelledUnsubscribe = BookingService.onBookingsUpdate((bookings) => {
+          displayOrders(bookings, 'cancelled', 'cancelledOrders');
+        }, 'cancelled');
+
+        // Return cleanup function
+        return () => {
+          pendingUnsubscribe();
+          acceptedUnsubscribe();
+          cancelledUnsubscribe();
+        };
+      }
+
+      // Initialize Firebase listeners
+      let cleanupListeners;
+      
+      // Sign in anonymously to access Firebase
+      firebase.auth().signInAnonymously()
+        .then(() => {
+          // Set up realtime listeners after successful authentication
+          cleanupListeners = setupRealtimeListeners();
+        })
+        .catch((error) => {
+          console.error("Authentication error: ", error);
+          alert("Error connecting to the server. Please refresh the page.");
+        });
+
+      // Clean up listeners when page unloads
+      window.addEventListener('beforeunload', () => {
+        if (cleanupListeners) cleanupListeners();
+      });
 
       function generateOrderNumber(date, index) {
       const today = new Date();
@@ -310,11 +412,65 @@
       return `${year}${month}${day}${count}`;
     }
 
-    function displayOrders(orders) {
-      // Clear containers
-      ordersContainer.innerHTML = '';
-      acceptedContainer.innerHTML = '';
-      cancelledContainer.innerHTML = '';
+    function displayOrders(docs, container) {
+      container.innerHTML = '';
+
+      // If no orders, show message
+      if (!docs || docs.length === 0) {
+        const status = container.id.replace('Orders', '');
+        const noOrdersMsg = document.createElement('div');
+        noOrdersMsg.className = 'no-orders';
+        noOrdersMsg.innerHTML = `
+          <p>No ${status} orders found</p>
+          ${status === 'pending' ? '<button class="back-btn" onclick="window.location.href=\'index.html\'">Book Appointment</button>' : ''}
+        `;
+        container.appendChild(noOrdersMsg);
+        return;
+      }
+
+      // Process each order
+      docs.forEach(doc => {
+        const order = { id: doc.id, ...doc.data() };
+        createOrderCard(order, container);
+      });
+    }
+
+    function createOrderCard(order, container) {
+      const orderCard = document.createElement('div');
+      orderCard.className = 'order-card';
+      
+      // Format date and time
+      const formattedDate = order.date ? new Date(order.date).toLocaleDateString() : 'Not specified';
+      const formattedTime = order.time || 'Not specified';
+      const serviceCount = order.services ? order.services.length : 0;
+      const serviceNames = order.services ? order.services.map(s => s.name).join(', ') : 'No services';
+      
+      orderCard.innerHTML = `
+        <div class="order-summary">
+          <div class="order-info">
+            <span class="order-number">#${order.id.substring(0, 8)}</span>
+            <span class="customer-name">${order.userName || 'No Name'}</span>
+          </div>
+          <div class="order-info">
+            <span class="order-date">${formattedDate}</span>
+            <span class="order-time">${formattedTime}</span>
+          </div>
+          <div class="order-services">
+            <span>${serviceCount} service${serviceCount !== 1 ? 's' : ''}: <span style="color: #90caf9;">${serviceNames}</span></span>
+          </div>
+          ${order.status === 'pending' ? `
+          <div class="order-actions">
+            <button class="action-btn accept-btn" onclick="updateOrderStatus('${order.id}', 'accepted')">Accept</button>
+            <button class="action-btn cancel-btn" onclick="updateOrderStatus('${order.id}', 'cancelled')">Cancel</button>
+          </div>
+          ` : ''}
+        </div>
+      `;
+
+      // Add click event to show details
+      orderCard.addEventListener('click', () => showOrderDetails(order));
+      container.appendChild(orderCard);
+    }
 
       // Sort orders by date and time
       const sortedOrders = [...orders].sort((a, b) => {
@@ -370,11 +526,11 @@
 
           // Add to appropriate container based on status
           if (order.status === 'accepted') {
-            acceptedContainer.appendChild(orderCard);
+            container.appendChild(orderCard);
           } else if (order.status === 'cancelled') {
-            cancelledContainer.appendChild(orderCard);
+            container.appendChild(orderCard);
           } else {
-            ordersContainer.appendChild(orderCard);
+            container.appendChild(orderCard);
           }
         });
       }
@@ -443,39 +599,117 @@
       document.body.style.overflow = 'auto';
     }
 
-      function handleOrderAction(button, status, orderId) {
-        if (status === 'accepted' && !confirm('Are you sure you want to accept this order?')) {
-          return;
-        }
-        if (status === 'cancelled' && !confirm('Are you sure you want to cancel this order?')) {
+      async function updateOrderStatus(orderId, status) {
+        const confirmMessage = status === 'accepted' 
+          ? 'Are you sure you want to accept this order?' 
+          : 'Are you sure you want to cancel this order?';
+        
+        if (!confirm(confirmMessage)) {
           return;
         }
         
-        const orders = JSON.parse(localStorage.getItem('orders') || '[]');
-        const orderIndex = orders.findIndex(order => order.id == orderId);
-        
-        if (orderIndex !== -1) {
-          orders[orderIndex].status = status;
-          // Update the order number if this is the first status change
-          if (!orders[orderIndex].orderNumber) {
-            const today = new Date();
-            const orderDate = new Date(orders[orderIndex].date);
-            const orderCount = orders.filter(o => {
-              const oDate = new Date(o.date);
-              return oDate.toDateString() === orderDate.toDateString();
-            }).length;
-            orders[orderIndex].orderNumber = generateOrderNumber(orders[orderIndex].date, orderCount);
-          }
-          
-          localStorage.setItem('orders', JSON.stringify(orders));
-          displayOrders(orders);
-          closePopup();
+        try {
+          // Update order status in Firebase
+          await db.collection('bookings').doc(orderId).update({
+            status: status,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
           
           // Show success message
           alert(`Order has been ${status} successfully!`);
+        } catch (error) {
+          console.error("Error updating order status: ", error);
+          alert("Error updating order. Please try again.");
         }
       }
+      
+      function showOrderDetails(order) {
+        const popup = document.getElementById('orderPopup');
+        const popupDetails = document.getElementById('popupDetails');
+        
+        // Format date and time
+        const formattedDate = order.date ? new Date(order.date).toLocaleDateString() : 'Not specified';
+        const formattedTime = order.time || 'Not specified';
+        
+        // Create popup content
+        popupDetails.innerHTML = `
+          <div class="popup-item">
+            <div class="popup-label">Order Number</div>
+            <div class="popup-value">#${order.id.substring(0, 8)}</div>
+          </div>
+          <div class="popup-item">
+            <div class="popup-label">Customer</div>
+            <div class="popup-value">${order.userName || 'Not specified'}</div>
+          </div>
+          <div class="popup-item">
+            <div class="popup-label">Email</div>
+            <div class="popup-value">${order.userEmail || 'Not specified'}</div>
+          </div>
+          <div class="popup-item">
+            <div class="popup-label">Phone</div>
+            <div class="popup-value">${order.userPhone || 'Not specified'}</div>
+          </div>
+          <div class="popup-item">
+            <div class="popup-label">Date</div>
+            <div class="popup-value">${formattedDate}</div>
+          </div>
+          <div class="popup-item">
+            <div class="popup-label">Time</div>
+            <div class="popup-value">${formattedTime}</div>
+          </div>
+          <div class="popup-item" style="grid-column: 1 / -1;">
+            <div class="popup-label">Services</div>
+            <div class="popup-value">
+              ${order.services ? order.services.map(service => `
+                <div class="service-item" style="background: #1a1a1a; padding: 10px; border-radius: 8px; margin-bottom: 8px;">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span style="font-weight: 600;">${service.name || 'Not specified'}</span>
+                    <span style="color: #90caf9;">${service.price || 'N/A'}</span>
+                  </div>
+                  <div style="font-size: 12px; color: #bbb;">
+                    Duration: ${service.time || 'Not specified'}
+                  </div>
+                </div>
+              `).join('') : 'No services'}
+            </div>
+          </div>
+          ${order.notes ? `
+          <div class="popup-item" style="grid-column: 1 / -1;">
+            <div class="popup-label">Notes</div>
+            <div class="popup-value">${order.notes}</div>
+          </div>
+          ` : ''}
+          ${order.status === 'pending' ? `
+          <div class="popup-item" style="grid-column: 1 / -1; display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px;">
+            <button class="action-btn cancel-btn" onclick="updateOrderStatus('${order.id}', 'cancelled')">Cancel Order</button>
+            <button class="action-btn accept-btn" onclick="updateOrderStatus('${order.id}', 'accepted')">Accept Order</button>
+          </div>
+          ` : ''}
+        `;
+        
+        // Show popup
+        popup.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        
+        // Close popup when clicking outside
+        popup.addEventListener('click', function(e) {
+          if (e.target === popup) {
+            closePopup();
+          }
+        });
+      }
+      
+      function closePopup() {
+        const popup = document.getElementById('orderPopup');
+        popup.classList.remove('active');
+        document.body.style.overflow = 'auto';
+      }
+      }
     });
+    
+    // Make functions available globally for button clicks
+    window.updateOrderStatus = updateOrderStatus;
+    window.closePopup = closePopup;
   </script>
 </body>
 </html>
