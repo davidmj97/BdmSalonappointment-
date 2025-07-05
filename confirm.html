@@ -72,7 +72,7 @@
       cursor: not-allowed;
     }
     .container {
-      flex: 极;
+      flex: 1;
       padding: 16px;
       display: flex;
       flex-direction: column;
@@ -237,7 +237,14 @@
       </div>
     </div>
   </div>
+
+  <!-- Add Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  
   <script>
+    // DOM Elements
     const servicesContainer = document.getElementById('servicesContainer');
     const stylistValue = document.getElementById('stylistValue');
     const stylistSpecialty = document.getElementById('stylistSpecialty');
@@ -248,6 +255,7 @@
     const emailValue = document.getElementById('emailValue');
     const confirmBtn = document.getElementById('confirmBtn');
     
+    // Load booking details
     const loadBookingDetails = () => {
       const servicesData = localStorage.getItem('selectedServices');
       if (servicesData) {
@@ -319,26 +327,59 @@
       }
     };
 
-    // ONLY THIS PART IS NEW!
-    const confirmBooking = () => {
-  const bookingDetails = {
-    services: JSON.parse(localStorage.getItem('selectedServices') || '[]'),
-    stylist: JSON.parse(localStorage.getItem('selectedStylist') || '{}'),
-    date: localStorage.getItem('formattedDate') || "",
-    time: localStorage.getItem('selectedTime') || "",
-    user: JSON.parse(localStorage.getItem('userDetails') || '{}'),
-    status: "pending",
-    id: Date.now()
-  };
+    // Confirm booking function
+    const confirmBooking = async () => {
+      // Show loading state
+      const confirmBtn = document.getElementById('confirmBtn');
+      const originalText = confirmBtn.textContent;
+      confirmBtn.disabled = true;
+      confirmBtn.textContent = 'Processing...';
 
-  const orders = JSON.parse(localStorage.getItem('orders') || '[]');
-  orders.push(bookingDetails);
-  localStorage.setItem('orders', JSON.stringify(orders));
-  window.location.href = 'booking-confirmation.html';
-};
+      try {
+        // Get user details from localStorage
+        const userDetails = JSON.parse(localStorage.getItem('userDetails') || '{}');
+        
+        // Create booking object
+        const bookingDetails = {
+          services: JSON.parse(localStorage.getItem('selectedServices') || '[]'),
+          stylist: JSON.parse(localStorage.getItem('selectedStylist') || '{}'),
+          date: localStorage.getItem('formattedDate') || "",
+          time: localStorage.getItem('selectedTime') || "",
+          user: {
+            name: userDetails.name || "Guest",
+            email: userDetails.email || "",
+            phone: userDetails.phone || ""
+          },
+          status: "pending",
+          createdAt: firebase.database.ServerValue.TIMESTAMP
+        };
 
-confirmBtn.addEventListener('click', confirmBooking);
+        // Push booking to Firebase
+        const newBookingRef = firebase.database().ref('bookings').push();
+        await newBookingRef.set(bookingDetails);
+        
+        // Store booking ID in localStorage for confirmation page
+        localStorage.setItem('currentBookingId', newBookingRef.key);
+        
+        // Clear booking data from localStorage
+        localStorage.removeItem('selectedServices');
+        localStorage.removeItem('selectedStylist');
+        localStorage.removeItem('formattedDate');
+        localStorage.removeItem('selectedTime');
+        
+        // Redirect to confirmation page
+        window.location.href = 'booking-confirmation.html';
+      } catch (error) {
+        console.error("Error saving booking:", error);
+        alert("There was an error processing your booking. Please try again.");
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = originalText;
+      }
+    };
+
+    // Event Listeners
     window.addEventListener('DOMContentLoaded', loadBookingDetails);
+    confirmBtn.addEventListener('click', confirmBooking);
   </script>
 </body>
 </html>
