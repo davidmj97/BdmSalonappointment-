@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - BDM Salon</title>
+    <style>
+        :root {
+            --primary: #1a237e;
+            --primary-dark: #000051;
+            --error: #d32f2f;
+            --success: #388e3c;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        body {
+            background: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .login-container {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--primary);
+        }
+        .logo h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+        .logo p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 500;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        .btn {
+            width: 100%;
+            padding: 0.8rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn:hover {
+            background: var(--primary-dark);
+        }
+        .error-message {
+            color: var(--error);
+            margin-top: 1rem;
+            text-align: center;
+            display: none;
+            font-size: 0.9rem;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .footer {
+            text-align: center;
+            margin-top: 2rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <h1>BDM Salon</h1>
+            <p>Admin Dashboard</p>
+        </div>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" required>
+            </div>
+            <button type="submit" class="btn" id="loginBtn">
+                <span class="btn-text">Login</span>
+            </button>
+            <div class="error-message" id="errorMessage"></div>
+        </form>
+        <div class="footer">
+            &copy; 2025 BDM Salon. All rights reserved.
+        </div>
+    </div>
+
+    <!-- Add Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.getElementById('loginForm');
+            const loginBtn = document.getElementById('loginBtn');
+            const btnText = loginBtn.querySelector('.btn-text');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            // Check if user is already logged in
+            firebase.auth().onAuthStateChanged((user) => {
+                if (user) {
+                    window.location.href = 'admin-dashboard.html';
+                }
+            });
+
+            // Handle login form submission
+            loginForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                
+                // Show loading state
+                loginBtn.disabled = true;
+                btnText.textContent = 'Logging in...';
+                loginBtn.insertAdjacentHTML('afterbegin', '<div class="loading"></div>');
+                errorMessage.style.display = 'none';
+                
+                try {
+                    // Sign in with email and password
+                    await firebase.auth().signInWithEmailAndPassword(email, password);
+                    
+                    // Redirect to admin dashboard
+                    window.location.href = 'admin-dashboard.html';
+                } catch (error) {
+                    console.error("Login error:", error);
+                    errorMessage.textContent = error.message;
+                    errorMessage.style.display = 'block';
+                    
+                    // Reset button state
+                    loginBtn.disabled = false;
+                    btnText.textContent = 'Login';
+                    const loadingIcon = loginBtn.querySelector('.loading');
+                    if (loadingIcon) {
+                        loadingIcon.remove();
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
