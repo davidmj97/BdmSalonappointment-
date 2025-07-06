@@ -517,12 +517,17 @@
           }
 
           if (isAvailable) {
-            timeCard.addEventListener('click', () => {
-              document.querySelectorAll('.time-card.selected').forEach(el => el.classList.remove('selected'));
-              timeCard.classList.add('selected');
-              selectedTime = `${slot.time}-${slot.endTime}`;
-              updateNextButton();
-            });
+           timeCard.addEventListener('click', () => {
+  if (isAvailable) {
+    document.querySelectorAll('.time-card.selected').forEach(el => el.classList.remove('selected'));
+    timeCard.classList.add('selected');
+    selectedTime = `${slot.time}-${slot.endTime}`;
+    // Store the slot ID and date for the booking confirmation
+    localStorage.setItem('selectedSlotId', availableSlot.id || `${slot.time}-${slot.endTime}`);
+    localStorage.setItem('selectedDate', selectedDate);
+    updateNextButton();
+  }
+});
           } else {
             timeCard.classList.add('unavailable');
             timeCard.title = 'This time slot is fully booked';
