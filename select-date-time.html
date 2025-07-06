@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Select Date & Time – BDM Salon</title>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   <style>
     :root {
       --bg: #000;
@@ -99,7 +101,12 @@
       align-items: center;
       position: relative;
       cursor: pointer;
-      /* keep original width/size (do not add min-width or width) */
+      transition: all 0.2s ease;
+      min-width: 100px;
+    }
+    .date-card.unavailable {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
     .date-day {
       font-size: 14px;
@@ -123,7 +130,7 @@
       background: #222;
       border-radius: 10px;
       padding: 16px 14px;
-      min-width: 100px;
+      min-width: 140px;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -133,18 +140,38 @@
       font-size: 15px;
       font-weight: 500;
       border: 2px solid transparent;
-      transition: all 0.15s;
+      transition: all 0.2s ease;
+      position: relative;
     }
     .time-card.selected {
       background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
       border-color: #90caf9;
       color: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
     .time-card.unavailable {
       background: #444;
-      color: #bbb;
+      color: #777;
       cursor: not-allowed;
       opacity: 0.6;
+    }
+    .time-card::after {
+      content: '';
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #4caf50;
+    }
+    .time-card.unavailable::after {
+      background: #f44336;
+    }
+    .time-card:hover:not(.unavailable) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
     .month-header {
       display: flex;
@@ -157,6 +184,8 @@
       font-size: 18px;
       font-weight: 600;
       color: #90caf9;
+      min-width: 200px;
+      text-align: center;
     }
     .nav-arrow {
       background: #222;
@@ -178,8 +207,21 @@
     #timesGrid {
       display: flex;
       flex-wrap: wrap;
-      gap: 16px;
-      justify-content: flex-start;
+      gap: 12px;
+      justify-content: center;
+    }
+    .loading {
+      text-align: center;
+      color: #90caf9;
+      padding: 20px;
+      font-style: italic;
+    }
+    .no-slots {
+      grid-column: 1 / -1;
+      text-align: center;
+      color: #aaa;
+      padding: 20px;
+      font-style: italic;
     }
     @media (max-width: 900px) {
       body {
@@ -187,12 +229,14 @@
       }
       .date-card {
         padding: 16px;
+        min-width: 80px;
       }
       .date-number {
         font-size: 24px;
       }
       .time-card {
         padding: 12px;
+        min-width: 120px;
       }
     }
     ::-webkit-scrollbar {
@@ -213,10 +257,12 @@
       <div>
         <div class="month-header">
           <button class="nav-arrow" id="prevMonthBtn">‹</button>
-          <div class="month-title" id="currentMonth">June 2025</div>
+          <div class="month-title" id="currentMonth">Loading...</div>
           <button class="nav-arrow" id="nextMonthBtn">›</button>
         </div>
-        <div class="cards-grid" id="datesGrid"></div>
+        <div class="cards-grid" id="datesGrid">
+          <div class="loading">Loading available dates...</div>
+        </div>
       </div>
       <div id="timeSelectionSection">
         <div class="section-title">Select Time</div>
@@ -224,8 +270,25 @@
       </div>
     </div>
   </div>
+
   <script>
-    // DOM references
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyAmimDsjW_pF2NGw-w-40QzTsgmf1tdqyI",
+      authDomain: "bdmsalonappointment.firebaseapp.com",
+      databaseURL: "https://bdmsalonappointment-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "bdmsalonappointment",
+      storageBucket: "bdmsalonappointment.firebasestorage.app",
+      messagingSenderId: "123933913893",
+      appId: "1:123933913893:web:c1f57caf4dc2a5440ba0cc",
+      measurementId: "G-Q0FVZRVS64"
+    };
+
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // DOM elements
     const datesGrid = document.getElementById('datesGrid');
     const timesGrid = document.getElementById('timesGrid');
     const nextBtn = document.getElementById('nextBtn');
@@ -234,129 +297,192 @@
     const currentMonthEl = document.getElementById('currentMonth');
     const timeSection = document.getElementById('timeSelectionSection');
 
+    // State
     let selectedDate = null;
     let selectedTime = null;
     let currentMonth = new Date().getMonth();
     let currentYear = new Date().getFullYear();
+    let availableSlots = {};
 
-    const bookedTimes = {
-      "2025-06-25": ["1:00 PM", "5:30 PM"],
-      "2025-06-26": ["9:00 AM", "11:30 AM"],
-      "2025-06-27": ["10:00 AM", "2:30 PM"],
-      "2025-06-28": ["3:00 PM", "4:30 PM"],
-      "2025-07-01": ["10:00 AM", "2:00 PM"],
-      "2025-07-02": ["11:00 AM", "3:30 PM"]
-    };
-
-    function renderDates() {
-      datesGrid.innerHTML = '';
-      const today = new Date();
-      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-      for (let d = 1; d <= daysInMonth; d++) {
-        const date = new Date(currentYear, currentMonth, d);
-        // Only show dates from today onwards
-        if (
-          date.getFullYear() < today.getFullYear() ||
-          (date.getFullYear() === today.getFullYear() && date.getMonth() < today.getMonth()) ||
-          (date.getFullYear() === today.getFullYear() && date.getMonth() === today.getMonth() && date.getDate() < today.getDate())
-        ) {
-          continue;
-        }
-        const year = date.getFullYear();
-        const month = date.getMonth() + 1; // 1-12
-        const day = date.getDate();
-        const isoStr = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-
-        // Manual weekday name (no Date object for day name)
-        // Use Zeller's Congruence
-        const m = month < 3 ? month + 12 : month;
-        const Y = month < 3 ? year - 1 : year;
-        const q = day;
-        const h = (q + Math.floor((13*(m+1))/5) + Y + Math.floor(Y/4) - Math.floor(Y/100) + Math.floor(Y/400)) % 7;
-        const weekdayIndex = (h + 6) % 7;
-        const weekdayNames = [
-          "Sunday", "Monday", "Tuesday", "Wednesday",
-          "Thursday", "Friday", "Saturday"
-        ];
-        const monthNames = [
-          "January", "February", "March", "April", "May", "June",
-          "July", "August", "September", "October", "November", "December"
-        ];
-
-        const dateCard = document.createElement('div');
-        dateCard.classList.add('date-card');
-        dateCard.dataset.date = isoStr;
-        dateCard.innerHTML = `
-          <div class="date-day">${weekdayNames[weekdayIndex].slice(0, 3)}</div>
-          <div class="date-number">${day}</div>
-          <div class="date-month">${monthNames[month-1].slice(0, 3)}</div>
-        `;
-        if (selectedDate === isoStr) {
-          dateCard.classList.add('selected');
-        }
-        dateCard.addEventListener('click', () => {
-          document.querySelectorAll('.date-card.selected').forEach(el => el.classList.remove('selected'));
-          dateCard.classList.add('selected');
-          selectedDate = isoStr;
-          selectedTime = null;
-          renderTimes();
-          updateNextButton();
-          setTimeout(() => {
-            timeSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }, 100);
-        });
-        datesGrid.appendChild(dateCard);
-      }
-    }
-
-    function renderTimes() {
+    // Load available slots from Firebase
+    function loadAvailableSlots() {
+      datesGrid.innerHTML = '<div class="loading">Loading available dates...</div>';
       timesGrid.innerHTML = '';
-      if (!selectedDate) return;
-      const startHour = 9;
-      const endHour = 18;
-      const times = [];
-      for (let hour = startHour; hour < endHour; hour++) {
-        for (let minute = 0; minute < 60; minute += 30) {
-          const period = hour >= 12 ? 'PM' : 'AM';
-          const displayHour = hour > 12 ? hour - 12 : hour;
-          const displayMinute = minute < 10 ? '0' + minute : minute;
-          const timeStr = `${displayHour === 0 ? 12 : displayHour}:${displayMinute} ${period}`;
-          times.push(timeStr);
+
+      database.ref('availableSlots').on('value', (snapshot) => {
+        availableSlots = snapshot.val() || {};
+        renderDates();
+        if (selectedDate) {
+          renderTimes();
         }
-      }
-      times.forEach(time => {
-        const timeCard = document.createElement('div');
-        timeCard.classList.add('time-card');
-        timeCard.textContent = time;
-        timeCard.dataset.time = time;
-        const isBooked = bookedTimes[selectedDate] && bookedTimes[selectedDate].includes(time);
-        if (isBooked) {
-          timeCard.classList.add('unavailable');
-        } else {
-          if (selectedTime === time) timeCard.classList.add('selected');
-          timeCard.addEventListener('click', () => {
-            document.querySelectorAll('.time-card.selected').forEach(el => el.classList.remove('selected'));
-            timeCard.classList.add('selected');
-            selectedTime = time;
-            updateNextButton();
-          });
-        }
-        timesGrid.appendChild(timeCard);
       });
     }
 
-    function updateMonthDisplay() {
+    // Render available dates
+    function renderDates() {
+      datesGrid.innerHTML = '';
+      const today = new Date();
+      const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
+      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+      const monthStart = firstDayOfMonth.getDay();
+      
+      // Get dates with available slots
+      const availableDates = Object.keys(availableSlots || {}).filter(date => {
+        const slots = availableSlots[date];
+        return slots && Object.keys(slots).length > 0;
+      });
+
+      // Add month header
       const monthNames = [
         "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"
       ];
       currentMonthEl.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+
+      // Add day headers
+      const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      dayNames.forEach(day => {
+        const dayHeader = document.createElement('div');
+        dayHeader.className = 'date-day';
+        dayHeader.textContent = day;
+        dayHeader.style.textAlign = 'center';
+        dayHeader.style.padding = '10px';
+        dayHeader.style.fontWeight = 'bold';
+        dayHeader.style.color = '#90caf9';
+        datesGrid.appendChild(dayHeader);
+      });
+
+      // Add empty cells for days before the first of the month
+      for (let i = 0; i < monthStart; i++) {
+        const emptyCell = document.createElement('div');
+        emptyCell.style.visibility = 'hidden';
+        datesGrid.appendChild(emptyCell);
+      }
+
+      // Add date cells
+      for (let d = 1; d <= daysInMonth; d++) {
+        const date = new Date(currentYear, currentMonth, d);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1;
+        const day = date.getDate();
+        const isoStr = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+
+        // Check if this date has any available slots
+        const hasAvailableSlots = availableDates.includes(isoStr);
+        const isPastDate = date < today && date.toDateString() !== today.toDateString();
+        const isSelectable = hasAvailableSlots && !isPastDate;
+
+        const dateCard = document.createElement('div');
+        dateCard.className = 'date-card';
+        if (!isSelectable) {
+          dateCard.classList.add('unavailable');
+        }
+        dateCard.dataset.date = isoStr;
+
+        const dayName = dayNames[date.getDay()];
+        const monthName = monthNames[month - 1].substring(0, 3);
+        
+        dateCard.innerHTML = `
+          <div class="date-day">${dayName}</div>
+          <div class="date-number">${day}</div>
+          <div class="date-month">${monthName}</div>
+        `;
+
+        if (selectedDate === isoStr) {
+          dateCard.classList.add('selected');
+        }
+
+        if (isSelectable) {
+          dateCard.addEventListener('click', () => {
+            document.querySelectorAll('.date-card.selected').forEach(el => el.classList.remove('selected'));
+            dateCard.classList.add('selected');
+            selectedDate = isoStr;
+            selectedTime = null;
+            renderTimes();
+            updateNextButton();
+            setTimeout(() => {
+              timeSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+          });
+        }
+
+        datesGrid.appendChild(dateCard);
+      }
+
+      // Show message if no dates available
+      if (availableDates.length === 0) {
+        datesGrid.innerHTML = '<div class="no-slots">No available dates found. Please check back later.</div>';
+      }
     }
 
+    // Render available times for selected date
+    function renderTimes() {
+      timesGrid.innerHTML = '';
+      if (!selectedDate) {
+        timesGrid.innerHTML = '<div class="no-slots">Please select a date first</div>';
+        return;
+      }
+
+      const dateSlots = availableSlots[selectedDate] || {};
+      const slots = Object.values(dateSlots);
+
+      if (slots.length === 0) {
+        timesGrid.innerHTML = '<div class="no-slots">No time slots available for this date</div>';
+        return;
+      }
+
+      // Sort slots by start time
+      slots.sort((a, b) => a.startTime.localeCompare(b.startTime));
+
+      // Render each time slot
+      slots.forEach((slot, index) => {
+        const timeCard = document.createElement('div');
+        timeCard.className = 'time-card';
+        
+        const startTime = slot.startTime;
+        const endTime = slot.endTime;
+        const displayTime = `${startTime} - ${endTime}`;
+        
+        timeCard.textContent = displayTime;
+        timeCard.dataset.start = startTime;
+        timeCard.dataset.end = endTime;
+        timeCard.dataset.max = slot.maxBookings || 1;
+        timeCard.dataset.index = index;
+
+        // Check if slot is fully booked
+        const currentBookings = slot.currentBookings || 0;
+        const maxBookings = slot.maxBookings || 1;
+        const isFullyBooked = currentBookings >= maxBookings;
+        
+        if (isFullyBooked) {
+          timeCard.classList.add('unavailable');
+          timeCard.title = 'This time slot is fully booked';
+        } else {
+          const isSelected = selectedTime === `${startTime}-${endTime}`;
+          if (isSelected) {
+            timeCard.classList.add('selected');
+          }
+          timeCard.addEventListener('click', () => {
+            document.querySelectorAll('.time-card.selected').forEach(el => el.classList.remove('selected'));
+            timeCard.classList.add('selected');
+            selectedTime = `${startTime}-${endTime}`;
+            updateNextButton();
+          });
+        }
+
+        timesGrid.appendChild(timeCard);
+      });
+    }
+
+    // Update next button state
     function updateNextButton() {
       nextBtn.disabled = !(selectedDate && selectedTime);
     }
 
+    // Event listeners
     prevMonthBtn.addEventListener('click', () => {
       if (currentMonth === 0) {
         currentMonth = 11;
@@ -365,7 +491,6 @@
         currentMonth--;
       }
       renderDates();
-      updateMonthDisplay();
     });
 
     nextMonthBtn.addEventListener('click', () => {
@@ -376,34 +501,41 @@
         currentMonth++;
       }
       renderDates();
-      updateMonthDisplay();
     });
 
     nextBtn.addEventListener('click', () => {
       if (!selectedDate || !selectedTime) return;
+      
       // Store selected date and time in localStorage
       localStorage.setItem('selectedDate', selectedDate);
       localStorage.setItem('selectedTime', selectedTime);
+      
+      // Store the full time slot details
+      const [startTime, endTime] = selectedTime.split('-');
+      localStorage.setItem('selectedTimeSlot', JSON.stringify({
+        startTime,
+        endTime,
+        date: selectedDate
+      }));
 
-      // Manual formatting for confirmation page
+      // Format and store the display date
       const dateParts = selectedDate.split('-');
       const year = parseInt(dateParts[0], 10);
       const month = parseInt(dateParts[1], 10);
       const day = parseInt(dateParts[2], 10);
+      
       const monthNames = [
         "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"
       ];
+      
+      const date = new Date(year, month - 1, day);
       const weekdayNames = [
         "Sunday", "Monday", "Tuesday", "Wednesday",
         "Thursday", "Friday", "Saturday"
       ];
-      // Zeller's Congruence
-      const q = day;
-      const m = month < 3 ? month + 12 : month;
-      const Y = month < 3 ? year - 1 : year;
-      const h = (q + Math.floor((13*(m+1))/5) + Y + Math.floor(Y/4) - Math.floor(Y/100) + Math.floor(Y/400)) % 7;
-      const weekdayIndex = (h + 6) % 7;
+      
+      const weekdayIndex = date.getDay();
       const formattedDate = `${weekdayNames[weekdayIndex]}, ${monthNames[month-1]} ${day}, ${year}`;
       localStorage.setItem('formattedDate', formattedDate);
 
@@ -411,11 +543,21 @@
       window.location.href = 'add-details.html';
     });
 
-    // Initial render
-    renderDates();
-    renderTimes();
-    updateMonthDisplay();
-    updateNextButton();
+    // Initialize the page
+    function init() {
+      loadAvailableSlots();
+      updateNextButton();
+      
+      // Set initial month display
+      const monthNames = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+      ];
+      currentMonthEl.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+    }
+
+    // Start the app
+    document.addEventListener('DOMContentLoaded', init);
   </script>
 </body>
 </html>
