@@ -104,9 +104,32 @@
       transition: all 0.2s ease;
       min-width: 70px;
       margin: 4px;
+      opacity: 0.7;
+    }
+    .date-card.selected {
+      background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+      color: white;
+      opacity: 1;
+    }
+    .date-card:not(.unavailable):not(.no-slots) {
+      opacity: 1;
+      border: 2px solid #4caf50;
+    }
+    .date-card.no-slots {
+      position: relative;
+    }
+    .date-card.no-slots::after {
+      content: '';
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: #ff9800;
     }
     .date-card.unavailable {
-      opacity: 0.5;
+      opacity: 0.4;
       cursor: not-allowed;
     }
     .date-number {
@@ -120,9 +143,10 @@
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
-    .date-card.selected {
-      background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
-      color: white;
+    .date-day {
+      font-size: 12px;
+      color: #aaa;
+      margin-top: 2px;
     }
     .time-card {
       background: #222;
@@ -229,6 +253,7 @@
       color: #90caf9;
       padding: 20px;
       font-style: italic;
+      grid-column: 1 / -1;
     }
     .no-slots {
       grid-column: 1 / -1;
@@ -339,6 +364,9 @@
         if (selectedDate) {
           renderTimes();
         }
+      }, (error) => {
+        console.error('Error loading slots:', error);
+        datesGrid.innerHTML = '<div class="no-slots">Error loading dates. Please try again.</div>';
       });
     }
 
@@ -368,84 +396,62 @@
     function renderDates() {
       datesGrid.innerHTML = '';
       const today = new Date();
-      const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
-      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-      const monthStart = firstDayOfMonth.getDay();
+      today.setHours(0, 0, 0, 0); // Reset time part to compare dates only
       
-      // Get dates with available slots
-      const availableDates = Object.keys(availableSlots || {}).filter(date => {
-        const slots = availableSlots[date];
-        return slots && Object.keys(slots).length > 0;
-      });
-
-      // Add month header
-      const monthNames = [
-        "January", "February", "March", "April", "May", "June",
-        "July", "August", "September", "October", "November", "December"
-      ];
-      currentMonthEl.textContent = `${monthNames[currentMonth]} ${currentYear}`;
-
-      // Add empty cells for days before the first of the month
-      for (let i = 0; i < monthStart; i++) {
-        const emptyCell = document.createElement('div');
-        emptyCell.style.visibility = 'hidden';
-        datesGrid.appendChild(emptyCell);
-      }
-
-      // Add date cells
-      for (let d = 1; d <= daysInMonth; d++) {
-        const date = new Date(currentYear, currentMonth, d);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        
+      // Show dates for next 60 days
+      for (let i = 0; i < 60; i++) {
+        const date = new Date();
+        date.setDate(today.getDate() + i);
         const year = date.getFullYear();
-        const month = date.getMonth() + 1;
-        const day = date.getDate();
-        const isoStr = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-
-        // Check if this date has any available slots
-        const hasAvailableSlots = availableDates.includes(isoStr);
-        const isPastDate = date < today && date.toDateString() !== today.toDateString();
-        const isSelectable = hasAvailableSlots && !isPastDate;
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const dateStr = `${year}-${month}-${day}`;
+        const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+        const monthName = date.toLocaleDateString('en-US', { month: 'short' });
 
         const dateCard = document.createElement('div');
         dateCard.className = 'date-card';
-        if (!isSelectable) {
-          dateCard.classList.add('unavailable');
-        }
-        dateCard.dataset.date = isoStr;
+        dateCard.dataset.date = dateStr;
 
-        const monthName = monthNames[month - 1].substring(0, 3);
+        // Check if this date has available slots
+        const hasSlots = availableSlots[dateStr] && Object.keys(availableSlots[dateStr]).length > 0;
+        const isPastDate = date < today;
         
+        if (isPastDate) {
+          dateCard.classList.add('unavailable');
+        } else if (!hasSlots) {
+          dateCard.classList.add('no-slots');
+        }
+
         dateCard.innerHTML = `
-          <div class="date-number">${day}</div>
+          <div class="date-number">${date.getDate()}</div>
           <div class="date-month">${monthName}</div>
+          <div class="date-day">${dayName}</div>
         `;
 
-        if (selectedDate === isoStr) {
-          dateCard.classList.add('selected');
-        }
-
-        if (isSelectable) {
+        if (!isPastDate) {
           dateCard.addEventListener('click', () => {
             document.querySelectorAll('.date-card.selected').forEach(el => el.classList.remove('selected'));
             dateCard.classList.add('selected');
-            selectedDate = isoStr;
+            selectedDate = dateStr;
             selectedTime = null;
             renderTimes();
             updateNextButton();
-            setTimeout(() => {
-              timeSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 100);
           });
         }
 
         datesGrid.appendChild(dateCard);
       }
 
-      // Show message if no dates available
-      if (availableDates.length === 0) {
-        datesGrid.innerHTML = '<div class="no-slots">No available dates found. Please check back later.</div>';
+      // Auto-select today if not already selected
+      if (!selectedDate) {
+        const todayStr = today.toISOString().split('T')[0];
+        selectedDate = todayStr;
+        const todayCard = document.querySelector(`.date-card[data-date="${todayStr}"]`);
+        if (todayCard) {
+          todayCard.classList.add('selected');
+          renderTimes();
+        }
       }
     }
 
@@ -461,7 +467,12 @@
       const slots = Object.values(dateSlots);
 
       if (slots.length === 0) {
-        timesGrid.innerHTML = '<div class="no-slots">No time slots available for this date</div>';
+        timesGrid.innerHTML = `
+          <div class="no-slots">
+            No time slots available for this date.<br>
+            Please select another date or check back later.
+          </div>
+        `;
         return;
       }
 
@@ -492,6 +503,7 @@
         timeCard.className = 'time-card';
         
         // Check if this slot exists in the available slots
+        const slotKey = `${slot.time}-${slot.endTime}`;
         const availableSlot = Object.values(slots).find(s => 
           s.startTime === slot.time && s.endTime === slot.endTime
         );
@@ -517,17 +529,15 @@
           }
 
           if (isAvailable) {
-           timeCard.addEventListener('click', () => {
-  if (isAvailable) {
-    document.querySelectorAll('.time-card.selected').forEach(el => el.classList.remove('selected'));
-    timeCard.classList.add('selected');
-    selectedTime = `${slot.time}-${slot.endTime}`;
-    // Store the slot ID and date for the booking confirmation
-    localStorage.setItem('selectedSlotId', availableSlot.id || `${slot.time}-${slot.endTime}`);
-    localStorage.setItem('selectedDate', selectedDate);
-    updateNextButton();
-  }
-});
+            timeCard.addEventListener('click', () => {
+              document.querySelectorAll('.time-card.selected').forEach(el => el.classList.remove('selected'));
+              timeCard.classList.add('selected');
+              selectedTime = `${slot.time}-${slot.endTime}`;
+              // Store the slot ID for the booking confirmation
+              localStorage.setItem('selectedSlotId', availableSlot.id || `${slot.time}-${slot.endTime}`);
+              localStorage.setItem('selectedDate', selectedDate);
+              updateNextButton();
+            });
           } else {
             timeCard.classList.add('unavailable');
             timeCard.title = 'This time slot is fully booked';
@@ -623,7 +633,7 @@
         "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"
       ];
-      currentMonthEl.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+      currentMonthEl.textContent = `${monthNames[new Date().getMonth()]} ${new Date().getFullYear()}`;
     }
 
     // Start the app
