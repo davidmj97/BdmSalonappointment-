@@ -754,37 +754,44 @@
             }, 0);
         }
 
-        // Generate order number (YYYYMMXXX)
-        async function generateOrderNumber(orderDate) {
-            const monthCode = getOrderMonthCode(orderDate);
-            
-            try {
-                // Get all orders for this month
-                const snapshot = await database.ref('bookings')
-                    .orderByChild('orderMonth')
-                    .equalTo(monthCode)
-                    .once('value');
-                
-                let maxNumber = 0;
-                
-                // Find the highest order number for this month
-                snapshot.forEach(child => {
-                    const order = child.val();
-                    if (order.orderNumber && order.orderNumber.startsWith(monthCode)) {
-                        const num = parseInt(order.orderNumber.slice(6), 10) || 0;
-                        if (num > maxNumber) maxNumber = num;
+       // Generate sequential order number (YYYYXXXX)
+async function generateOrderNumber() {
+    try {
+        // Get current year
+        const currentYear = new Date().getFullYear();
+        
+        // Find the highest order number starting with current year
+        const snapshot = await database.ref('bookings')
+            .orderByChild('orderNumber')
+            .startAt(currentYear.toString())
+            .endAt((currentYear + 1).toString())
+            .once('value');
+        
+        let maxNumber = 0;
+        
+        // Find the highest order number for this year
+        snapshot.forEach(child => {
+            const order = child.val();
+            if (order.orderNumber) {
+                const orderNum = parseInt(order.orderNumber, 10);
+                if (orderNum >= currentYear * 10000 && orderNum < (currentYear + 1) * 10000) {
+                    const seqNum = orderNum % 10000; // Get last 4 digits
+                    if (seqNum > maxNumber) {
+                        maxNumber = seqNum;
                     }
-                });
-                
-                // Generate the next order number
-                return `${monthCode}${String(maxNumber + 1).padStart(3, '0')}`;
-            } catch (error) {
-                console.error('Error generating order number:', error);
-                // Fallback: use timestamp if there's an error
-                return `${monthCode}${String(Date.now() % 1000).padStart(3, '0')}`;
+                }
             }
-        }
-
+        });
+        
+        // Generate the next order number
+        return (currentYear * 10000 + maxNumber + 1).toString();
+        
+    } catch (error) {
+        console.error('Error generating order number:', error);
+        // Fallback: use timestamp if there's an error
+        return (new Date().getFullYear() * 10000 + Math.floor(Math.random() * 10000)).toString();
+    }
+}
         // Show notification
         function showNotification(message, type = 'info') {
             notificationMessage.textContent = message;
@@ -1079,21 +1086,17 @@
                     updatedAt: firebase.database.ServerValue.TIMESTAMP
                 };
                 
-                // If this is a new status and we don't have an order number yet, generate one
-               
-            if (newStatus === 'accepted') {
-                const orderRef = database.ref(`bookings/${orderId}`);
-                const snapshot = await orderRef.once('value');
-                const order = snapshot.val();
-                
-                if (!order.orderNumber) {
-                    const orderNumber = await generateOrderNumber(order.date);
-                    updates.orderNumber = orderNumber;
-                    
-                    // Also update the order month for proper grouping
-                    updates.orderMonth = getOrderMonthCode(order.date);
-                }
-            }
+          // If this is a new status and we don't have an order number yet, generate one
+if (newStatus === 'accepted') {
+    const orderRef = database.ref(`bookings/${orderId}`);
+    const snapshot = await orderRef.once('value');
+    const order = snapshot.val();
+    
+    if (!order.orderNumber) {
+        const orderNumber = await generateOrderNumber();
+        updates.orderNumber = orderNumber;
+    }
+}
 
             // Update the order in the database
             await database.ref(`bookings/${orderId}`).update(updates);
@@ -1163,19 +1166,18 @@
                     ordersByStatus[status].push(order);
                 }
                 
-                // Generate order number for accepted orders if missing
-                if (status === 'accepted' && !order.orderNumber) {
-                    try {
-                        const orderNumber = await generateOrderNumber(order.date);
-                        await database.ref(`bookings/${order.id}`).update({
-                            orderNumber,
-                            orderMonth: getOrderMonthCode(order.date)
-                        });
-                        order.orderNumber = orderNumber;
-                    } catch (error) {
-                        console.error('Error generating order number:', error);
-                    }
-                }
+               // Generate order number for accepted orders if missing
+if (status === 'accepted' && !order.orderNumber) {
+    try {
+        const orderNumber = await generateOrderNumber();
+        await database.ref(`bookings/${order.id}`).update({
+            orderNumber: orderNumber
+        });
+        order.orderNumber = orderNumber;
+    } catch (error) {
+        console.error('Error generating order number:', error);
+    }
+}
             }
             
             // Update the UI
