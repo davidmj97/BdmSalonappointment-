@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Time Slots - BDM Salon Admin</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --bg: #000;
+            --fg: #fff;
+            --card-bg: #111;
+            --accent: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+            --border: #333;
+            --text-muted: #bbb;
+            --success: #2e7d32;
+            --danger: #c62828;
+            --warning: #ff9800;
+            --primary-blue: #1a73e8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--fg);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--fg);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .btn-back {
+            background: #333;
+            color: white;
+        }
+
+        .btn-back:hover {
+            background: #444;
+            transform: translateY(-2px);
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .card-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border);
+            background: #1a1a1a;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #90caf9;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--fg);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            background: #222;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--fg);
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+        }
+
+        .time-slots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .time-slot {
+            background: #1a1a1a;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 15px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .time-slot:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .time-slot.selected {
+            background: var(--primary-blue);
+            border-color: var(--primary-blue);
+        }
+
+        .time-slot.booked {
+            background: #2a1a1a;
+            border-color: #5c2a2a;
+            color: #ff6b6b;
+            cursor: not-allowed;
+        }
+
+        .time-slot.booked::after {
+            content: 'Booked';
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 10px;
+            background: var(--danger);
+            color: white;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+
+        .time-display {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .slot-details {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .selected .slot-details {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .date-picker-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: flex-end;
+        }
+
+        .date-input {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .date-input label {
+            margin-bottom: 0;
+            white-space: nowrap;
+        }
+
+        .date-input .form-control {
+            max-width: 250px;
+        }
+
+        .max-bookings-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .max-bookings-selector label {
+            margin-bottom: 0;
+            white-space: nowrap;
+        }
+
+        .max-bookings-selector select {
+            background: #222;
+            color: var(--fg);
+            border: 1px solid var(--border);
+            padding: 8px;
+            border-radius: 4px;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-muted);
+            grid-column: 1 / -1;
+        }
+
+        .no-slots {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-muted);
+            grid-column: 1 / -1;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 6px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            transform: translateX(120%);
+            transition: transform 0.3s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 300px;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: var(--success);
+        }
+
+        .notification.error {
+            background: var(--danger);
+        }
+
+        .notification.warning {
+            background: var(--warning);
+        }
+
+        @media (max-width: 768px) {
+            .time-slots-grid {
+                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            }
+
+            .date-picker-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .date-input {
+                width: 100%;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .date-input .form-control {
+                max-width: 100%;
+                width: 100%;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .max-bookings-selector {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Manage Time Slots</h1>
+        <a href="orders.html" class="btn btn-back">
+            <i class="fas fa-arrow-left"></i> Back to Orders
+        </a>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Add/Edit Time Slots</div>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <div class="date-picker-container">
+                        <div class="date-input">
+                            <label for="datePicker">Select Date:</label>
+                            <input type="text" id="datePicker" class="form-control" placeholder="Select a date">
+                            <button id="loadSlotsBtn" class="btn btn-primary">
+                                <i class="fas fa-search"></i> Load Slots
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="max-bookings-selector">
+                        <label for="maxBookings">Max bookings per slot:</label>
+                        <select id="maxBookings">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3" selected>3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                    </div>
+
+                    <div class="time-slots-grid" id="timeSlotsGrid">
+                        <!-- Time slots will be generated here -->
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button id="clearSlotsBtn" class="btn btn-danger" disabled>
+                        <i class="fas fa-trash"></i> Clear Selected
+                    </button>
+                    <button id="saveSlotsBtn" class="btn btn-primary" disabled>
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notificationMessage">Operation completed successfully</span>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAmimDsjW_pF2NGw-w-40QzTsgmf1tdqyI",
+            authDomain: "bdmsalonappointment.firebaseapp.com",
+            databaseURL: "https://bdmsalonappointment-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "bdmsalonappointment",
+            storageBucket: "bdmsalonappointment.firebasestorage.app",
+            messagingSenderId: "123933913893",
+            appId: "1:123933913893:web:c1f57caf4dc2a5440ba0cc",
+            measurementId: "G-Q0FVZRVS64"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // DOM Elements
+        const datePicker = document.getElementById('datePicker');
+        const loadSlotsBtn = document.getElementById('loadSlotsBtn');
+        const saveSlotsBtn = document.getElementById('saveSlotsBtn');
+        const clearSlotsBtn = document.getElementById('clearSlotsBtn');
+        const timeSlotsGrid = document.getElementById('timeSlotsGrid');
+        const notification = document.getElementById('notification');
+        const notificationMessage = document.getElementById('notificationMessage');
+        const maxBookingsSelect = document.getElementById('maxBookings');
+
+        // State
+        let selectedDate = null;
+        let selectedSlots = new Map(); // Map of slotId to maxBookings
+        let bookedSlots = {};
+
+        // Initialize date picker
+        const fp = flatpickr(datePicker, {
+            dateFormat: "Y F d",
+            minDate: "today",
+            onChange: function(selectedDates, dateStr) {
+                selectedDate = selectedDates[0] ? selectedDates[0].toISOString().split('T')[0] : null;
+                loadSlotsBtn.disabled = !selectedDate;
+            }
+        });
+
+        // Generate time slots from 9:00 AM to 6:00 PM in 30-minute intervals
+        function generateTimeSlots() {
+            const slots = [];
+            const startHour = 9; // 9 AM
+            const endHour = 18;  // 6 PM
+
+            for (let hour = startHour; hour < endHour; hour++) {
+                // Add :00 slot
+                const startTime = `${hour.toString().padStart(2, '0')}:00`;
+                const endTime = `${hour.toString().padStart(2, '0')}:30`;
+                slots.push({
+                    start: startTime,
+                    end: endTime,
+                    id: `${startTime}-${endTime}`
+                });
+
+                // Add :30 slot (except for the last hour)
+                if (hour < endHour - 1) {
+                    const startTime2 = `${hour.toString().padStart(2, '0')}:30`;
+                    const endTime2 = `${(hour + 1).toString().padStart(2, '0')}:00`;
+                    slots.push({
+                        start: startTime2,
+                        end: endTime2,
+                        id: `${startTime2}-${endTime2}`
+                    });
+                }
+            }
+
+            return slots;
+        }
+
+        // Format time for display (e.g., "09:00" -> "9:00 AM")
+        function formatTime(time24) {
+            const [hours, minutes] = time24.split(':').map(Number);
+            const period = hours >= 12 ? 'PM' : 'AM';
+            const displayHours = hours % 12 || 12;
+            return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
+        }
+
+        // Render time slots in the grid
+        function renderTimeSlots(bookedSlotsForDate = {}) {
+            timeSlotsGrid.innerHTML = '';
+            const slots = generateTimeSlots();
+            
+            if (slots.length === 0) {
+                timeSlotsGrid.innerHTML = '<div class="no-slots">No time slots available</div>';
+                return;
+            }
+
+            slots.forEach(slot => {
+                const slotData = bookedSlotsForDate[slot.id] || {};
+                const isBooked = slotData.currentBookings > 0;
+                const isSelected = selectedSlots.has(slot.id);
+                const maxBookings = slotData.maxBookings || 1;
+                const currentBookings = slotData.currentBookings || 0;
+
+                const slotElement = document.createElement('div');
+                slotElement.className = `time-slot ${isBooked ? 'booked' : ''} ${isSelected ? 'selected' : ''}`;
+                slotElement.dataset.id = slot.id;
+                
+                slotElement.innerHTML = `
+                    <div class="time-display">${formatTime(slot.start)}</div>
+                    <div class="slot-details">
+                        ${isBooked ? 
+                            `Booked: ${currentBookings}/${maxBookings}` : 
+                            isSelected ? 
+                            `Max: ${selectedSlots.get(slot.id)}` : 
+                            'Available'}
+                    </div>
+                `;
+
+                if (!isBooked) {
+                    slotElement.addEventListener('click', () => toggleSlotSelection(slot.id));
+                }
+
+                timeSlotsGrid.appendChild(slotElement);
+            });
+
+            // Update buttons state
+            updateButtonsState();
+        }
+
+        // Toggle slot selection
+        function toggleSlotSelection(slotId) {
+            const maxBookings = parseInt(maxBookingsSelect.value);
+            
+            if (selectedSlots.has(slotId)) {
+                selectedSlots.delete(slotId);
+            } else {
+                selectedSlots.set(slotId, maxBookings);
+            }
+            
+            // Update UI
+            renderTimeSlots(bookedSlots[selectedDate] || {});
+            updateButtonsState();
+        }
+
+        // Update buttons state based on selection
+        function updateButtonsState() {
+            saveSlotsBtn.disabled = selectedSlots.size === 0;
+            clearSlotsBtn.disabled = selectedSlots.size === 0;
+        }
+
+        // Show notification
+        function showNotification(message, type = 'success') {
+            notification.className = `notification ${type} show`;
+            notificationMessage.textContent = message;
+            
+            // Update icon based on type
+            const icon = notification.querySelector('i');
+            icon.className = type === 'error' ? 'fas fa-exclamation-circle' : 
+                            type === 'warning' ? 'fas fa-exclamation-triangle' : 
+                            'fas fa-check-circle';
+            
+            // Auto-hide after 3 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Load slots for the selected date
+        async function loadSlotsForDate(date) {
+            try {
+                timeSlotsGrid.innerHTML = '<div class="loading">Loading slots...</div>';
+                
+                // Get slots from Firebase
+                const snapshot = await database.ref(`availableSlots/${date}`).once('value');
+                const slots = snapshot.val() || {};
+                
+                // Reset selection
+                selectedSlots.clear();
+                
+                // Store booked slots for this date
+                if (!bookedSlots[date]) {
+                    bookedSlots[date] = {};
+                }
+                
+                // Update with data from Firebase
+                Object.entries(slots).forEach(([slotId, slotData]) => {
+                    bookedSlots[date][slotId] = slotData;
+                });
+                
+                // Render slots
+                renderTimeSlots(bookedSlots[date]);
+                
+                // Enable/disable buttons
+                saveSlotsBtn.disabled = true;
+                clearSlotsBtn.disabled = true;
+                
+                return slots;
+            } catch (error) {
+                console.error('Error loading slots:', error);
+                showNotification('Failed to load slots', 'error');
+                return {};
+            }
+        }
+
+        // Event Listeners
+        loadSlotsBtn.addEventListener('click', async () => {
+            if (!selectedDate) {
+                showNotification('Please select a date first', 'warning');
+                return;
+            }
+            
+            await loadSlotsForDate(selectedDate);
+        });
+
+        saveSlotsBtn.addEventListener('click', async () => {
+            if (!selectedDate || selectedSlots.size === 0) {
+                showNotification('No slots selected', 'warning');
+                return;
+            }
+            
+            try {
+                const updates = {};
+                const slotsData = {};
+                
+                // Prepare updates
+                selectedSlots.forEach((maxBookings, slotId) => {
+                    const [startTime, endTime] = slotId.split('-');
+                    slotsData[slotId] = {
+                        startTime,
+                        endTime,
+                        maxBookings: maxBookings,
+                        currentBookings: 0 // Will be updated by the booking system
+                    };
+                });
+                
+                // Update database
+                await database.ref(`availableSlots/${selectedDate}`).update(slotsData);
+                
+                showNotification('Time slots saved successfully');
+                
+                // Reload slots to update the UI
+                await loadSlotsForDate(selectedDate);
+                
+            } catch (error) {
+                console.error('Error saving slots:', error);
+                showNotification('Failed to save slots', 'error');
+            }
+        });
+
+        clearSlotsBtn.addEventListener('click', async () => {
+            if (!selectedDate || selectedSlots.size === 0) {
+                showNotification('No slots selected', 'warning');
+                return;
+            }
+            
+            if (!confirm('Are you sure you want to clear the selected time slots?')) {
+                return;
+            }
+            
+            try {
+                const updates = {};
+                
+                // Remove selected slots
+                selectedSlots.forEach((_, slotId) => {
+                    updates[`availableSlots/${selectedDate}/${slotId}`] = null;
+                });
+                
+                // Update database
+                await database.ref().update(updates);
+                
+                showNotification('Selected slots cleared');
+                
+                // Reload slots
+                await loadSlotsForDate(selectedDate);
+                
+            } catch (error) {
+                console.error('Error clearing slots:', error);
+                showNotification('Failed to clear slots', 'error');
+            }
+        });
+
+        // Update max bookings for selected slots when the dropdown changes
+        maxBookingsSelect.addEventListener('change', () => {
+            if (selectedSlots.size > 0) {
+                const maxBookings = parseInt(maxBookingsSelect.value);
+                const newSelectedSlots = new Map();
+                
+                // Update max bookings for all selected slots
+                selectedSlots.forEach((_, slotId) => {
+                    newSelectedSlots.set(slotId, maxBookings);
+                });
+                
+                selectedSlots = newSelectedSlots;
+                
+                // Update the display
+                renderTimeSlots(bookedSlots[selectedDate] || {});
+            }
+        });
+
+        // Initialize the page
+        async function init() {
+            // Set default date to today
+            const today = new Date();
+            fp.setDate(today);
+            selectedDate = today.toISOString().split('T')[0];
+            
+            // Load initial data
+            await loadSlotsForDate(selectedDate);
+        }
+
+        // Start the app
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
