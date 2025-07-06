@@ -95,32 +95,30 @@
     .date-card {
       background: #111;
       border-radius: 10px;
-      padding: 20px;
+      padding: 12px 8px;
       display: flex;
       flex-direction: column;
       align-items: center;
       position: relative;
       cursor: pointer;
       transition: all 0.2s ease;
-      min-width: 100px;
+      min-width: 70px;
+      margin: 4px;
     }
     .date-card.unavailable {
       opacity: 0.5;
       cursor: not-allowed;
     }
-    .date-day {
-      font-size: 14px;
-      color: #ccc;
-      margin-bottom: 6px;
-    }
     .date-number {
-      font-size: 28px;
+      font-size: 22px;
       font-weight: 700;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
     .date-month {
-      font-size: 14px;
+      font-size: 12px;
       color: #aaa;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     .date-card.selected {
       background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
@@ -128,11 +126,11 @@
     }
     .time-card {
       background: #222;
-      border-radius: 10px;
-      padding: 16px 14px;
+      border-radius: 8px;
+      padding: 14px 16px 14px 40px;
       min-width: 140px;
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
       cursor: pointer;
       color: #fff;
@@ -151,23 +149,39 @@
       box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
     .time-card.unavailable {
-      background: #444;
+      background: #222;
       color: #777;
       cursor: not-allowed;
-      opacity: 0.6;
     }
-    .time-card::after {
+    .time-card::before {
       content: '';
       position: absolute;
-      top: 5px;
-      right: 5px;
-      width: 8px;
-      height: 8px;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 10px;
+      height: 10px;
       border-radius: 50%;
       background: #4caf50;
     }
-    .time-card.unavailable::after {
+    .time-card.unavailable::before {
       background: #f44336;
+    }
+    .time-card .booking-count {
+      font-size: 12px;
+      color: #aaa;
+      margin-left: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 2px 6px;
+      border-radius: 10px;
+    }
+    .time-card.unavailable .booking-count {
+      color: #f44336;
+      background: rgba(244, 67, 54, 0.1);
+    }
+    .time-card.selected .booking-count {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.2);
     }
     .time-card:hover:not(.unavailable) {
       transform: translateY(-2px);
@@ -207,7 +221,7 @@
     #timesGrid {
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 8px;
       justify-content: center;
     }
     .loading {
@@ -228,15 +242,25 @@
         padding-top: 110px;
       }
       .date-card {
-        padding: 16px;
-        min-width: 80px;
+        padding: 10px 6px;
+        min-width: 60px;
       }
       .date-number {
-        font-size: 24px;
+        font-size: 18px;
       }
       .time-card {
-        padding: 12px;
+        padding: 12px 16px 12px 36px;
         min-width: 120px;
+        font-size: 14px;
+      }
+      .time-card::before {
+        left: 14px;
+      }
+    }
+    @media (max-width: 400px) {
+      .time-card {
+        width: 100%;
+        max-width: 160px;
       }
     }
     ::-webkit-scrollbar {
@@ -318,6 +342,28 @@
       });
     }
 
+    // Format time to 12-hour format
+    function formatTime(time24) {
+      const [hours, minutes] = time24.split(':').map(Number);
+      const period = hours >= 12 ? 'PM' : 'AM';
+      const hours12 = hours % 12 || 12;
+      return `${hours12}:${minutes.toString().padStart(2, '0')} ${period}`;
+    }
+
+    // Get end time (30 minutes after start)
+    function getEndTime(startTime) {
+      const [hours, minutes] = startTime.split(':').map(Number);
+      let endHours = hours;
+      let endMinutes = minutes + 30;
+      
+      if (endMinutes >= 60) {
+        endHours += Math.floor(endMinutes / 60);
+        endMinutes %= 60;
+      }
+      
+      return `${endHours.toString().padStart(2, '0')}:${endMinutes.toString().padStart(2, '0')}`;
+    }
+
     // Render available dates
     function renderDates() {
       datesGrid.innerHTML = '';
@@ -338,19 +384,6 @@
         "July", "August", "September", "October", "November", "December"
       ];
       currentMonthEl.textContent = `${monthNames[currentMonth]} ${currentYear}`;
-
-      // Add day headers
-      const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-      dayNames.forEach(day => {
-        const dayHeader = document.createElement('div');
-        dayHeader.className = 'date-day';
-        dayHeader.textContent = day;
-        dayHeader.style.textAlign = 'center';
-        dayHeader.style.padding = '10px';
-        dayHeader.style.fontWeight = 'bold';
-        dayHeader.style.color = '#90caf9';
-        datesGrid.appendChild(dayHeader);
-      });
 
       // Add empty cells for days before the first of the month
       for (let i = 0; i < monthStart; i++) {
@@ -382,11 +415,9 @@
         }
         dateCard.dataset.date = isoStr;
 
-        const dayName = dayNames[date.getDay()];
         const monthName = monthNames[month - 1].substring(0, 3);
         
         dateCard.innerHTML = `
-          <div class="date-day">${dayName}</div>
           <div class="date-number">${day}</div>
           <div class="date-month">${monthName}</div>
         `;
@@ -434,47 +465,81 @@
         return;
       }
 
-      // Sort slots by start time
-      slots.sort((a, b) => a.startTime.localeCompare(b.startTime));
+      // Generate time slots from 9:00 AM to 6:00 PM in 30-minute intervals
+      const timeSlots = [];
+      for (let hour = 9; hour < 18; hour++) {
+        for (let minute = 0; minute < 60; minute += 30) {
+          const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+          const formattedTime = formatTime(time);
+          timeSlots.push({
+            display: formattedTime,
+            time: time,
+            endTime: getEndTime(time)
+          });
+        }
+      }
+
+      // Add 6:00 PM slot
+      timeSlots.push({
+        display: '06:00 PM',
+        time: '18:00',
+        endTime: '18:30'
+      });
 
       // Render each time slot
-      slots.forEach((slot, index) => {
+      timeSlots.forEach(slot => {
         const timeCard = document.createElement('div');
         timeCard.className = 'time-card';
         
-        const startTime = slot.startTime;
-        const endTime = slot.endTime;
-        const displayTime = `${startTime} - ${endTime}`;
-        
-        timeCard.textContent = displayTime;
-        timeCard.dataset.start = startTime;
-        timeCard.dataset.end = endTime;
-        timeCard.dataset.max = slot.maxBookings || 1;
-        timeCard.dataset.index = index;
+        // Check if this slot exists in the available slots
+        const availableSlot = Object.values(slots).find(s => 
+          s.startTime === slot.time && s.endTime === slot.endTime
+        );
 
-        // Check if slot is fully booked
-        const currentBookings = slot.currentBookings || 0;
-        const maxBookings = slot.maxBookings || 1;
-        const isFullyBooked = currentBookings >= maxBookings;
+        // Create time text
+        const timeText = document.createElement('span');
+        timeText.textContent = slot.display;
         
-        if (isFullyBooked) {
-          timeCard.classList.add('unavailable');
-          timeCard.title = 'This time slot is fully booked';
-        } else {
-          const isSelected = selectedTime === `${startTime}-${endTime}`;
-          if (isSelected) {
-            timeCard.classList.add('selected');
+        // Add elements to time card
+        timeCard.appendChild(timeText);
+        
+        if (availableSlot) {
+          const currentBookings = parseInt(availableSlot.currentBookings || 0);
+          const maxBookings = parseInt(availableSlot.maxBookings || 1);
+          const isAvailable = currentBookings < maxBookings;
+
+          // Only show booking count if there are current bookings
+          if (maxBookings > 1 && currentBookings > 0) {
+            const countSpan = document.createElement('span');
+            countSpan.className = 'booking-count';
+            countSpan.textContent = `${currentBookings}/${maxBookings}`;
+            timeCard.appendChild(countSpan);
           }
-          timeCard.addEventListener('click', () => {
-            document.querySelectorAll('.time-card.selected').forEach(el => el.classList.remove('selected'));
-            timeCard.classList.add('selected');
-            selectedTime = `${startTime}-${endTime}`;
-            updateNextButton();
-          });
+
+          if (isAvailable) {
+            timeCard.addEventListener('click', () => {
+              document.querySelectorAll('.time-card.selected').forEach(el => el.classList.remove('selected'));
+              timeCard.classList.add('selected');
+              selectedTime = `${slot.time}-${slot.endTime}`;
+              updateNextButton();
+            });
+          } else {
+            timeCard.classList.add('unavailable');
+            timeCard.title = 'This time slot is fully booked';
+          }
+        } else {
+          timeCard.classList.add('unavailable');
+          timeCard.title = 'This time slot is not available';
         }
 
         timesGrid.appendChild(timeCard);
       });
+
+      // If no slots are available, show message
+      const availableSlotsCount = document.querySelectorAll('.time-card:not(.unavailable)').length;
+      if (availableSlotsCount === 0) {
+        timesGrid.innerHTML = '<div class="no-slots">No available time slots for this date</div>';
+      }
     }
 
     // Update next button state
