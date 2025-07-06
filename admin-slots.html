@@ -849,12 +849,13 @@
                 // Prepare updates
                 selectedSlots.forEach((slotData, slotId) => {
                     const { maxBookings, start, end } = slotData;
-                    slotsData[slotId] = {
-                        startTime: start,
-                        endTime: end,
-                        maxBookings: maxBookings,
-                        currentBookings: 0 // Will be updated by the booking system
-                    };
+                   slotsData[slotId] = {
+  startTime: start,
+  endTime: end,
+  maxBookings: maxBookings,
+  currentBookings: 0,  // Add this line
+  id: slotId           // Add this line
+};
                 });
                 
                 // Update database
