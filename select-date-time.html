@@ -104,32 +104,9 @@
       transition: all 0.2s ease;
       min-width: 70px;
       margin: 4px;
-      opacity: 0.7;
-    }
-    .date-card.selected {
-      background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
-      color: white;
-      opacity: 1;
-    }
-    .date-card:not(.unavailable):not(.no-slots) {
-      opacity: 1;
-      border: 2px solid #4caf50;
-    }
-    .date-card.no-slots {
-      position: relative;
-    }
-    .date-card.no-slots::after {
-      content: '';
-      position: absolute;
-      top: 5px;
-      right: 5px;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background-color: #ff9800;
     }
     .date-card.unavailable {
-      opacity: 0.4;
+      opacity: 0.5;
       cursor: not-allowed;
     }
     .date-number {
@@ -143,10 +120,9 @@
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
-    .date-day {
-      font-size: 12px;
-      color: #aaa;
-      margin-top: 2px;
+    .date-card.selected {
+      background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+      color: white;
     }
     .time-card {
       background: #222;
@@ -253,7 +229,6 @@
       color: #90caf9;
       padding: 20px;
       font-style: italic;
-      grid-column: 1 / -1;
     }
     .no-slots {
       grid-column: 1 / -1;
@@ -321,147 +296,333 @@
   </div>
 
   <script>
-// Firebase configuration
-const firebaseConfig = {
-    apiKey: "AIzaSyAmimDsjW_pF2NGw-w-40QzTsgmf1tdqyI",
-    authDomain: "bdmsalonappointment.firebaseapp.com",
-    databaseURL: "https://bdmsalonappointment-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "bdmsalonappointment",
-    storageBucket: "bdmsalonappointment.firebasestorage.app",
-    messagingSenderId: "123933913893",
-    appId: "1:123933913893:web:c1f57caf4dc2a5440ba0cc",
-    measurementId: "G-Q0FVZRVS64"
-};
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyAmimDsjW_pF2NGw-w-40QzTsgmf1tdqyI",
+      authDomain: "bdmsalonappointment.firebaseapp.com",
+      databaseURL: "https://bdmsalonappointment-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "bdmsalonappointment",
+      storageBucket: "bdmsalonappointment.firebasestorage.app",
+      messagingSenderId: "123933913893",
+      appId: "1:123933913893:web:c1f57caf4dc2a5440ba0cc",
+      measurementId: "G-Q0FVZRVS64"
+    };
 
-// Initialize Firebase
-const app = firebase.initializeApp(firebaseConfig);
-const database = firebase.database();
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
 
-// DOM Elements
-const datePicker = document.getElementById('datePicker');
-const timeSlotsContainer = document.getElementById('timeSlots');
-const continueBtn = document.getElementById('continueBtn');
-const notification = document.getElementById('notification');
-const notificationMessage = document.getElementById('notificationMessage');
+    // DOM elements
+    const datesGrid = document.getElementById('datesGrid');
+    const timesGrid = document.getElementById('timesGrid');
+    const nextBtn = document.getElementById('nextBtn');
+    const prevMonthBtn = document.getElementById('prevMonthBtn');
+    const nextMonthBtn = document.getElementById('nextMonthBtn');
+    const currentMonthEl = document.getElementById('currentMonth');
+    const timeSection = document.getElementById('timeSelectionSection');
 
-// State
-let selectedDate = null;
-let selectedSlot = null;
+    // State
+    let selectedDate = null;
+    let selectedTime = null;
+    let currentMonth = new Date().getMonth();
+    let currentYear = new Date().getFullYear();
+    let availableSlots = {};
 
-// Initialize date picker
-const fp = flatpickr(datePicker, {
-    dateFormat: "Y-m-d",
-    minDate: "today",
-    disable: [date => date.getDay() === 0], // Disable Sundays
-    onChange: function(selectedDates, dateStr) {
-        selectedDate = dateStr;
-        loadAvailableSlots(dateStr);
+    // Load available slots from Firebase
+    function loadAvailableSlots() {
+      datesGrid.innerHTML = '<div class="loading">Loading available dates...</div>';
+      timesGrid.innerHTML = '';
+
+      database.ref('availableSlots').on('value', (snapshot) => {
+        availableSlots = snapshot.val() || {};
+        renderDates();
+        if (selectedDate) {
+          renderTimes();
+        }
+      });
     }
-});
 
-// Format time for display (e.g., "09:00" -> "9:00 AM")
-function formatTime(time24) {
-    const [hours, minutes] = time24.split(':').map(Number);
-    const period = hours >= 12 ? 'PM' : 'AM';
-    const displayHours = hours % 12 || 12;
-    return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
-}
+    // Format time to 12-hour format
+    function formatTime(time24) {
+      const [hours, minutes] = time24.split(':').map(Number);
+      const period = hours >= 12 ? 'PM' : 'AM';
+      const hours12 = hours % 12 || 12;
+      return `${hours12}:${minutes.toString().padStart(2, '0')} ${period}`;
+    }
 
-// Load available slots for selected date
-function loadAvailableSlots(date) {
-    timeSlotsContainer.innerHTML = '<div class="loading">Loading available slots...</div>';
-    
-    database.ref(`availableSlots/${date}`).once('value').then(snapshot => {
-        timeSlotsContainer.innerHTML = '';
+    // Get end time (30 minutes after start)
+    function getEndTime(startTime) {
+      const [hours, minutes] = startTime.split(':').map(Number);
+      let endHours = hours;
+      let endMinutes = minutes + 30;
+      
+      if (endMinutes >= 60) {
+        endHours += Math.floor(endMinutes / 60);
+        endMinutes %= 60;
+      }
+      
+      return `${endHours.toString().padStart(2, '0')}:${endMinutes.toString().padStart(2, '0')}`;
+    }
+
+    // Render available dates
+    function renderDates() {
+      datesGrid.innerHTML = '';
+      const today = new Date();
+      const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
+      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+      const monthStart = firstDayOfMonth.getDay();
+      
+      // Get dates with available slots
+      const availableDates = Object.keys(availableSlots || {}).filter(date => {
+        const slots = availableSlots[date];
+        return slots && Object.keys(slots).length > 0;
+      });
+
+      // Add month header
+      const monthNames = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+      ];
+      currentMonthEl.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+
+      // Add empty cells for days before the first of the month
+      for (let i = 0; i < monthStart; i++) {
+        const emptyCell = document.createElement('div');
+        emptyCell.style.visibility = 'hidden';
+        datesGrid.appendChild(emptyCell);
+      }
+
+      // Add date cells
+      for (let d = 1; d <= daysInMonth; d++) {
+        const date = new Date(currentYear, currentMonth, d);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
         
-        if (!snapshot.exists()) {
-            timeSlotsContainer.innerHTML = '<div class="no-slots">No time slots available for this date.</div>';
-            return;
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1;
+        const day = date.getDate();
+        const isoStr = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+
+        // Check if this date has any available slots
+        const hasAvailableSlots = availableDates.includes(isoStr);
+        const isPastDate = date < today && date.toDateString() !== today.toDateString();
+        const isSelectable = hasAvailableSlots && !isPastDate;
+
+        const dateCard = document.createElement('div');
+        dateCard.className = 'date-card';
+        if (!isSelectable) {
+          dateCard.classList.add('unavailable');
         }
-        
-        const slots = snapshot.val();
-        let hasAvailableSlots = false;
-        
-        Object.entries(slots).forEach(([slotId, slotData]) => {
-            const available = (slotData.maxBookings || 1) - (slotData.currentBookings || 0);
-            
-            if (available > 0) {
-                hasAvailableSlots = true;
-                const slotElement = document.createElement('div');
-                slotElement.className = 'time-slot';
-                slotElement.innerHTML = `
-                    <input type="radio" name="timeSlot" id="${slotId}" value='${JSON.stringify({
-                        id: slotId,
-                        time: `${slotData.startTime} - ${slotData.endTime}`,
-                        date: date
-                    })}'>
-                    <label for="${slotId}">
-                        <span class="time">${formatTime(slotData.startTime)} - ${formatTime(slotData.endTime)}</span>
-                        <span class="availability">${available} available</span>
-                    </label>
-                `;
-                timeSlotsContainer.appendChild(slotElement);
-                
-                // Add event listener to update selected slot
-                const radio = document.getElementById(slotId);
-                radio.addEventListener('change', (e) => {
-                    if (e.target.checked) {
-                        selectedSlot = JSON.parse(e.target.value);
-                        continueBtn.disabled = false;
-                    }
-                });
-            }
-        });
-        
-        if (!hasAvailableSlots) {
-            timeSlotsContainer.innerHTML = '<div class="no-slots">No available time slots for this date.</div>';
-        }
-    }).catch(error => {
-        console.error('Error loading slots:', error);
-        timeSlotsContainer.innerHTML = '<div class="error">Failed to load time slots. Please try again.</div>';
-    });
-}
+        dateCard.dataset.date = isoStr;
 
-// Handle continue button click
-continueBtn.addEventListener('click', () => {
-    if (!selectedSlot) {
-        showNotification('Please select a time slot', 'warning');
+        const monthName = monthNames[month - 1].substring(0, 3);
+        
+        dateCard.innerHTML = `
+          <div class="date-number">${day}</div>
+          <div class="date-month">${monthName}</div>
+        `;
+
+        if (selectedDate === isoStr) {
+          dateCard.classList.add('selected');
+        }
+
+        if (isSelectable) {
+          dateCard.addEventListener('click', () => {
+            document.querySelectorAll('.date-card.selected').forEach(el => el.classList.remove('selected'));
+            dateCard.classList.add('selected');
+            selectedDate = isoStr;
+            selectedTime = null;
+            renderTimes();
+            updateNextButton();
+            setTimeout(() => {
+              timeSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+          });
+        }
+
+        datesGrid.appendChild(dateCard);
+      }
+
+      // Show message if no dates available
+      if (availableDates.length === 0) {
+        datesGrid.innerHTML = '<div class="no-slots">No available dates found. Please check back later.</div>';
+      }
+    }
+
+    // Render available times for selected date
+    function renderTimes() {
+      timesGrid.innerHTML = '';
+      if (!selectedDate) {
+        timesGrid.innerHTML = '<div class="no-slots">Please select a date first</div>';
         return;
+      }
+
+      const dateSlots = availableSlots[selectedDate] || {};
+      const slots = Object.values(dateSlots);
+
+      if (slots.length === 0) {
+        timesGrid.innerHTML = '<div class="no-slots">No time slots available for this date</div>';
+        return;
+      }
+
+      // Generate time slots from 9:00 AM to 6:00 PM in 30-minute intervals
+      const timeSlots = [];
+      for (let hour = 9; hour < 18; hour++) {
+        for (let minute = 0; minute < 60; minute += 30) {
+          const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+          const formattedTime = formatTime(time);
+          timeSlots.push({
+            display: formattedTime,
+            time: time,
+            endTime: getEndTime(time)
+          });
+        }
+      }
+
+      // Add 6:00 PM slot
+      timeSlots.push({
+        display: '06:00 PM',
+        time: '18:00',
+        endTime: '18:30'
+      });
+
+      // Render each time slot
+      timeSlots.forEach(slot => {
+        const timeCard = document.createElement('div');
+        timeCard.className = 'time-card';
+        
+        // Check if this slot exists in the available slots
+        const availableSlot = Object.values(slots).find(s => 
+          s.startTime === slot.time && s.endTime === slot.endTime
+        );
+
+        // Create time text
+        const timeText = document.createElement('span');
+        timeText.textContent = slot.display;
+        
+        // Add elements to time card
+        timeCard.appendChild(timeText);
+        
+        if (availableSlot) {
+          const currentBookings = parseInt(availableSlot.currentBookings || 0);
+          const maxBookings = parseInt(availableSlot.maxBookings || 1);
+          const isAvailable = currentBookings < maxBookings;
+
+          // Only show booking count if there are current bookings
+          if (maxBookings > 1 && currentBookings > 0) {
+            const countSpan = document.createElement('span');
+            countSpan.className = 'booking-count';
+            countSpan.textContent = `${currentBookings}/${maxBookings}`;
+            timeCard.appendChild(countSpan);
+          }
+
+          if (isAvailable) {
+            timeCard.addEventListener('click', () => {
+              document.querySelectorAll('.time-card.selected').forEach(el => el.classList.remove('selected'));
+              timeCard.classList.add('selected');
+              selectedTime = `${slot.time}-${slot.endTime}`;
+              updateNextButton();
+            });
+          } else {
+            timeCard.classList.add('unavailable');
+            timeCard.title = 'This time slot is fully booked';
+          }
+        } else {
+          timeCard.classList.add('unavailable');
+          timeCard.title = 'This time slot is not available';
+        }
+
+        timesGrid.appendChild(timeCard);
+      });
+
+      // If no slots are available, show message
+      const availableSlotsCount = document.querySelectorAll('.time-card:not(.unavailable)').length;
+      if (availableSlotsCount === 0) {
+        timesGrid.innerHTML = '<div class="no-slots">No available time slots for this date</div>';
+      }
     }
-    
-    // Store selected slot in localStorage for the next step
-    localStorage.setItem('selectedSlot', JSON.stringify(selectedSlot));
-    
-    // Redirect to the next step
-    window.location.href = 'confirm.html';
-});
 
-// Show notification
-function showNotification(message, type = 'success') {
-    notification.className = `notification ${type} show`;
-    notificationMessage.textContent = message;
-    
-    const icon = notification.querySelector('i');
-    icon.className = type === 'error' ? 'fas fa-exclamation-circle' : 
-                    type === 'warning' ? 'fas fa-exclamation-triangle' : 
-                    'fas fa-check-circle';
-    
-    setTimeout(() => {
-        notification.classList.remove('show');
-    }, 3000);
-}
+    // Update next button state
+    function updateNextButton() {
+      nextBtn.disabled = !(selectedDate && selectedTime);
+    }
 
-// Initialize the page
-document.addEventListener('DOMContentLoaded', () => {
-    // Load today's slots by default
-    const today = new Date();
-    const todayFormatted = today.toISOString().split('T')[0];
-    selectedDate = todayFormatted;
-    loadAvailableSlots(todayFormatted);
-    
-    // Disable continue button until a slot is selected
-    continueBtn.disabled = true;
-});
+    // Event listeners
+    prevMonthBtn.addEventListener('click', () => {
+      if (currentMonth === 0) {
+        currentMonth = 11;
+        currentYear--;
+      } else {
+        currentMonth--;
+      }
+      renderDates();
+    });
+
+    nextMonthBtn.addEventListener('click', () => {
+      if (currentMonth === 11) {
+        currentMonth = 0;
+        currentYear++;
+      } else {
+        currentMonth++;
+      }
+      renderDates();
+    });
+
+    nextBtn.addEventListener('click', () => {
+      if (!selectedDate || !selectedTime) return;
+      
+      // Store selected date and time in localStorage
+      localStorage.setItem('selectedDate', selectedDate);
+      localStorage.setItem('selectedTime', selectedTime);
+      
+      // Store the full time slot details
+      const [startTime, endTime] = selectedTime.split('-');
+      localStorage.setItem('selectedTimeSlot', JSON.stringify({
+        startTime,
+        endTime,
+        date: selectedDate
+      }));
+
+      // Format and store the display date
+      const dateParts = selectedDate.split('-');
+      const year = parseInt(dateParts[0], 10);
+      const month = parseInt(dateParts[1], 10);
+      const day = parseInt(dateParts[2], 10);
+      
+      const monthNames = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+      ];
+      
+      const date = new Date(year, month - 1, day);
+      const weekdayNames = [
+        "Sunday", "Monday", "Tuesday", "Wednesday",
+        "Thursday", "Friday", "Saturday"
+      ];
+      
+      const weekdayIndex = date.getDay();
+      const formattedDate = `${weekdayNames[weekdayIndex]}, ${monthNames[month-1]} ${day}, ${year}`;
+      localStorage.setItem('formattedDate', formattedDate);
+
+      // Go to details page
+      window.location.href = 'add-details.html';
+    });
+
+    // Initialize the page
+    function init() {
+      loadAvailableSlots();
+      updateNextButton();
+      
+      // Set initial month display
+      const monthNames = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+      ];
+      currentMonthEl.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+    }
+
+    // Start the app
+    document.addEventListener('DOMContentLoaded', init);
   </script>
 </body>
 </html>
