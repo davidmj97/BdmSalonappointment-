@@ -215,12 +215,13 @@
         }
 
         .slot-details {
-            font-size: 11px;
+            font-size: 13px;
             color: var(--text-muted);
         }
 
         .selected .slot-details {
-            color: rgba(255, 255, 255, 0.8);
+            color: rgba(255, 255, 255, 0.95);
+            font-weight: bold;
         }
 
         .date-picker-container {
@@ -245,28 +246,6 @@
 
         .date-input .form-control {
             max-width: 200px;
-            font-size: 13px;
-        }
-
-        .max-bookings-selector {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 12px;
-            font-size: 13px;
-        }
-
-        .max-bookings-selector label {
-            margin-bottom: 0;
-            white-space: nowrap;
-        }
-
-        .max-bookings-selector select {
-            background: #222;
-            color: var(--fg);
-            border: 1px solid var(--border);
-            padding: 6px 8px;
-            border-radius: 4px;
             font-size: 13px;
         }
 
@@ -415,12 +394,6 @@
                 padding: 7px 12px;
             }
 
-            .max-bookings-selector {
-                flex-direction: row;
-                align-items: center;
-                font-size: 12px;
-            }
-
             .time-slot {
                 padding: 10px 5px;
                 font-size: 13px;
@@ -499,16 +472,7 @@
                         </div>
                     </div>
 
-                    <div class="max-bookings-selector">
-                        <label for="maxBookings">Max per slot:</label>
-                        <select id="maxBookings">
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3" selected>3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                        </select>
-                    </div>
+                    <!-- Max bookings selector removed -->
 
                     <div class="time-slots-grid" id="timeSlotsGrid">
                         <!-- Time slots will be generated here -->
@@ -564,7 +528,7 @@ const timeSlotsGrid = document.getElementById('timeSlotsGrid');
 const saveSlotsBtn = document.getElementById('saveSlotsBtn');
 const clearSlotsBtn = document.getElementById('clearSlotsBtn');
 const loadSlotsBtn = document.getElementById('loadSlotsBtn');
-const maxBookingsSelect = document.getElementById('maxBookings');
+// maxBookingsSelect removed
 const selectedSlotsList = document.getElementById('selectedSlotsList');
 const selectedSlotsContainer = document.getElementById('selectedSlotsContainer');
 const notification = document.getElementById('notification');
@@ -575,6 +539,8 @@ let selectedDate = null;
 let selectedSlots = new Map();
 let allSlots = [];
 let databaseRef = null;
+
+const DEFAULT_MAX_BOOKINGS = 1; // Fixed to 1 as dropdown is removed
 
 // Format date as YYYY-MM-DD
 function formatDate(date) {
@@ -644,7 +610,6 @@ function updateSelectedSlotsUI() {
         slotElement.className = 'selected-slot-item';
         slotElement.innerHTML = `
             ${formatTime(slotData.start)}
-            <span class="max-bookings">(${slotData.maxBookings})</span>
             <button class="remove-slot" data-slot-id="${slotId}" title="Remove slot">
                 <i class="fas fa-times"></i>
             </button>
@@ -679,9 +644,18 @@ function renderTimeSlots(bookedSlotsForDate = {}) {
         const slotData = bookedSlotsForDate[slot.id] || {};
         const isBooked = slotData.currentBookings > 0;
         const isSelected = selectedSlots.has(slot.id);
-        const maxBookings = slotData.maxBookings || 1;
+        const maxBookings = slotData.maxBookings || DEFAULT_MAX_BOOKINGS;
         const currentBookings = slotData.currentBookings || 0;
         const isAvailable = currentBookings < maxBookings;
+
+        let slotStatusText = '';
+        if (isBooked) {
+            slotStatusText = `${currentBookings}/${maxBookings} booked`;
+        } else if (isSelected) {
+            slotStatusText = 'Selected';
+        } else {
+            slotStatusText = 'Available';
+        }
 
         const slotElement = document.createElement('div');
         slotElement.className = `time-slot 
@@ -694,13 +668,7 @@ function renderTimeSlots(bookedSlotsForDate = {}) {
         
         slotElement.innerHTML = `
             <div class="time-display">${formatTime(slot.start)}</div>
-            <div class="slot-details">
-                ${currentBookings > 0 ? 
-                    `${currentBookings}/${maxBookings} booked` : 
-                    isSelected ? 
-                    `Max: ${selectedSlots.get(slot.id).maxBookings}` : 
-                    'Available'}
-            </div>
+            <div class="slot-details">${slotStatusText}</div>
         `;
 
         if (isAvailable) {
@@ -715,13 +683,11 @@ function renderTimeSlots(bookedSlotsForDate = {}) {
 
 // Toggle slot selection
 function toggleSlotSelection(slotId, startTime, endTime) {
-    const maxBookings = parseInt(maxBookingsSelect.value);
-    
     if (selectedSlots.has(slotId)) {
         selectedSlots.delete(slotId);
     } else {
         selectedSlots.set(slotId, {
-            maxBookings: maxBookings,
+            maxBookings: DEFAULT_MAX_BOOKINGS,
             start: startTime,
             end: endTime
         });
@@ -790,15 +756,10 @@ async function loadSlotsForDate(date) {
         // If slots exist for this date, select them and preserve their data
         Object.entries(slots).forEach(([slotId, slotData]) => {
             selectedSlots.set(slotId, {
-                maxBookings: slotData.maxBookings || 1,
+                maxBookings: slotData.maxBookings || DEFAULT_MAX_BOOKINGS,
                 start: slotData.startTime,
                 end: slotData.endTime
             });
-            
-            // Update the max bookings dropdown to match the first slot's value
-            if (selectedSlots.size === 1) {
-                maxBookingsSelect.value = slotData.maxBookings || 1;
-            }
         });
         
         renderTimeSlots(slots);
@@ -845,7 +806,7 @@ saveSlotsBtn.addEventListener('click', async () => {
             slotsData[slotId] = {
                 startTime: slotData.start,
                 endTime: slotData.end,
-                maxBookings: slotData.maxBookings,
+                maxBookings: DEFAULT_MAX_BOOKINGS,
                 currentBookings: currentBookings,  // Preserve existing bookings
                 id: slotId
             };
@@ -872,7 +833,6 @@ clearSlotsBtn.addEventListener('click', async () => {
     }
     
     try {
-        // Instead of removing the entire date, just clear the slots
         await database.ref(`availableSlots/${selectedDate}`).set({});
         selectedSlots.clear();
         renderTimeSlots();
@@ -883,26 +843,6 @@ clearSlotsBtn.addEventListener('click', async () => {
     } catch (error) {
         console.error('Error clearing slots:', error);
         showNotification('Failed to clear slots', 'error');
-    }
-});
-
-// Update max bookings for selected slots when the dropdown changes
-maxBookingsSelect.addEventListener('change', () => {
-    if (selectedSlots.size > 0) {
-        const maxBookings = parseInt(maxBookingsSelect.value);
-        const newSelectedSlots = new Map();
-        
-        // Update max bookings for all selected slots
-        selectedSlots.forEach((slotData, slotId) => {
-            newSelectedSlots.set(slotId, {
-                ...slotData,
-                maxBookings: maxBookings
-            });
-        });
-        
-        selectedSlots = newSelectedSlots;
-        updateSelectedSlotsUI();
-        renderTimeSlots();
     }
 });
 
