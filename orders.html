@@ -575,21 +575,13 @@
         </div>
         
         <div id="pending-orders" class="tab-content active">
-            <div class="orders-grid" id="pending-orders-grid">
-                <!-- Pending orders will be populated here -->
-            </div>
+            <div class="orders-grid" id="pending-orders-grid"></div>
         </div>
-        
         <div id="accepted-orders" class="tab-content">
-            <div class="orders-grid" id="accepted-orders-grid">
-                <!-- Accepted orders will be populated here -->
-            </div>
+            <div class="orders-grid" id="accepted-orders-grid"></div>
         </div>
-        
         <div id="cancelled-orders" class="tab-content">
-            <div class="orders-grid" id="cancelled-orders-grid">
-                <!-- Cancelled orders will be populated here -->
-            </div>
+            <div class="orders-grid" id="cancelled-orders-grid"></div>
         </div>
     </div>
     
@@ -650,540 +642,393 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     
     <script>
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyAmimDsjW_pF2NGw-w-40QzTsgmf1tdqyI",
-            authDomain: "bdmsalonappointment.firebaseapp.com",
-            databaseURL: "https://bdmsalonappointment-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "bdmsalonappointment",
-            storageBucket: "bdmsalonappointment.firebasestorage.app",
-            messagingSenderId: "123933913893",
-            appId: "1:123933913893:web:c1f57caf4dc2a5440ba0cc",
-            measurementId: "G-Q0FVZRVS64"
-        };
+    // Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyAmimDsjW_pF2NGw-w-40QzTsgmf1tdqyI",
+        authDomain: "bdmsalonappointment.firebaseapp.com",
+        databaseURL: "https://bdmsalonappointment-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "bdmsalonappointment",
+        storageBucket: "bdmsalonappointment.firebasestorage.app",
+        messagingSenderId: "123933913893",
+        appId: "1:123933913893:web:c1f57caf4dc2a5440ba0cc",
+        measurementId: "G-Q0FVZRVS64"
+    };
 
-        // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-        let currentOrderId = null;
-        let ordersMap = new Map();
-        
-        // Track order counts and new orders
-        let lastOrderCounts = { pending: 0, accepted: 0, cancelled: 0 };
-        let isFirstLoad = true;
-        let isTabVisible = true;
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+    let currentOrderId = null;
+    let ordersMap = new Map();
 
-        // DOM Elements
-        const modal = document.getElementById('orderModal');
-        const closeModal = document.querySelector('.close-modal');
-        const tabs = document.querySelectorAll('.tab');
-        const tabContents = document.querySelectorAll('.tab-content');
-        const orderGrids = {
-            pending: document.getElementById('pending-orders-grid'),
-            accepted: document.getElementById('accepted-orders-grid'),
-            cancelled: document.getElementById('cancelled-orders-grid')
-        };
-        const notification = document.getElementById('notification');
-        const notificationMessage = document.getElementById('notification-message');
+    // Track order counts and new orders
+    let lastOrderCounts = { pending: 0, accepted: 0, cancelled: 0 };
+    let isFirstLoad = true;
+    let isTabVisible = true;
 
-        // Helper function to get current month code (YYYYMM)
-        function getCurrentMonthCode() {
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            return `${year}${month}`;
-        }
+    // DOM Elements
+    const modal = document.getElementById('orderModal');
+    const closeModal = document.querySelector('.close-modal');
+    const tabs = document.querySelectorAll('.tab');
+    const tabContents = document.querySelectorAll('.tab-content');
+    const orderGrids = {
+        pending: document.getElementById('pending-orders-grid'),
+        accepted: document.getElementById('accepted-orders-grid'),
+        cancelled: document.getElementById('cancelled-orders-grid')
+    };
+    const notification = document.getElementById('notification');
+    const notificationMessage = document.getElementById('notification-message');
 
-        // Helper function to get month code from date string (YYYY-MM-DD)
-        function getOrderMonthCode(dateString) {
-            if (!dateString) return getCurrentMonthCode();
-            const [year, month] = dateString.split('-');
-            return `${year}${month}`;
-        }
-
-        // Format date to YYYY-MM-DD
-        function formatDate(date) {
-            if (!date) return '';
-            const d = new Date(date);
-            if (isNaN(d.getTime())) return '';
-            
-            const year = d.getFullYear();
-            const month = String(d.getMonth() + 1).padStart(2, '0');
-            const day = String(d.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        }
-
-        // Format timestamp to readable date
-        function formatTimestamp(timestamp) {
-            if (!timestamp) return 'N/A';
-            const date = new Date(timestamp);
-            if (isNaN(date.getTime())) return 'N/A';
-            return date.toLocaleString();
-        }
-
-        // Format time in HH:MM AM/PM
-        function formatTime(timeStr) {
-            if (!timeStr) return 'N/A';
-            // If time is already in 12-hour format, return as is
-            if (timeStr.includes('AM') || timeStr.includes('PM')) {
-                return timeStr;
-            }
-            // Convert 24-hour format to 12-hour format
-            const [hours, minutes] = timeStr.split(':');
-            const hour = parseInt(hours, 10);
-            const ampm = hour >= 12 ? 'PM' : 'AM';
-            const hour12 = hour % 12 || 12;
-            return `${hour12}:${minutes} ${ampm}`;
-        }
-
-        // Format price with currency
-        function formatPrice(price) {
-            if (price === undefined || price === null) return 'N/A';
-            return `₹${parseFloat(price).toFixed(2)}`;
-        }
-
-        // Calculate total price of services
-        function calculateTotal(services) {
-            if (!services || !services.length) return 0;
-            return services.reduce((total, service) => {
-                if (!service.price) return total;
-                // Remove any non-numeric characters except decimal point
-                const priceStr = String(service.price).replace(/[^0-9.]/g, '');
-                const price = parseFloat(priceStr) || 0;
-                return total + price;
-            }, 0);
-        }
-
-       // Generate sequential order number (YYYYXXXX)
-async function generateOrderNumber() {
-    try {
-        // Get current year
-        const currentYear = new Date().getFullYear();
-        
-        // Find the highest order number starting with current year
-        const snapshot = await database.ref('bookings')
-            .orderByChild('orderNumber')
-            .startAt(currentYear.toString())
-            .endAt((currentYear + 1).toString())
-            .once('value');
-        
-        let maxNumber = 0;
-        
-        // Find the highest order number for this year
-        snapshot.forEach(child => {
-            const order = child.val();
-            if (order.orderNumber) {
-                const orderNum = parseInt(order.orderNumber, 10);
-                if (orderNum >= currentYear * 10000 && orderNum < (currentYear + 1) * 10000) {
-                    const seqNum = orderNum % 10000; // Get last 4 digits
-                    if (seqNum > maxNumber) {
-                        maxNumber = seqNum;
-                    }
-                }
-            }
-        });
-        
-        // Generate the next order number
-        return (currentYear * 10000 + maxNumber + 1).toString();
-        
-    } catch (error) {
-        console.error('Error generating order number:', error);
-        // Fallback: use timestamp if there's an error
-        return (new Date().getFullYear() * 10000 + Math.floor(Math.random() * 10000)).toString();
+    // Helper function to get current year
+    function getCurrentYear() {
+        return new Date().getFullYear();
     }
-}
-        // Show notification
-        function showNotification(message, type = 'info') {
-            notificationMessage.textContent = message;
-            notification.className = `notification ${type} show`;
-            notification.style.display = 'flex';
-            
-            // Update notification icon based on type
-            const icon = notification.querySelector('i');
-            if (type === 'error') {
-                icon.className = 'fas fa-exclamation-circle';
-            } else if (type === 'success') {
-                icon.className = 'fas fa-check-circle';
-            } else if (type === 'new-order') {
-                icon.className = 'fas fa-bell';
-            } else {
-                icon.className = 'fas fa-info-circle';
-            }
-            
-            // Hide after 5 seconds
-            setTimeout(() => {
-                notification.classList.remove('show');
-                setTimeout(() => {
-                    notification.style.display = 'none';
-                }, 300);
-            }, 5000);
-        }
 
-        // Play notification sound
-        function playNotificationSound() {
-            try {
-                const audio = new Audio('https://assets.mixkit.co/active_checklist/short-notification-alert-2355.mp3');
-                audio.play().catch(e => console.log('Audio play failed:', e));
-            } catch (e) {
-                console.error('Error playing sound:', e);
-            }
-        }
+    // Format time in HH:MM AM/PM
+    function formatTime(timeStr) {
+        if (!timeStr) return 'N/A';
+        if (timeStr.includes('AM') || timeStr.includes('PM')) return timeStr;
+        const [hours, minutes] = timeStr.split(':');
+        const hour = parseInt(hours, 10);
+        const ampm = hour >= 12 ? 'PM' : 'AM';
+        const hour12 = hour % 12 || 12;
+        return `${hour12}:${minutes} ${ampm}`;
+    }
 
-        // Update tab badges with order counts
-        function updateTabBadges(counts) {
-            Object.entries(counts).forEach(([status, count]) => {
-                const tab = document.querySelector(`.tab[data-tab="${status}"]`);
-                if (tab) {
-                    let badge = tab.querySelector('.badge');
-                    if (!badge) {
-                        badge = document.createElement('span');
-                        badge.className = 'badge';
-                        tab.appendChild(badge);
-                    }
-                    badge.textContent = count || '0';
-                    badge.style.display = count > 0 ? 'inline-block' : 'none';
-                    
-                    // Show/hide new order indicator
-                    const indicator = tab.querySelector('.new-order-indicator');
-                    if (indicator) {
-                        indicator.style.display = (status === 'pending' && count > lastOrderCounts.pending && !isFirstLoad && isTabVisible) 
-                            ? 'block' 
-                            : 'none';
-                            
-                        // Play sound for new pending orders
-                        if (status === 'pending' && count > lastOrderCounts.pending && !isFirstLoad && isTabVisible) {
-                            playNotificationSound();
-                            showNotification(`New order received! ${count - lastOrderCounts.pending} new order(s)`, 'new-order');
+    // Format price with currency
+    function formatPrice(price) {
+        if (price === undefined || price === null) return 'N/A';
+        return `$${parseFloat(price).toFixed(2)}`;
+    }
+
+    // Calculate total price of services
+    function calculateTotal(services) {
+        if (!services || !services.length) return 0;
+        return services.reduce((total, service) => {
+            if (!service.price) return total;
+            const priceStr = String(service.price).replace(/[^0-9.]/g, '');
+            const price = parseFloat(priceStr) || 0;
+            return total + price;
+        }, 0);
+    }
+
+    // Generate sequential order number (YYYYXXXX)
+    async function generateOrderNumber() {
+        try {
+            const currentYear = getCurrentYear();
+            const snapshot = await database.ref('bookings')
+                .orderByChild('orderNumber')
+                .startAt(currentYear.toString())
+                .endAt((currentYear + 1).toString())
+                .once('value');
+            let maxNumber = 0;
+            snapshot.forEach(child => {
+                const order = child.val();
+                if (order.orderNumber && String(order.orderNumber).length === 8) {
+                    const orderNum = parseInt(order.orderNumber, 10);
+                    if (orderNum >= currentYear * 10000 && orderNum < (currentYear + 1) * 10000) {
+                        const seqNum = orderNum % 10000;
+                        if (seqNum > maxNumber) {
+                            maxNumber = seqNum;
                         }
                     }
                 }
             });
-            
-            // Update last order counts
-            lastOrderCounts = { ...counts };
-            isFirstLoad = false;
+            // Generate the next order number
+            return (currentYear * 10000 + maxNumber + 1).toString();
+        } catch (error) {
+            console.error('Error generating order number:', error);
+            return (new Date().getFullYear() * 10000 + Math.floor(Math.random() * 10000)).toString();
         }
+    }
 
-        // Create order card element
-        function createOrderCard(order, id) {
-            // Skip if we've already processed this order
-            if (ordersMap.has(id)) {
-                return null;
-            }
-            ordersMap.set(id, true);
-            
-            const card = document.createElement('div');
-            const status = order.status || 'pending';
-            card.className = `order-card ${status}`;
-            card.dataset.id = id;
-            
-            // Get order number or display temporary one
-            const orderNumber = order.orderNumber || `TEMP-${id.substring(0, 6)}`;
-            const statusClass = `status-${status}`;
-            const statusText = status.charAt(0).toUpperCase() + status.slice(1);
-            
-            // Get first service name or default
-            const firstService = order.services?.[0]?.name || 'No Service';
-            const serviceCount = order.services?.length || 0;
-            
-            // Format price
-            const totalPrice = calculateTotal(order.services);
-            
-            card.innerHTML = `
-                <div class="order-header">
-                    <div class="order-status ${statusClass}">${statusText}</div>
-                    <div class="order-number">#${orderNumber}</div>
-                </div>
-                <div class="order-detail"><span>Customer:</span> ${order.user?.name || 'N/A'}</div>
-                <div class="order-detail"><span>Service:</span> ${firstService}${serviceCount > 1 ? ` +${serviceCount - 1} more` : ''}</div>
-                <div class="order-detail"><span>Date:</span> ${order.date || 'N/A'}</div>
-                <div class="order-detail"><span>Time:</span> ${formatTime(order.time) || 'N/A'}</div>
-                <div class="order-detail"><span>Amount:</span> ${formatPrice(totalPrice)}</div>
-                
-                <div class="order-actions" id="actions-${id}">
-                    <button class="btn btn-view" data-id="${id}">
-                        <i class="fas fa-eye"></i> View
-                    </button>
-                    <button class="btn btn-delete" data-id="${id}">
-                        <i class="fas fa-trash"></i> Delete
-                    </button>
-                    ${status === 'pending' ? `
-                        <button class="btn btn-accept" data-id="${id}">
-                            <i class="fas fa-check"></i> Accept
-                        </button>
-                        <button class="btn btn-cancel" data-id="${id}">
-                            <i class="fas fa-times"></i> Cancel
-                        </button>
-                    ` : ''}
-                </div>
-            `;
-            
-            // Add event listeners to action buttons
-            const viewBtn = card.querySelector('.btn-view');
-            if (viewBtn) {
-                viewBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    openOrderModal(order, id);
-                });
-            }
-            
-            // Add delete button handler
-            const deleteBtn = card.querySelector('.btn-delete');
-            if (deleteBtn) {
-                deleteBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    if (confirm('Are you sure you want to delete this order? This action cannot be undone.')) {
-                        deleteOrder(id);
-                    }
-                });
-            }
-            
-            // Add accept button handler (for pending orders)
-            const acceptBtn = card.querySelector('.btn-accept');
-            if (acceptBtn) {
-                acceptBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    updateOrderStatus(id, 'accepted');
-                });
-            }
-            
-            // Add cancel button handler (for pending orders)
-            const cancelBtn = card.querySelector('.btn-cancel');
-            if (cancelBtn) {
-                cancelBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    if (confirm('Are you sure you want to cancel this order?')) {
-                        updateOrderStatus(id, 'cancelled');
-                    }
-                });
-            }
-            
-            // Make entire card clickable to view details
-            card.addEventListener('click', (e) => {
-                // Don't trigger if clicking on a button or link
-                if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.closest('button, a')) {
-                    return;
+    // Show notification
+    function showNotification(message, type = 'info') {
+        notificationMessage.textContent = message;
+        notification.className = `notification ${type} show`;
+        notification.style.display = 'flex';
+        const icon = notification.querySelector('i');
+        if (type === 'error') {
+            icon.className = 'fas fa-exclamation-circle';
+        } else if (type === 'success') {
+            icon.className = 'fas fa-check-circle';
+        } else if (type === 'new-order') {
+            icon.className = 'fas fa-bell';
+        } else {
+            icon.className = 'fas fa-info-circle';
+        }
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 300);
+        }, 5000);
+    }
+
+    // Play notification sound
+    function playNotificationSound() {
+        try {
+            const audio = new Audio('https://assets.mixkit.co/active_checklist/short-notification-alert-2355.mp3');
+            audio.play().catch(e => console.log('Audio play failed:', e));
+        } catch (e) {
+            console.error('Error playing sound:', e);
+        }
+    }
+
+    // Update tab badges with order counts
+    function updateTabBadges(counts) {
+        Object.entries(counts).forEach(([status, count]) => {
+            const tab = document.querySelector(`.tab[data-tab="${status}"]`);
+            if (tab) {
+                let badge = tab.querySelector('.badge');
+                if (!badge) {
+                    badge = document.createElement('span');
+                    badge.className = 'badge';
+                    tab.appendChild(badge);
                 }
+                badge.textContent = count || '0';
+                badge.style.display = count > 0 ? 'inline-block' : 'none';
+                
+                // Show/hide new order indicator
+                const indicator = tab.querySelector('.new-order-indicator');
+                if (indicator) {
+                    indicator.style.display = (status === 'pending' && count > lastOrderCounts.pending && !isFirstLoad && isTabVisible) 
+                        ? 'block' 
+                        : 'none';
+                    if (status === 'pending' && count > lastOrderCounts.pending && !isFirstLoad && isTabVisible) {
+                        playNotificationSound();
+                        showNotification(`New order received! ${count - lastOrderCounts.pending} new order(s)`, 'new-order');
+                    }
+                }
+            }
+        });
+        lastOrderCounts = { ...counts };
+        isFirstLoad = false;
+    }
+
+    // Create order card element
+    function createOrderCard(order, id) {
+        if (ordersMap.has(id)) return null;
+        ordersMap.set(id, true);
+        const card = document.createElement('div');
+        const status = order.status || 'pending';
+        card.className = `order-card ${status}`;
+        card.dataset.id = id;
+        const orderNumber = order.orderNumber && String(order.orderNumber).length === 8 ? order.orderNumber : 'N/A';
+        const statusClass = `status-${status}`;
+        const statusText = status.charAt(0).toUpperCase() + status.slice(1);
+        const firstService = order.services?.[0]?.name || 'No Service';
+        const serviceCount = order.services?.length || 0;
+        const totalPrice = calculateTotal(order.services);
+        card.innerHTML = `
+            <div class="order-header">
+                <div class="order-status ${statusClass}">${statusText}</div>
+                <div class="order-number">#${orderNumber}</div>
+            </div>
+            <div class="order-detail"><span>Customer:</span> ${order.user?.name || 'N/A'}</div>
+            <div class="order-detail"><span>Service:</span> ${firstService}${serviceCount > 1 ? ` +${serviceCount - 1} more` : ''}</div>
+            <div class="order-detail"><span>Date:</span> ${order.date || 'N/A'}</div>
+            <div class="order-detail"><span>Time:</span> ${formatTime(order.time) || 'N/A'}</div>
+            <div class="order-detail"><span>Amount:</span> ${formatPrice(totalPrice)}</div>
+            <div class="order-actions" id="actions-${id}">
+                <button class="btn btn-view" data-id="${id}">
+                    <i class="fas fa-eye"></i> View
+                </button>
+                <button class="btn btn-delete" data-id="${id}">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+                ${status === 'pending' ? `
+                    <button class="btn btn-accept" data-id="${id}">
+                        <i class="fas fa-check"></i> Accept
+                    </button>
+                    <button class="btn btn-cancel" data-id="${id}">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                ` : ''}
+            </div>
+        `;
+        const viewBtn = card.querySelector('.btn-view');
+        if (viewBtn) {
+            viewBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
                 openOrderModal(order, id);
             });
-            
-            return card;
         }
-
-        // Delete an order
-        async function deleteOrder(orderId) {
-            if (!orderId) return;
-            
-            try {
-                await database.ref(`bookings/${orderId}`).remove();
-                showNotification('Order deleted successfully!', 'success');
-                
-                // Remove the card from the UI
-                const card = document.querySelector(`.order-card[data-id="${orderId}"]`);
-                if (card) {
-                    card.remove();
-                }
-            } catch (error) {
-                console.error('Error deleting order:', error);
-                showNotification('Failed to delete order. Please try again.', 'error');
-            }
-        }
-
-        // Open order details modal
-        function openOrderModal(order, id) {
-            currentOrderId = id;
-            const orderDate = order.date || new Date().toISOString().split('T')[0];
-            const orderNumber = order.orderNumber || `TEMP-${id.substring(0, 6)}`;
-            
-            // Set modal content
-            document.getElementById('modal-order-number').textContent = `#${orderNumber}`;
-            document.getElementById('modal-customer-name').textContent = order.user?.name || 'N/A';
-            document.getElementById('modal-phone').textContent = order.user?.phone || 'N/A';
-            document.getElementById('modal-email').textContent = order.user?.email || 'N/A';
-            document.getElementById('modal-date').textContent = order.date || 'N/A';
-            document.getElementById('modal-time').textContent = formatTime(order.time) || 'N/A';
-            document.getElementById('modal-stylist').textContent = order.stylist?.name || 'N/A';
-            document.getElementById('modal-booking-time').textContent = formatTimestamp(order.createdAt);
-            
-            // Set services
-            const servicesContainer = document.getElementById('modal-services');
-            servicesContainer.innerHTML = '';
-            
-            if (order.services && order.services.length) {
-                order.services.forEach(service => {
-                    const serviceEl = document.createElement('div');
-                    serviceEl.className = 'service-item';
-                    serviceEl.innerHTML = `
-                        <div class="service-name">${service.name || 'N/A'}</div>
-                        <div>Duration: ${service.time || 'N/A'}</div>
-                        <div>Price: ${service.price || 'N/A'}</div>
-                    `;
-                    servicesContainer.appendChild(serviceEl);
-                });
-            } else {
-                servicesContainer.innerHTML = '<div class="service-item">No services selected</div>';
-            }
-            
-            // Set total price
-            const totalPrice = calculateTotal(order.services);
-            document.getElementById('modal-total-price').textContent = formatPrice(totalPrice);
-            
-            // Set action buttons based on order status
-            const modalFooter = document.getElementById('modal-footer');
-            modalFooter.innerHTML = '';
-            
-            // Add delete button to all order types
-            const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'btn btn-delete';
-            deleteBtn.innerHTML = '<i class="fas fa-trash"></i> Delete Order';
-            deleteBtn.onclick = () => {
+        const deleteBtn = card.querySelector('.btn-delete');
+        if (deleteBtn) {
+            deleteBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
                 if (confirm('Are you sure you want to delete this order? This action cannot be undone.')) {
                     deleteOrder(id);
-                    modal.style.display = 'none';
+                }
+            });
+        }
+        const acceptBtn = card.querySelector('.btn-accept');
+        if (acceptBtn) {
+            acceptBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                updateOrderStatus(id, 'accepted');
+            });
+        }
+        const cancelBtn = card.querySelector('.btn-cancel');
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (confirm('Are you sure you want to cancel this order?')) {
+                    updateOrderStatus(id, 'cancelled');
+                }
+            });
+        }
+        card.addEventListener('click', (e) => {
+            if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.closest('button, a')) {
+                return;
+            }
+            openOrderModal(order, id);
+        });
+        return card;
+    }
+
+    // Delete an order
+    async function deleteOrder(orderId) {
+        if (!orderId) return;
+        try {
+            await database.ref(`bookings/${orderId}`).remove();
+            showNotification('Order deleted successfully!', 'success');
+            const card = document.querySelector(`.order-card[data-id="${orderId}"]`);
+            if (card) card.remove();
+        } catch (error) {
+            console.error('Error deleting order:', error);
+            showNotification('Failed to delete order. Please try again.', 'error');
+        }
+    }
+
+    // Open order details modal
+    function openOrderModal(order, id) {
+        currentOrderId = id;
+        const orderNumber = order.orderNumber && String(order.orderNumber).length === 8 ? order.orderNumber : 'N/A';
+        document.getElementById('modal-order-number').textContent = `#${orderNumber}`;
+        document.getElementById('modal-customer-name').textContent = order.user?.name || 'N/A';
+        document.getElementById('modal-phone').textContent = order.user?.phone || 'N/A';
+        document.getElementById('modal-email').textContent = order.user?.email || 'N/A';
+        document.getElementById('modal-date').textContent = order.date || 'N/A';
+        document.getElementById('modal-time').textContent = formatTime(order.time) || 'N/A';
+        document.getElementById('modal-stylist').textContent = order.stylist?.name || 'N/A';
+        document.getElementById('modal-booking-time').textContent = order.createdAt ? (new Date(order.createdAt)).toLocaleString() : 'N/A';
+        const servicesContainer = document.getElementById('modal-services');
+        servicesContainer.innerHTML = '';
+        if (order.services && order.services.length) {
+            order.services.forEach(service => {
+                const serviceEl = document.createElement('div');
+                serviceEl.className = 'service-item';
+                serviceEl.innerHTML = `
+                    <div class="service-name">${service.name || 'N/A'}</div>
+                    <div>Duration: ${service.time || 'N/A'}</div>
+                    <div>Price: ${service.price || 'N/A'}</div>
+                `;
+                servicesContainer.appendChild(serviceEl);
+            });
+        } else {
+            servicesContainer.innerHTML = '<div class="service-item">No services selected</div>';
+        }
+        const totalPrice = calculateTotal(order.services);
+        document.getElementById('modal-total-price').textContent = formatPrice(totalPrice);
+        const modalFooter = document.getElementById('modal-footer');
+        modalFooter.innerHTML = '';
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'btn btn-delete';
+        deleteBtn.innerHTML = '<i class="fas fa-trash"></i> Delete Order';
+        deleteBtn.onclick = () => {
+            if (confirm('Are you sure you want to delete this order? This action cannot be undone.')) {
+                deleteOrder(id);
+                modal.style.display = 'none';
+            }
+        };
+        if (order.status === 'pending') {
+            const acceptBtn = document.createElement('button');
+            acceptBtn.className = 'btn btn-accept';
+            acceptBtn.innerHTML = '<i class="fas fa-check"></i> Accept Order';
+            acceptBtn.onclick = () => updateOrderStatus(id, 'accepted');
+            const cancelBtn = document.createElement('button');
+            cancelBtn.className = 'btn btn-cancel';
+            cancelBtn.innerHTML = '<i class="fas fa-times"></i> Cancel Order';
+            cancelBtn.onclick = () => {
+                if (confirm('Are you sure you want to cancel this order?')) {
+                    updateOrderStatus(id, 'cancelled');
                 }
             };
-            
-            // Add appropriate action buttons based on status
-            if (order.status === 'pending') {
-                const acceptBtn = document.createElement('button');
-                acceptBtn.className = 'btn btn-accept';
-                acceptBtn.innerHTML = '<i class="fas fa-check"></i> Accept Order';
-                acceptBtn.onclick = () => updateOrderStatus(id, 'accepted');
-                
-                const cancelBtn = document.createElement('button');
-                cancelBtn.className = 'btn btn-cancel';
-                cancelBtn.innerHTML = '<i class="fas fa-times"></i> Cancel Order';
-                cancelBtn.onclick = () => {
-                    if (confirm('Are you sure you want to cancel this order?')) {
-                        updateOrderStatus(id, 'cancelled');
-                    }
-                };
-                
-                modalFooter.appendChild(acceptBtn);
-                modalFooter.appendChild(cancelBtn);
-            } else {
-                const closeBtn = document.createElement('button');
-                closeBtn.className = 'btn btn-close';
-                closeBtn.innerHTML = '<i class="fas fa-times"></i> Close';
-                closeBtn.onclick = () => modal.style.display = 'none';
-                modalFooter.appendChild(closeBtn);
-            }
-            
-            // Always add delete button
-            modalFooter.appendChild(deleteBtn);
-            
-            // Show the modal
-            modal.style.display = 'block';
+            modalFooter.appendChild(acceptBtn);
+            modalFooter.appendChild(cancelBtn);
+        } else {
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'btn btn-close';
+            closeBtn.innerHTML = '<i class="fas fa-times"></i> Close';
+            closeBtn.onclick = () => modal.style.display = 'none';
+            modalFooter.appendChild(closeBtn);
         }
-
-        // Update order status
-        async function updateOrderStatus(orderId, newStatus) {
-            if (!orderId) return;
-            
-            try {
-                const updates = {
-                    status: newStatus,
-                    updatedAt: firebase.database.ServerValue.TIMESTAMP
-                };
-                
-          // If this is a new status and we don't have an order number yet, generate one
-if (newStatus === 'accepted') {
-    const orderRef = database.ref(`bookings/${orderId}`);
-    const snapshot = await orderRef.once('value');
-    const order = snapshot.val();
-    
-    if (!order.orderNumber) {
-        const orderNumber = await generateOrderNumber();
-        updates.orderNumber = orderNumber;
+        modalFooter.appendChild(deleteBtn);
+        modal.style.display = 'block';
     }
-}
 
-            // Update the order in the database
+    // Update order status (no more orderNumber logic here)
+    async function updateOrderStatus(orderId, newStatus) {
+        if (!orderId) return;
+        try {
+            const updates = {
+                status: newStatus,
+                updatedAt: firebase.database.ServerValue.TIMESTAMP
+            };
             await database.ref(`bookings/${orderId}`).update(updates);
-            
-            // Show success message
             const statusText = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
             showNotification(`Order ${statusText} successfully!`, 'success');
-            
-            // Close the modal if it's open
             modal.style.display = 'none';
-            
         } catch (error) {
             console.error(`Error updating order status to ${newStatus}:`, error);
             showNotification(`Failed to update order status. Please try again.`, 'error');
         }
     }
 
+    // One-time fix: Assign proper order numbers to all orders that don't have one (or don't have 8 digit orderNumber)
+    async function fixOrderNumbers(orders) {
+        let changed = false;
+        for (const order of orders) {
+            if (!order.orderNumber || String(order.orderNumber).length !== 8) {
+                const newOrderNumber = await generateOrderNumber();
+                await database.ref(`bookings/${order.id}`).update({ orderNumber: newOrderNumber });
+                order.orderNumber = newOrderNumber;
+                changed = true;
+            }
+        }
+        return changed;
+    }
+
     // Load orders from Firebase
     function loadOrders() {
         const ordersRef = database.ref('bookings');
-        
         ordersRef.on('value', async (snapshot) => {
-            // Clear existing orders
-            Object.values(orderGrids).forEach(grid => {
-                grid.innerHTML = '';
-            });
+            Object.values(orderGrids).forEach(grid => { grid.innerHTML = ''; });
             ordersMap.clear();
-            
-            const ordersByStatus = { 
-                pending: [], 
-                accepted: [], 
-                cancelled: [] 
-            };
-            
-            const orderCounts = { 
-                pending: 0, 
-                accepted: 0, 
-                cancelled: 0 
-            };
-            
-            // Process all orders
+            const ordersByStatus = { pending: [], accepted: [], cancelled: [] };
+            const orderCounts = { pending: 0, accepted: 0, cancelled: 0 };
             const orders = [];
             snapshot.forEach(childSnapshot => {
                 const order = childSnapshot.val();
                 order.id = childSnapshot.key;
                 orders.push(order);
             });
-            
-            // Sort orders by creation date (newest first)
+
+            // Fix order numbers if missing or invalid
+            await fixOrderNumbers(orders);
+
             orders.sort((a, b) => {
                 const timeA = a.createdAt || 0;
                 const timeB = b.createdAt || 0;
                 return timeB - timeA;
             });
-            
-            // Process each order
             for (const order of orders) {
                 const status = order.status || 'pending';
-                
-                // Update counts
-                if (status in orderCounts) {
-                    orderCounts[status]++;
-                }
-                
-                // Add to appropriate status array
-                if (status in ordersByStatus) {
-                    ordersByStatus[status].push(order);
-                }
-                
-               // Generate order number for accepted orders if missing
-if (status === 'accepted' && !order.orderNumber) {
-    try {
-        const orderNumber = await generateOrderNumber();
-        await database.ref(`bookings/${order.id}`).update({
-            orderNumber: orderNumber
-        });
-        order.orderNumber = orderNumber;
-    } catch (error) {
-        console.error('Error generating order number:', error);
-    }
-}
+                if (status in orderCounts) orderCounts[status]++;
+                if (status in ordersByStatus) ordersByStatus[status].push(order);
             }
-            
-            // Update the UI
             updateTabBadges(orderCounts);
-            
-            // Render orders in their respective grids
             Object.entries(ordersByStatus).forEach(([status, orders]) => {
                 const grid = orderGrids[status];
                 if (grid) {
@@ -1195,15 +1040,11 @@ if (status === 'accepted' && !order.orderNumber) {
                     } else {
                         orders.forEach(order => {
                             const card = createOrderCard(order, order.id);
-                            if (card) {
-                                grid.appendChild(card);
-                            }
+                            if (card) grid.appendChild(card);
                         });
                     }
                 }
             });
-            
-            // Mark first load as complete
             isFirstLoad = false;
         }, (error) => {
             console.error('Error loading orders:', error);
@@ -1211,50 +1052,40 @@ if (status === 'accepted' && !order.orderNumber) {
         });
     }
 
+    // Booking creation (for demonstration: call this function to add a new order)
+    // Use this in your booking form submit handler!
+    async function createBooking(orderData) {
+        orderData.orderNumber = await generateOrderNumber();
+        orderData.status = 'pending';
+        orderData.createdAt = Date.now();
+        await database.ref('bookings').push(orderData);
+        showNotification('Booking created successfully!', 'success');
+    }
+
     // Initialize the page
     function init() {
-        // Set up tab switching
         tabs.forEach(tab => {
             tab.addEventListener('click', () => {
-                // Remove active class from all tabs
                 tabs.forEach(t => t.classList.remove('active'));
-                // Add active class to clicked tab
                 tab.classList.add('active');
-                
-                // Hide all tab contents
                 tabContents.forEach(content => {
                     content.classList.remove('active');
                 });
-                
-                // Show the selected tab content
                 const tabId = tab.getAttribute('data-tab');
                 document.getElementById(`${tabId}-orders`).classList.add('active');
             });
         });
-        
-        // Close modal when clicking the close button
-        closeModal.addEventListener('click', () => {
-            modal.style.display = 'none';
-        });
-        
-        // Close modal when clicking outside the modal content
+        closeModal.addEventListener('click', () => { modal.style.display = 'none'; });
         window.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.style.display = 'none';
-            }
+            if (e.target === modal) modal.style.display = 'none';
         });
-        
-        // Handle tab visibility changes
         document.addEventListener('visibilitychange', () => {
             isTabVisible = !document.hidden;
         });
-        
-        // Load initial orders
         loadOrders();
     }
 
-    // Initialize the app when the DOM is fully loaded
     document.addEventListener('DOMContentLoaded', init);
-</script>
+    </script>
 </body>
 </html>
