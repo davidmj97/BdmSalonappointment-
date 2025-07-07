@@ -273,6 +273,26 @@
     const emailValue = document.getElementById('emailValue');
     const confirmBtn = document.getElementById('confirmBtn');
     
+    // Function to show only the starting time in AM/PM
+    function formatTimeOnlyStart(timeStr) {
+      if (!timeStr) return 'Not selected';
+      let timePart = timeStr.split('-')[0].trim();
+      // If already in AM/PM, standardize
+      if (/(AM|PM)$/i.test(timePart)) {
+        let [h, mAP] = timePart.split(':');
+        let m = mAP ? mAP.match(/\d+/)?.[0] || "00" : "00";
+        let ap = mAP ? mAP.match(/(AM|PM)/i)?.[0].toUpperCase() : "";
+        return `${h.padStart(2, '0')}:${m.padStart(2, '0')} ${ap}`;
+      }
+      // If 24h format
+      const [hours, minutes] = timePart.split(':');
+      if (!hours || !minutes) return timePart;
+      let h = parseInt(hours, 10);
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      const hour12 = h % 12 || 12;
+      return `${hour12.toString().padStart(2, '0')}:${minutes.padStart(2, '0')} ${ampm}`;
+    }
+    
     // Load booking details
     const loadBookingDetails = () => {
       const servicesData = localStorage.getItem('selectedServices');
@@ -327,7 +347,7 @@
       dateValue.textContent = formattedDate || "Not selected";
       
       const selectedTime = localStorage.getItem('selectedTime');
-      timeValue.textContent = selectedTime || "Not selected";
+      timeValue.textContent = formatTimeOnlyStart(selectedTime) || "Not selected";
       
       const userDetails = localStorage.getItem('userDetails');
       if (userDetails) {
@@ -350,119 +370,61 @@
     };
 
     // Confirm booking function
-   const confirmBooking = async () => {
-  // Show loading state
-  const confirmBtn = document.getElementById('confirmBtn');
-  const originalText = confirmBtn.textContent;
-  confirmBtn.disabled = true;
-  confirmBtn.textContent = 'Processing...';
+    const confirmBooking = async () => {
+      // Show loading state
+      const confirmBtn = document.getElementById('confirmBtn');
+      const originalText = confirmBtn.textContent;
+      confirmBtn.disabled = true;
+      confirmBtn.textContent = 'Processing...';
 
-  try {
-    // Get user details from localStorage
-    const userDetails = JSON.parse(localStorage.getItem('userDetails') || '{}');
-    const services = JSON.parse(localStorage.getItem('selectedServices') || '[]');
-    const stylist = JSON.parse(localStorage.getItem('selectedStylist') || '{}');
-    const selectedDate = localStorage.getItem('selectedDate');
-    const selectedTime = localStorage.getItem('selectedTime');
-    const formattedDate = localStorage.getItem('formattedDate') || "";
-    const slotId = localStorage.getItem('selectedSlotId');
-    
-    if (!services.length) {
-      throw new Error("No services selected");
-    }
+      try {
+        // Get user details from localStorage
+        const userDetails = JSON.parse(localStorage.getItem('userDetails') || '{}');
+        const services = JSON.parse(localStorage.getItem('selectedServices') || '[]');
+        const stylist = JSON.parse(localStorage.getItem('selectedStylist') || '{}');
+        const selectedDate = localStorage.getItem('selectedDate');
+        const selectedTime = localStorage.getItem('selectedTime');
+        const formattedDate = localStorage.getItem('formattedDate') || "";
 
-    if (!slotId || !selectedDate) {
-      throw new Error("No time slot selected or session expired");
-    }
+        if (!services.length) {
+          throw new Error("No services selected");
+        }
 
-    // 1. First, get the current slot data
-    const slotRef = database.ref(`availableSlots/${selectedDate}/${slotId}`);
-    const slotSnapshot = await slotRef.once('value');
-    const slotData = slotSnapshot.val();
+        // Create booking object
+        const bookingDetails = {
+          services: services,
+          stylist: stylist,
+          date: formattedDate,
+          time: selectedTime,
+          user: {
+            name: userDetails.name || "Guest",
+            email: userDetails.email || "",
+            phone: userDetails.phone || ""
+          },
+          status: "pending",
+          createdAt: firebase.database.ServerValue.TIMESTAMP
+        };
 
-    if (!slotData) {
-      throw new Error('Selected time slot is no longer available');
-    }
+        // Save booking to Firebase
+        const newBookingRef = await database.ref('bookings').push(bookingDetails);
+        localStorage.setItem('currentBookingId', newBookingRef.key);
 
-    // 2. Check if the slot is still available
-    if (slotData.currentBookings >= slotData.maxBookings) {
-      throw new Error('This time slot is now fully booked. Please choose another time.');
-    }
-
-    // 3. Create booking object
-    const bookingDetails = {
-      services: services,
-      stylist: stylist,
-      date: formattedDate,
-      time: selectedTime,
-      slotId: slotId,
-      slotDate: selectedDate,
-      user: {
-        name: userDetails.name || "Guest",
-        email: userDetails.email || "",
-        phone: userDetails.phone || ""
-      },
-      status: "pending",
-      createdAt: firebase.database.ServerValue.TIMESTAMP
+        // Clear booking data from localStorage
+        localStorage.removeItem('selectedServices');
+        localStorage.removeItem('selectedStylist');
+        localStorage.removeItem('formattedDate');
+        localStorage.removeItem('selectedTime');
+        localStorage.removeItem('selectedDate');
+        
+        // Redirect to confirmation page
+        window.location.href = 'booking-confirmation.html';
+      } catch (error) {
+        console.error("Error saving booking:", error);
+        alert(`Error: ${error.message}`);
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = originalText;
+      }
     };
-
-    // 4. Start a database transaction
-    await database.ref().transaction(async (currentData) => {
-      if (!currentData) {
-        currentData = {};
-      }
-
-      // Make sure the slot still exists and has availability
-      const slotPath = `availableSlots/${selectedDate}/${slotId}`;
-      const slot = currentData.availableSlots?.[selectedDate]?.[slotId] || slotData;
-      
-      if (!slot || slot.currentBookings >= slot.maxBookings) {
-        throw new Error('This time slot is no longer available');
-      }
-
-      // Update the currentBookings count
-      if (!currentData.availableSlots) currentData.availableSlots = {};
-      if (!currentData.availableSlots[selectedDate]) currentData.availableSlots[selectedDate] = {};
-      if (!currentData.availableSlots[selectedDate][slotId]) {
-        currentData.availableSlots[selectedDate][slotId] = slot;
-      }
-      currentData.availableSlots[selectedDate][slotId].currentBookings = (slot.currentBookings || 0) + 1;
-
-      // Add the new booking
-      const newBookingId = database.ref('bookings').push().key;
-      if (!currentData.bookings) currentData.bookings = {};
-      currentData.bookings[newBookingId] = bookingDetails;
-
-      // Store booking ID in localStorage for confirmation page
-      localStorage.setItem('currentBookingId', newBookingId);
-
-      return currentData;
-    }, (error, committed) => {
-      if (error) {
-        console.error("Transaction failed: ", error);
-        throw error;
-      } else if (!committed) {
-        throw new Error("Could not complete booking. Please try again.");
-      }
-    });
-
-    // Clear booking data from localStorage
-    localStorage.removeItem('selectedServices');
-    localStorage.removeItem('selectedStylist');
-    localStorage.removeItem('formattedDate');
-    localStorage.removeItem('selectedTime');
-    localStorage.removeItem('selectedDate');
-    localStorage.removeItem('selectedSlotId');
-    
-    // Redirect to confirmation page
-    window.location.href = 'booking-confirmation.html';
-  } catch (error) {
-    console.error("Error saving booking:", error);
-    alert(`Error: ${error.message}`);
-    confirmBtn.disabled = false;
-    confirmBtn.textContent = originalText;
-  }
-};
 
     // Event Listeners
     document.addEventListener('DOMContentLoaded', loadBookingDetails);
