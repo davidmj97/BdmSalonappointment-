@@ -238,28 +238,10 @@
     </div>
   </div>
 
-  <!-- Firebase SDK -->
+  <!-- Add Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-  
-  <!-- Firebase Configuration -->
-  <script>
-    // Your web app's Firebase configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyAmimDsjW_pF2NGw-w-40QzTsgmf1tdqyI",
-      authDomain: "bdmsalonappointment.firebaseapp.com",
-      databaseURL: "https://bdmsalonappointment-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "bdmsalonappointment",
-      storageBucket: "bdmsalonappointment.firebasestorage.app",
-      messagingSenderId: "123933913893",
-      appId: "1:123933913893:web:c1f57caf4dc2a5440ba0cc",
-      measurementId: "G-Q0FVZRVS64"
-    };
-
-    // Initialize Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
-  </script>
+  <script src="firebase-config.js"></script>
   
   <script>
     // DOM Elements
@@ -300,7 +282,6 @@
             servicesContainer.appendChild(serviceItem);
           });
         } catch (e) {
-          console.error("Error parsing services:", e);
           servicesContainer.innerHTML = '<div class="booking-item">Error loading services</div>';
         }
       } else {
@@ -314,7 +295,6 @@
           stylistValue.textContent = stylist.name || "Not selected";
           stylistSpecialty.textContent = stylist.specialty || "Not specified";
         } catch (e) {
-          console.error("Error parsing stylist:", e);
           stylistValue.textContent = "Error loading stylist";
           stylistSpecialty.textContent = "Error loading specialty";
         }
@@ -325,7 +305,6 @@
       
       const formattedDate = localStorage.getItem('formattedDate');
       dateValue.textContent = formattedDate || "Not selected";
-      
       const selectedTime = localStorage.getItem('selectedTime');
       timeValue.textContent = selectedTime || "Not selected";
       
@@ -337,7 +316,6 @@
           phoneValue.textContent = user.phone || "Not provided";
           emailValue.textContent = user.email || "Not provided";
         } catch (e) {
-          console.error("Error parsing user details:", e);
           nameValue.textContent = "Error loading name";
           phoneValue.textContent = "Error loading phone";
           emailValue.textContent = "Error loading email";
@@ -360,21 +338,13 @@
       try {
         // Get user details from localStorage
         const userDetails = JSON.parse(localStorage.getItem('userDetails') || '{}');
-        const services = JSON.parse(localStorage.getItem('selectedServices') || '[]');
-        const stylist = JSON.parse(localStorage.getItem('selectedStylist') || '{}');
-        const date = localStorage.getItem('formattedDate') || "";
-        const time = localStorage.getItem('selectedTime') || "";
-        
-        if (!services.length) {
-          throw new Error("No services selected");
-        }
         
         // Create booking object
         const bookingDetails = {
-          services: services,
-          stylist: stylist,
-          date: date,
-          time: time,
+          services: JSON.parse(localStorage.getItem('selectedServices') || '[]'),
+          stylist: JSON.parse(localStorage.getItem('selectedStylist') || '{}'),
+          date: localStorage.getItem('formattedDate') || "",
+          time: localStorage.getItem('selectedTime') || "",
           user: {
             name: userDetails.name || "Guest",
             email: userDetails.email || "",
@@ -385,7 +355,7 @@
         };
 
         // Push booking to Firebase
-        const newBookingRef = database.ref('bookings').push();
+        const newBookingRef = firebase.database().ref('bookings').push();
         await newBookingRef.set(bookingDetails);
         
         // Store booking ID in localStorage for confirmation page
@@ -401,14 +371,14 @@
         window.location.href = 'booking-confirmation.html';
       } catch (error) {
         console.error("Error saving booking:", error);
-        alert("There was an error processing your booking. Please try again.\nError: " + error.message);
+        alert("There was an error processing your booking. Please try again.");
         confirmBtn.disabled = false;
         confirmBtn.textContent = originalText;
       }
     };
 
     // Event Listeners
-    document.addEventListener('DOMContentLoaded', loadBookingDetails);
+    window.addEventListener('DOMContentLoaded', loadBookingDetails);
     confirmBtn.addEventListener('click', confirmBooking);
   </script>
 </body>
