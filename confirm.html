@@ -11,7 +11,11 @@
       --accent: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
       --border-color: #444;
     }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
     body {
       font-family: 'Helvetica Neue', Arial, sans-serif;
       background: var(--bg);
@@ -19,95 +23,107 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      padding-top: 90px;
+      padding-top: 120px;
     }
     .header-container {
       position: fixed;
-      top: 0; left: 0; right: 0;
+      top: 0;
+      left: 0;
+      right: 0;
       background: #000;
       z-index: 100;
-      padding: 8px 0;
+      padding: 10px 0;
       box-shadow: 0 2px 10px rgba(0,0,0,0.5);
     }
     .step-heading {
       text-align: center;
-      margin: 2px 0 6px;
-      font-size: 14px;
+      margin: 10px 0;
+      font-size: 20px;
       color: white;
     }
     .btn-container {
       display: flex;
-      gap: 8px;
-      margin: 0 8px 2px;
+      gap: 16px;
+      margin: 0 16px 10px;
       padding: 0;
     }
-    .btn-prev, .confirm-btn {
+    .btn-prev,
+    .confirm-btn {
       flex: 1;
-      padding: 7px 8px;
+      padding: 12px 24px;
       border: none;
-      border-radius: 6px;
-      font-size: 10px;
+      border-radius: 8px;
+      font-size: 14px;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s ease;
     }
-    .btn-prev { background: #444; color: #fff; }
-    .confirm-btn { background: var(--accent); color: #fff; }
-    .btn-prev:disabled, .confirm-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-prev {
+      background: #444;
+      color: #fff;
+    }
+    .confirm-btn {
+      background: var(--accent);
+      color: white;
+    }
+    .btn-prev:disabled,
+    .confirm-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
     .container {
       flex: 1;
-      padding: 3px 2px 2px 2px;
+      padding: 16px;
       display: flex;
       flex-direction: column;
     }
     .booking-card {
       background: #111;
-      border-radius: 7px;
+      border-radius: 16px;
       margin: 0 auto;
-      margin-top: 2px;
-      padding: 7px 6px;
-      max-width: 360px;
+      margin-top: 30px;
+      padding: 32px 20px;
+      max-width: 480px;
       width: 100%;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.14);
+      box-shadow: 0 2px 24px rgba(0,0,0,0.25);
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 32px;
     }
     .booking-section {
-      margin-bottom: 6px;
+      margin-bottom: 20px;
     }
     .section-title {
-      font-size: 11px;
+      font-size: 18px;
       font-weight: 700;
-      margin-bottom: 4px;
-      padding: 0 3px;
+      margin-bottom: 12px;
+      padding: 0 8px;
       color: #90caf9;
     }
-    .booking-list {
+    .booking-grid {
       display: flex;
-      flex-direction: column;
-      gap: 4px;
-      width: 100%;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: space-between;
     }
     .booking-item {
       background: #222;
-      border-radius: 5px;
-      padding: 4px 3px;
-      min-width: 60px;
-      width: 100%;
+      border-radius: 10px;
+      padding: 16px 14px;
+      min-width: 120px;
+      flex: 1 1 40%;
       display: flex;
       flex-direction: column;
       align-items: flex-start;
       box-shadow: 0 1px 4px rgba(0,0,0,0.09);
-      margin-bottom: 2px;
     }
     .item-label {
-      font-size: 8px;
+      font-size: 13px;
       color: #bbb;
-      margin-bottom: 2px;
+      margin-bottom: 8px;
     }
     .item-value {
-      font-size: 10px;
+      font-size: 16px;
       font-weight: 500;
       color: #fff;
       word-break: break-word;
@@ -115,9 +131,9 @@
     .service-item {
       background: #1a237e;
       color: #fff;
-      border-radius: 5px;
-      padding: 4px 4px;
-      margin-bottom: 2px;
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
       box-shadow: 0 1px 6px rgba(26,35,126,0.12);
       display: flex;
       flex-direction: column;
@@ -127,14 +143,35 @@
       display: flex;
       justify-content: space-between;
       margin-bottom: 2px;
-      font-size: 8px;
+      font-size: 14px;
     }
     .service-name {
       font-weight: bold;
-      font-size: 9px;
+      font-size: 15px;
     }
-   
-    ::-webkit-scrollbar { display: none; }
+    @media (max-width: 600px) {
+      .booking-card {
+        padding: 12px 6px;
+        max-width: 99vw;
+        margin-top: 10px;
+      }
+      .booking-item {
+        min-width: 100px;
+        padding: 10px 7px;
+      }
+      .section-title {
+        font-size: 16px;
+      }
+      .service-property {
+        font-size: 13px;
+      }
+      .service-name {
+        font-size: 14px;
+      }
+    }
+    ::-webkit-scrollbar {
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -147,10 +184,26 @@
   </div>
   <div class="container">
     <div class="booking-card">
-      <!-- Date & Time Section First -->
+      <div class="booking-section">
+        <h2 class="section-title">Service Details</h2>
+        <div id="servicesContainer"></div>
+      </div>
+      <div class="booking-section">
+        <h2 class="section-title">Stylist</h2>
+        <div class="booking-grid">
+          <div class="booking-item">
+            <div class="item-label">Stylist</div>
+            <div class="item-value" id="stylistValue"></div>
+          </div>
+          <div class="booking-item">
+            <div class="item-label">Specialty</div>
+            <div class="item-value" id="stylistSpecialty"></div>
+          </div>
+        </div>
+      </div>
       <div class="booking-section">
         <h2 class="section-title">Date & Time</h2>
-        <div class="booking-list">
+        <div class="booking-grid">
           <div class="booking-item">
             <div class="item-label">Date</div>
             <div class="item-value" id="dateValue"></div>
@@ -165,29 +218,9 @@
           </div>
         </div>
       </div>
-      <!-- Service Details -->
-      <div class="booking-section">
-        <h2 class="section-title">Service Details</h2>
-        <div id="servicesContainer"></div>
-      </div>
-      <!-- Stylist -->
-      <div class="booking-section">
-        <h2 class="section-title">Stylist</h2>
-        <div class="booking-list">
-          <div class="booking-item">
-            <div class="item-label">Stylist</div>
-            <div class="item-value" id="stylistValue"></div>
-          </div>
-          <div class="booking-item">
-            <div class="item-label">Specialty</div>
-            <div class="item-value" id="stylistSpecialty"></div>
-          </div>
-        </div>
-      </div>
-      <!-- Personal Details -->
       <div class="booking-section">
         <h2 class="section-title">Personal Details</h2>
-        <div class="booking-list">
+        <div class="booking-grid">
           <div class="booking-item">
             <div class="item-label">Name</div>
             <div class="item-value" id="nameValue"></div>
