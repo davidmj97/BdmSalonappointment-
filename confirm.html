@@ -350,121 +350,62 @@
     };
 
     // Confirm booking function
-   const confirmBooking = async () => {
-  const confirmBtn = document.getElementById('confirmBtn');
-  const originalText = confirmBtn.textContent;
-  confirmBtn.disabled = true;
-  confirmBtn.textContent = 'Processing...';
+    const confirmBooking = async () => {
+      // Show loading state
+      const confirmBtn = document.getElementById('confirmBtn');
+      const originalText = confirmBtn.textContent;
+      confirmBtn.disabled = true;
+      confirmBtn.textContent = 'Processing...';
 
-  try {
-    // Get user details from localStorage
-    const userDetails = JSON.parse(localStorage.getItem('userDetails') || '{}');
-    const services = JSON.parse(localStorage.getItem('selectedServices') || '[]');
-    const stylist = JSON.parse(localStorage.getItem('selectedStylist') || '{}');
-    const selectedDate = localStorage.getItem('selectedDate');
-    const selectedTime = localStorage.getItem('selectedTime');
-    const formattedDate = localStorage.getItem('formattedDate') || "";
-    const slotId = localStorage.getItem('selectedSlotId');
-    
-    if (!services.length) {
-      throw new Error("No services selected");
-    }
+      try {
+        // Get user details from localStorage
+        const userDetails = JSON.parse(localStorage.getItem('userDetails') || '{}');
+        const services = JSON.parse(localStorage.getItem('selectedServices') || '[]');
+        const stylist = JSON.parse(localStorage.getItem('selectedStylist') || '{}');
+        const date = localStorage.getItem('formattedDate') || "";
+        const time = localStorage.getItem('selectedTime') || "";
+        
+        if (!services.length) {
+          throw new Error("No services selected");
+        }
+        
+        // Create booking object
+        const bookingDetails = {
+          services: services,
+          stylist: stylist,
+          date: date,
+          time: time,
+          user: {
+            name: userDetails.name || "Guest",
+            email: userDetails.email || "",
+            phone: userDetails.phone || ""
+          },
+          status: "pending",
+          createdAt: firebase.database.ServerValue.TIMESTAMP
+        };
 
-    if (!slotId || !selectedDate) {
-      throw new Error("No time slot selected or session expired");
-    }
-
-    // 1. First, get the current slot data
-    const slotRef = database.ref(`availableSlots/${selectedDate}/${slotId}`);
-    
-    // Use transaction to ensure data consistency
-    await database.ref().transaction(async (currentData) => {
-      if (!currentData) {
-        currentData = { availableSlots: {} };
+        // Push booking to Firebase
+        const newBookingRef = database.ref('bookings').push();
+        await newBookingRef.set(bookingDetails);
+        
+        // Store booking ID in localStorage for confirmation page
+        localStorage.setItem('currentBookingId', newBookingRef.key);
+        
+        // Clear booking data from localStorage
+        localStorage.removeItem('selectedServices');
+        localStorage.removeItem('selectedStylist');
+        localStorage.removeItem('formattedDate');
+        localStorage.removeItem('selectedTime');
+        
+        // Redirect to confirmation page
+        window.location.href = 'booking-confirmation.html';
+      } catch (error) {
+        console.error("Error saving booking:", error);
+        alert("There was an error processing your booking. Please try again.\nError: " + error.message);
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = originalText;
       }
-      
-      if (!currentData.availableSlots) {
-        currentData.availableSlots = {};
-      }
-      
-      if (!currentData.availableSlots[selectedDate]) {
-        throw new Error('Selected date is no longer available');
-      }
-      
-      const slot = currentData.availableSlots[selectedDate][slotId];
-      
-      if (!slot) {
-        throw new Error('Selected time slot is no longer available');
-      }
-
-      // Check if slot is still available
-      const currentBookings = slot.currentBookings || 0;
-      const maxBookings = slot.maxBookings || 1;
-      
-      if (currentBookings >= maxBookings) {
-        throw new Error('This time slot is now fully booked. Please choose another time.');
-      }
-
-      // Update the currentBookings count
-      if (!currentData.availableSlots[selectedDate][slotId]) {
-        currentData.availableSlots[selectedDate][slotId] = slot;
-      }
-      currentData.availableSlots[selectedDate][slotId].currentBookings = currentBookings + 1;
-
-      // Create booking object
-      const bookingDetails = {
-        services: services,
-        stylist: stylist,
-        date: formattedDate,
-        time: selectedTime,
-        slotId: slotId,
-        slotDate: selectedDate,
-        user: {
-          name: userDetails.name || "Guest",
-          email: userDetails.email || "",
-          phone: userDetails.phone || ""
-        },
-        status: "confirmed",
-        createdAt: firebase.database.ServerValue.TIMESTAMP
-      };
-
-      // Add the new booking
-      const newBookingId = database.ref('bookings').push().key;
-      if (!currentData.bookings) {
-        currentData.bookings = {};
-      }
-      currentData.bookings[newBookingId] = bookingDetails;
-
-      // Store booking ID in localStorage for confirmation page
-      localStorage.setItem('currentBookingId', newBookingId);
-
-      return currentData;
-    }, (error, committed) => {
-      if (error) {
-        console.error("Transaction failed: ", error);
-        throw error;
-      } else if (!committed) {
-        throw new Error("Could not complete booking. Please try again.");
-      }
-    });
-
-    // Clear booking data from localStorage
-    localStorage.removeItem('selectedServices');
-    localStorage.removeItem('selectedStylist');
-    localStorage.removeItem('formattedDate');
-    localStorage.removeItem('selectedTime');
-    localStorage.removeItem('selectedDate');
-    localStorage.removeItem('selectedSlotId');
-    
-    // Redirect to confirmation page
-    window.location.href = 'booking-confirmation.html';
-  } catch (error) {
-    console.error("Error saving booking:", error);
-    alert(`Error: ${error.message}`);
-    confirmBtn.disabled = false;
-    confirmBtn.textContent = originalText;
-  }
-};
+    };
 
     // Event Listeners
     document.addEventListener('DOMContentLoaded', loadBookingDetails);
