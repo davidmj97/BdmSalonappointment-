@@ -88,30 +88,30 @@
       box-shadow: 0 2px 24px rgba(0,0,0,0.25);
       display: flex;
       flex-direction: column;
-      gap: 32px;
+      gap: 24px;
     }
     .booking-section {
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
     .section-title {
       font-size: 18px;
       font-weight: 700;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       padding: 0 8px;
       color: #90caf9;
     }
-    .booking-grid {
+    .booking-list, .booking-grid {
       display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-      justify-content: space-between;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
     }
     .booking-item {
       background: #222;
       border-radius: 10px;
-      padding: 16px 14px;
-      min-width: 120px;
-      flex: 1 1 40%;
+      padding: 12px 10px;
+      min-width: 90px;
+      width: 100%;
       display: flex;
       flex-direction: column;
       align-items: flex-start;
@@ -120,10 +120,10 @@
     .item-label {
       font-size: 13px;
       color: #bbb;
-      margin-bottom: 8px;
+      margin-bottom: 4px;
     }
     .item-value {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 500;
       color: #fff;
       word-break: break-word;
@@ -132,8 +132,8 @@
       background: #1a237e;
       color: #fff;
       border-radius: 8px;
-      padding: 12px 14px;
-      margin-bottom: 10px;
+      padding: 10px 10px;
+      margin-bottom: 4px;
       box-shadow: 0 1px 6px rgba(26,35,126,0.12);
       display: flex;
       flex-direction: column;
@@ -143,35 +143,75 @@
       display: flex;
       justify-content: space-between;
       margin-bottom: 2px;
-      font-size: 14px;
+      font-size: 13px;
     }
     .service-name {
       font-weight: bold;
-      font-size: 15px;
+      font-size: 14px;
     }
     @media (max-width: 600px) {
-      .booking-card {
-        padding: 12px 6px;
-        max-width: 99vw;
-        margin-top: 10px;
+      body {
+        padding-top: 74px;
       }
-      .booking-item {
-        min-width: 100px;
-        padding: 10px 7px;
+      .header-container {
+        padding: 5px 0;
+      }
+      .step-heading {
+        font-size: 13px;
+        margin: 2px 0;
+      }
+      .btn-container {
+        gap: 6px;
+        margin: 0 5px 6px;
+      }
+      .btn-prev, .confirm-btn {
+        font-size: 10px;
+        padding: 6px 2px;
+        border-radius: 6px;
+      }
+      .container {
+        padding: 2px;
+      }
+      .booking-card {
+        padding: 8px 2px;
+        margin-top: 4px;
+        border-radius: 10px;
+        gap: 10px;
       }
       .section-title {
-        font-size: 16px;
+        font-size: 11px;
+        margin-bottom: 5px;
+        padding: 0 3px;
+      }
+      .booking-list, .booking-grid {
+        gap: 4px;
+      }
+      .booking-item {
+        padding: 4px 3px;
+        min-width: 60px;
+        border-radius: 5px;
+        margin-bottom: 2px;
+      }
+      .item-label {
+        font-size: 8px;
+        margin-bottom: 2px;
+      }
+      .item-value {
+        font-size: 10px;
+      }
+      .service-item {
+        padding: 4px 4px;
+        border-radius: 5px;
+        margin-bottom: 2px;
       }
       .service-property {
-        font-size: 13px;
+        font-size: 8px;
       }
       .service-name {
-        font-size: 14px;
+        font-size: 9px;
       }
     }
-    ::-webkit-scrollbar {
-      display: none;
-    }
+    ::-webkit-scrollbar { display: none; }
   </style>
 </head>
 <body>
@@ -184,26 +224,10 @@
   </div>
   <div class="container">
     <div class="booking-card">
-      <div class="booking-section">
-        <h2 class="section-title">Service Details</h2>
-        <div id="servicesContainer"></div>
-      </div>
-      <div class="booking-section">
-        <h2 class="section-title">Stylist</h2>
-        <div class="booking-grid">
-          <div class="booking-item">
-            <div class="item-label">Stylist</div>
-            <div class="item-value" id="stylistValue"></div>
-          </div>
-          <div class="booking-item">
-            <div class="item-label">Specialty</div>
-            <div class="item-value" id="stylistSpecialty"></div>
-          </div>
-        </div>
-      </div>
+      <!-- Date & Time Section First -->
       <div class="booking-section">
         <h2 class="section-title">Date & Time</h2>
-        <div class="booking-grid">
+        <div class="booking-list">
           <div class="booking-item">
             <div class="item-label">Date</div>
             <div class="item-value" id="dateValue"></div>
@@ -218,9 +242,29 @@
           </div>
         </div>
       </div>
+      <!-- Service Details -->
+      <div class="booking-section">
+        <h2 class="section-title">Service Details</h2>
+        <div id="servicesContainer"></div>
+      </div>
+      <!-- Stylist -->
+      <div class="booking-section">
+        <h2 class="section-title">Stylist</h2>
+        <div class="booking-list">
+          <div class="booking-item">
+            <div class="item-label">Stylist</div>
+            <div class="item-value" id="stylistValue"></div>
+          </div>
+          <div class="booking-item">
+            <div class="item-label">Specialty</div>
+            <div class="item-value" id="stylistSpecialty"></div>
+          </div>
+        </div>
+      </div>
+      <!-- Personal Details -->
       <div class="booking-section">
         <h2 class="section-title">Personal Details</h2>
-        <div class="booking-grid">
+        <div class="booking-list">
           <div class="booking-item">
             <div class="item-label">Name</div>
             <div class="item-value" id="nameValue"></div>
@@ -244,7 +288,6 @@
   
   <!-- Firebase Configuration -->
   <script>
-    // Your web app's Firebase configuration
     const firebaseConfig = {
       apiKey: "AIzaSyAmimDsjW_pF2NGw-w-40QzTsgmf1tdqyI",
       authDomain: "bdmsalonappointment.firebaseapp.com",
@@ -255,24 +298,10 @@
       appId: "1:123933913893:web:c1f57caf4dc2a5440ba0cc",
       measurementId: "G-Q0FVZRVS64"
     };
-
-    // Initialize Firebase
-    const app = firebase.initializeApp(firebaseConfig);
+    firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
   </script>
-  
   <script>
-    // DOM Elements
-    const servicesContainer = document.getElementById('servicesContainer');
-    const stylistValue = document.getElementById('stylistValue');
-    const stylistSpecialty = document.getElementById('stylistSpecialty');
-    const dateValue = document.getElementById('dateValue');
-    const timeValue = document.getElementById('timeValue');
-    const nameValue = document.getElementById('nameValue');
-    const phoneValue = document.getElementById('phoneValue');
-    const emailValue = document.getElementById('emailValue');
-    const confirmBtn = document.getElementById('confirmBtn');
-    
     // Function to show only the starting time in AM/PM
     function formatTimeOnlyStart(timeStr) {
       if (!timeStr) return 'Not selected';
@@ -292,7 +321,18 @@
       const hour12 = h % 12 || 12;
       return `${hour12.toString().padStart(2, '0')}:${minutes.padStart(2, '0')} ${ampm}`;
     }
-    
+
+    // DOM Elements
+    const servicesContainer = document.getElementById('servicesContainer');
+    const stylistValue = document.getElementById('stylistValue');
+    const stylistSpecialty = document.getElementById('stylistSpecialty');
+    const dateValue = document.getElementById('dateValue');
+    const timeValue = document.getElementById('timeValue');
+    const nameValue = document.getElementById('nameValue');
+    const phoneValue = document.getElementById('phoneValue');
+    const emailValue = document.getElementById('emailValue');
+    const confirmBtn = document.getElementById('confirmBtn');
+
     // Load booking details
     const loadBookingDetails = () => {
       const servicesData = localStorage.getItem('selectedServices');
@@ -326,7 +366,7 @@
       } else {
         servicesContainer.innerHTML = '<div class="booking-item">No services selected</div>';
       }
-      
+
       const stylistData = localStorage.getItem('selectedStylist');
       if (stylistData) {
         try {
@@ -342,13 +382,13 @@
         stylistValue.textContent = "Not selected";
         stylistSpecialty.textContent = "Not specified";
       }
-      
+
       const formattedDate = localStorage.getItem('formattedDate');
       dateValue.textContent = formattedDate || "Not selected";
-      
+
       const selectedTime = localStorage.getItem('selectedTime');
       timeValue.textContent = formatTimeOnlyStart(selectedTime) || "Not selected";
-      
+
       const userDetails = localStorage.getItem('userDetails');
       if (userDetails) {
         try {
@@ -371,14 +411,11 @@
 
     // Confirm booking function
     const confirmBooking = async () => {
-      // Show loading state
-      const confirmBtn = document.getElementById('confirmBtn');
       const originalText = confirmBtn.textContent;
       confirmBtn.disabled = true;
       confirmBtn.textContent = 'Processing...';
 
       try {
-        // Get user details from localStorage
         const userDetails = JSON.parse(localStorage.getItem('userDetails') || '{}');
         const services = JSON.parse(localStorage.getItem('selectedServices') || '[]');
         const stylist = JSON.parse(localStorage.getItem('selectedStylist') || '{}');
@@ -386,9 +423,7 @@
         const selectedTime = localStorage.getItem('selectedTime');
         const formattedDate = localStorage.getItem('formattedDate') || "";
 
-        if (!services.length) {
-          throw new Error("No services selected");
-        }
+        if (!services.length) throw new Error("No services selected");
 
         // Create booking object
         const bookingDetails = {
@@ -415,7 +450,7 @@
         localStorage.removeItem('formattedDate');
         localStorage.removeItem('selectedTime');
         localStorage.removeItem('selectedDate');
-        
+
         // Redirect to confirmation page
         window.location.href = 'booking-confirmation.html';
       } catch (error) {
@@ -426,7 +461,6 @@
       }
     };
 
-    // Event Listeners
     document.addEventListener('DOMContentLoaded', loadBookingDetails);
     confirmBtn.addEventListener('click', confirmBooking);
   </script>
