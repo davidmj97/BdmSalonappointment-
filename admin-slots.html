@@ -585,30 +585,13 @@
             return `${year}-${month}-${day}`;
         }
 
-        // Format date for display (e.g., "2023 July 06")
-        function formatDateForDisplay(date) {
-            const d = new Date(date);
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            return d.toLocaleDateString('en-US', options);
+        // Format time for display (e.g., "09:00" -> "9:00 AM")
+        function formatTime(time24) {
+            const [hours, minutes] = time24.split(':').map(Number);
+            const period = hours >= 12 ? 'PM' : 'AM';
+            const displayHours = hours % 12 || 12;
+            return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
         }
-
-        // Initialize date picker with today's date
-        const today = new Date();
-        const todayFormatted = formatDate(today);
-        selectedDate = todayFormatted;
-
-        const fp = flatpickr(datePicker, {
-            dateFormat: "Y F d",
-            minDate: "today",
-            defaultDate: today,
-            onChange: function(selectedDates, dateStr) {
-                selectedDate = selectedDates[0] ? formatDate(selectedDates[0]) : null;
-                loadSlotsForDate(selectedDate);
-            }
-        });
-
-        // Set initial date display
-        datePicker._flatpickr.setDate(today, false, "Y F d");
 
         // Generate time slots from 9:00 AM to 6:00 PM in 30-minute intervals
         function generateTimeSlots() {
@@ -639,14 +622,6 @@
             }
 
             return slots;
-        }
-
-        // Format time for display (e.g., "09:00" -> "9:00 AM")
-        function formatTime(time24) {
-            const [hours, minutes] = time24.split(':').map(Number);
-            const period = hours >= 12 ? 'PM' : 'AM';
-            const displayHours = hours % 12 || 12;
-            return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
         }
 
         // Update the selected slots list UI
@@ -706,9 +681,13 @@
                 const isSelected = selectedSlots.has(slot.id);
                 const maxBookings = slotData.maxBookings || 1;
                 const currentBookings = slotData.currentBookings || 0;
+                const isAvailable = currentBookings < maxBookings;
 
                 const slotElement = document.createElement('div');
-                slotElement.className = `time-slot ${isBooked ? 'booked' : 'available'} ${isSelected ? 'selected' : ''}`;
+                slotElement.className = `time-slot 
+                    ${!isAvailable ? 'booked' : 'available'} 
+                    ${isSelected ? 'selected' : ''}`;
+                    
                 slotElement.dataset.id = slot.id;
                 slotElement.dataset.start = slot.start;
                 slotElement.dataset.end = slot.end;
@@ -716,16 +695,18 @@
                 slotElement.innerHTML = `
                     <div class="time-display">${formatTime(slot.start)}</div>
                     <div class="slot-details">
-                        ${isBooked ? 
-                            `${currentBookings}/${maxBookings}` : 
+                        ${currentBookings > 0 ? 
+                            `${currentBookings}/${maxBookings} booked` : 
                             isSelected ? 
                             `Max: ${selectedSlots.get(slot.id).maxBookings}` : 
                             'Available'}
                     </div>
                 `;
 
-                if (!isBooked) {
+                if (isAvailable) {
                     slotElement.addEventListener('click', () => toggleSlotSelection(slot.id, slot.start, slot.end));
+                } else {
+                    slotElement.title = 'This slot is fully booked';
                 }
 
                 timeSlotsGrid.appendChild(slotElement);
@@ -740,7 +721,7 @@
                 selectedSlots.delete(slotId);
             } else {
                 selectedSlots.set(slotId, {
-                    maxBookings,
+                    maxBookings: maxBookings,
                     start: startTime,
                     end: endTime
                 });
@@ -806,13 +787,18 @@
                 const snapshot = await database.ref(`availableSlots/${date}`).once('value');
                 const slots = snapshot.val() || {};
                 
-                // If slots exist for this date, select them
+                // If slots exist for this date, select them and preserve their data
                 Object.entries(slots).forEach(([slotId, slotData]) => {
                     selectedSlots.set(slotId, {
                         maxBookings: slotData.maxBookings || 1,
                         start: slotData.startTime,
                         end: slotData.endTime
                     });
+                    
+                    // Update the max bookings dropdown to match the first slot's value
+                    if (selectedSlots.size === 1) {
+                        maxBookingsSelect.value = slotData.maxBookings || 1;
+                    }
                 });
                 
                 renderTimeSlots(slots);
@@ -843,19 +829,26 @@
             }
             
             try {
+                // First, get the current slots to preserve existing bookings
+                const snapshot = await database.ref(`availableSlots/${selectedDate}`).once('value');
+                const existingSlots = snapshot.val() || {};
+                
                 const updates = {};
                 const slotsData = {};
                 
-                // Prepare updates
+                // Prepare updates while preserving existing bookings
                 selectedSlots.forEach((slotData, slotId) => {
-                    const { maxBookings, start, end } = slotData;
-                   slotsData[slotId] = {
-  startTime: start,
-  endTime: end,
-  maxBookings: maxBookings,
-  currentBookings: 0,  // Add this line
-  id: slotId           // Add this line
-};
+                    // If slot already exists, keep its currentBookings, otherwise initialize to 0
+                    const existingSlot = existingSlots[slotId];
+                    const currentBookings = existingSlot ? (existingSlot.currentBookings || 0) : 0;
+                    
+                    slotsData[slotId] = {
+                        startTime: slotData.start,
+                        endTime: slotData.end,
+                        maxBookings: slotData.maxBookings,
+                        currentBookings: currentBookings,  // Preserve existing bookings
+                        id: slotId
+                    };
                 });
                 
                 // Update database
@@ -879,7 +872,8 @@
             }
             
             try {
-                await database.ref(`availableSlots/${selectedDate}`).remove();
+                // Instead of removing the entire date, just clear the slots
+                await database.ref(`availableSlots/${selectedDate}`).set({});
                 selectedSlots.clear();
                 renderTimeSlots();
                 updateSelectedSlotsUI();
@@ -914,6 +908,24 @@
 
         // Initialize the page
         async function init() {
+            // Initialize date picker
+            const today = new Date();
+            const todayFormatted = formatDate(today);
+            selectedDate = todayFormatted;
+
+            const fp = flatpickr(datePicker, {
+                dateFormat: "Y F d",
+                minDate: "today",
+                defaultDate: today,
+                onChange: function(selectedDates, dateStr) {
+                    selectedDate = selectedDates[0] ? formatDate(selectedDates[0]) : null;
+                    loadSlotsForDate(selectedDate);
+                }
+            });
+
+            // Set initial date display
+            datePicker._flatpickr.setDate(today, false, "Y F d");
+
             // Load today's slots by default
             await loadSlotsForDate(selectedDate);
         }
