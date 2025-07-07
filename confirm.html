@@ -159,9 +159,16 @@
         font-size: 13px;
         margin-bottom: 6px;
       }
+      .booking-grid {
+        flex-direction: column;
+        gap: 6px;
+      }
       .booking-item {
-        min-width: 80px;
+        min-width: 60px;
         padding: 6px 4px;
+        width: 100%;
+        margin-bottom: 4px;
+        align-items: flex-start;
       }
       .item-label {
         font-size: 10px;
@@ -263,7 +270,6 @@
   
   <!-- Firebase Configuration -->
   <script>
-    // Your web app's Firebase configuration
     const firebaseConfig = {
       apiKey: "AIzaSyAmimDsjW_pF2NGw-w-40QzTsgmf1tdqyI",
       authDomain: "bdmsalonappointment.firebaseapp.com",
@@ -275,26 +281,27 @@
       measurementId: "G-Q0FVZRVS64"
     };
 
-    // Initialize Firebase
-    const app = firebase.initializeApp(firebaseConfig);
+    firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
   </script>
   
   <script>
-    // --- Responsive time formatter ---
+    // Redirect if required slot info missing
+    if (!localStorage.getItem('selectedSlotId') || !localStorage.getItem('selectedDate')) {
+      alert('Please select a time slot first.');
+      window.location.href = 'booking.html'; // or your slot/time page
+    }
+
+    // Responsive time formatter
     function formatTime(timeStr) {
       if (!timeStr) return 'Not selected';
-      // Handle range: use start
       let timePart = timeStr.split('-')[0].trim();
-
-      // If already in AM/PM, standardize zero-padding
       if (/(AM|PM)$/i.test(timePart)) {
         let [h, mAP] = timePart.split(':');
         let m = mAP.match(/\d+/)?.[0] || "00";
         let ap = mAP.match(/(AM|PM)/i)?.[0].toUpperCase() || "";
         return `${h.padStart(2, '0')}:${m.padStart(2, '0')} ${ap}`;
       }
-      // If 24h format
       const [hours, minutes] = timePart.split(':');
       if (!hours || !minutes) return timeStr;
       let h = parseInt(hours, 10);
@@ -448,13 +455,12 @@
     };
 
     // 4. Start a database transaction
-    await database.ref().transaction(async (currentData) => {
+    await database.ref().transaction(function(currentData) {
       if (!currentData) {
         currentData = {};
       }
 
       // Make sure the slot still exists and has availability
-      const slotPath = `availableSlots/${selectedDate}/${slotId}`;
       const slot = currentData.availableSlots?.[selectedDate]?.[slotId] || slotData;
       
       if (!slot || slot.currentBookings >= slot.maxBookings) {
@@ -478,7 +484,7 @@
       localStorage.setItem('currentBookingId', newBookingId);
 
       return currentData;
-    }, (error, committed) => {
+    }, function(error, committed) {
       if (error) {
         console.error("Transaction failed: ", error);
         throw error;
