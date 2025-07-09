@@ -263,108 +263,161 @@ body {
 
 <!-- AUTHENTICATION ADDITIONS START -->
 <script>
-// Firebase configuration
+// Firebase configuration - MUST match admin-services.html
 const firebaseConfig = {
-  apiKey: "AIzaSyAmimDsjW_pF2NGw-w-40QzTsgmf1tdqyI",
+  apiKey: "AIzaSyAmimDsjW_pF2NGg-w-40QzTsgmf1tdqyI",
   authDomain: "bdmsalonappointment.firebaseapp.com",
-  projectId: "bdmsalonappointment"
+  databaseURL: "https://bdmsalonappointment-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "bdmsalonappointment",
+  storageBucket: "bdmsalonappointment.appspot.com",
+  messagingSenderId: "123933913893",
+  appId: "1:123933913893:web:c1f57caf4dc2a5440ba0cc"
 };
 
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
 
-// Firebase auth state listener
-firebase.auth().onAuthStateChanged(function(user) {
-  if (user) {
-    localStorage.setItem('isLoggedIn', 'true');
-  } else {
-    localStorage.removeItem('isLoggedIn');
-    if (!window.location.href.includes('index.html')) {
-      window.location.href = 'index.html';
-    }
-  }
-});
+// Database paths - MUST match admin-services.html
+const SERVICES_DB_PATH = "services";
+const CATEGORIES_DB_PATH = "categories";
 
-// Authentication check
-if (!auth.isAuthenticated()) {
-  window.location.href = 'index.html';
-}
-</script>
-<!-- AUTHENTICATION ADDITIONS END -->
-
-<script>
 // DOM refs
 const servicesGrid = document.getElementById('servicesGrid');
 const nextBtn = document.getElementById('nextBtn');
 const categorySelect = document.getElementById('categorySelect');
 
-// --- FIREBASE SERVICES INTEGRATION ---
-// Will fetch and render from Firebase, for now just use the array as fallback if none in DB
+// Services data - will be loaded from Firebase
+let services = [];
+let categories = [];
+let selectedServices = [];
 
-// Services data with categories (points removed)
-let services = [
-  { id: '1', name: "Haircut", desc: "Classic cut & style", time: "30 min", price: "$25", category: "Hair" },
-  { id: '2', name: "Hair Color", desc: "Full colour service", time: "60 min", price: "$60", category: "Hair" },
-  { id: '3', name: "Beard Trim", desc: "Shape & line-up", time: "20 min", price: "$15", category: "Beard" },
-  { id: '4', name: "Facial", desc: "Deep cleansing facial", time: "45 min", price: "$40", category: "Skin" },
-  { id: '5', name: "Manicure", desc: "Clean & polish nails", time: "30 min", price: "$22", category: "Nails" },
-  { id: '6', name: "Pedicure", desc: "Spa pedicure treatment", time: "40 min", price: "$28", category: "Nails" },
-  { id: '7', name: "Make-up", desc: "Event/party glam look", time: "60 min", price: "$55", category: "Makeup" },
-  { id: '8', name: "Blow-dry", desc: "Quick styling session", time: "25 min", price: "$18", category: "Hair" },
-  { id: '9', name: "Hair Spa", desc: "Nourishing mask therapy", time: "50 min", price: "$50", category: "Hair" },
-  { id: '10', name: "Nail Art", desc: "Creative nail designs", time: "45 min", price: "$30", category: "Nails" },
-  { id: '11', name: "Eyebrow Wax", desc: "Precision shaping", time: "15 min", price: "$12", category: "Brows" },
-  { id: '12', name: "Eyelash Extension", desc: "Natural look", time: "60 min", price: "$70", category: "Lashes" },
-  { id: '13', name: "Eyebrow Tint", desc: "Enhance your brows", time: "20 min", price: "$15", category: "Brows" },
-  { id: '14', name: "Eyelash Tint", desc: "Enhance your lashes", time: "20 min", price: "$15", category: "Lashes" },
-  { id: '15', name: "Full Body Massage", desc: "Relaxing therapy", time: "90 min", price: "$80", category: "Massage" }
-];
+// Initialize the app when Firebase is ready
+function initApp() {
+  // Check authentication
+  firebase.auth().onAuthStateChanged(function(user) {
+    if (user) {
+      localStorage.setItem('isLoggedIn', 'true');
+      // User is signed in, load services
+      loadServices();
+      loadCategories();
+    } else {
+      // User is signed out, redirect to login
+      localStorage.removeItem('isLoggedIn');
+      if (!window.location.href.includes('index.html')) {
+        window.location.href = 'index.html';
+      }
+    }
+  });
 
-// Get unique categories
+  // Set up event listeners
+  categorySelect.addEventListener('change', filterServices);
+  nextBtn.onclick = handleNextButtonClick;
+}
+
+// Load services from Firebase
+function loadServices() {
+  database.ref(SERVICES_DB_PATH).on('value', (snapshot) => {
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      if (data) {
+        // Convert object to array
+        services = Object.values(data);
+        renderServices(services);
+        updateCategorySelect();
+      }
+    } else {
+      console.log("No services found in Firebase");
+      // Optional: Load default services if none in Firebase
+      // services = [...defaultServices];
+      // renderServices(services);
+    }
+  }, (error) => {
+    console.error("Error loading services:", error);
+  });
+}
+
+// Load categories from Firebase
+function loadCategories() {
+  database.ref(CATEGORIES_DB_PATH).on('value', (snapshot) => {
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      if (Array.isArray(data)) {
+        categories = data;
+      } else if (data && typeof data === 'object') {
+        categories = Object.values(data);
+      }
+      updateCategorySelect();
+    }
+  }, (error) => {
+    console.error("Error loading categories:", error);
+  });
+}
+
+// Update category dropdown
 function updateCategorySelect() {
-  // Remove all except "all"
-  while (categorySelect.options.length > 1) categorySelect.remove(1);
-  const categories = [...new Set(services.map(service => service.category))];
-  categories.forEach(category => {
+  // Get unique categories from services if categories collection is empty
+  const uniqueCategories = categories.length > 0 
+    ? categories 
+    : [...new Set(services.map(service => service.category))];
+  
+  // Save current selection
+  const currentSelection = categorySelect.value;
+  
+  // Clear and rebuild dropdown
+  categorySelect.innerHTML = '<option value="all">All Categories</option>';
+  
+  // Add categories to dropdown
+  uniqueCategories.forEach(category => {
     const option = document.createElement('option');
     option.value = category;
     option.textContent = category;
     categorySelect.appendChild(option);
   });
-}
-updateCategorySelect();
-
-// Selected services
-let selectedServices = [];
-
-// Initialize UI with all services
-renderServices(services);
-
-// Event listener for category filter
-categorySelect.addEventListener('change', () => {
-  const selectedCategory = categorySelect.value;
-  if (selectedCategory === "all") {
-    renderServices(services);
-  } else {
-    const filteredServices = services.filter(service => service.category === selectedCategory);
-    renderServices(filteredServices);
+  
+  // Restore selection if possible
+  if (currentSelection && uniqueCategories.includes(currentSelection)) {
+    categorySelect.value = currentSelection;
   }
-});
+  
+  // Re-apply current filter
+  filterServices();
+}
+
+// Filter services by category
+function filterServices() {
+  const selectedCategory = categorySelect.value;
+  let filteredServices = [...services];
+  
+  if (selectedCategory !== "all") {
+    filteredServices = services.filter(service => service.category === selectedCategory);
+  }
+  
+  renderServices(filteredServices);
+}
 
 // Render services to the grid
 function renderServices(servicesToRender) {
   servicesGrid.innerHTML = '';
+  
+  if (servicesToRender.length === 0) {
+    servicesGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:#888;">No services found in this category.</div>';
+    return;
+  }
+  
   servicesToRender.forEach(service => {
+    if (!service) return;
+    
     const isSelected = selectedServices.some(s => s.id === service.id);
     const card = document.createElement('div');
     card.className = `service-card ${isSelected ? 'selected' : ''}`;
     card.innerHTML = `
       <strong class="service-name">${service.name}</strong>
-      <p class="service-desc">${service.desc}</p>
+      <p class="service-desc">${service.description || service.desc || ''}</p>
       <div class="service-info">
-        <span class="service-time">${service.time}</span>
+        <span class="service-time">${service.duration || service.time || ''}</span>
       </div>
-      <span class="service-price">${service.price}</span>
+      <span class="service-price">${service.price || ''}</span>
     `;
     card.onclick = () => toggleServiceSelection(service, card);
     servicesGrid.appendChild(card);
@@ -380,10 +433,8 @@ function toggleServiceSelection(service, card) {
     selectedServices.splice(index, 1);
   }
   
-  // Update card appearance
+  // Update UI
   card.classList.toggle('selected');
-  
-  // Enable/disable next button
   updateNextButton();
 }
 
@@ -392,8 +443,8 @@ function updateNextButton() {
   nextBtn.disabled = selectedServices.length === 0;
 }
 
-// Next button handler
-nextBtn.onclick = () => {
+// Handle next button click
+function handleNextButtonClick() {
   if (selectedServices.length === 0) return;
   
   // Store selected services in localStorage
@@ -405,39 +456,16 @@ nextBtn.onclick = () => {
     localStorage.setItem('selectedService', JSON.stringify({
       name: selectedService.name,
       price: selectedService.price,
-      duration: selectedService.time
+      duration: selectedService.duration || selectedService.time
     }));
   }
   
   // Redirect to Pick Stylist page
   window.location.href = 'pick-stylist.html';
-};
-
-// Listen for changes from admin-services.html (using localStorage event)
-window.addEventListener('storage', function(event) {
-  if (event.key === 'adminServicesUpdate') {
-    // Admin has updated services; reload from DB or localStorage
-    loadServicesFromFirebaseOrStorage();
-  }
-});
-
-// Optionally: If you save services in Firebase, load them here
-function loadServicesFromFirebaseOrStorage() {
-  // Example: try to load from Firebase, fallback to localStorage
-  // (for demo, just use localStorage)
-  let updated = localStorage.getItem('adminServices');
-  if (updated) {
-    try {
-      services = JSON.parse(updated);
-      updateCategorySelect();
-      renderServices(services);
-    } catch (e) {
-      // ignore
-    }
-  } else {
-    renderServices(services);
-  }
 }
+
+// Initialize the app when the DOM is loaded
+document.addEventListener('DOMContentLoaded', initApp);
 </script>
 </body>
 </html>
