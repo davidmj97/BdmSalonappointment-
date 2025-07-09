@@ -407,9 +407,8 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = firebase.initializeApp(firebaseConfig);
+firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
-const auth = firebase.auth();
 
 // --- GLOBALS ---
 let services = [];
@@ -471,26 +470,30 @@ function renderServices(filter = "all") {
   });
 }
 
-async function saveService(serviceData, id = null) {
+async function saveAllServicesToDB() {
   try {
     loadingIndicator.style.display = 'block';
-    const serviceRef = id 
-      ? database.ref(`${SERVICES_DB_PATH}/${id}`)
-      : database.ref(SERVICES_DB_PATH).push();
+    const servicesObj = {};
+    services.forEach(service => {
+      if (service && service.id) {
+        // Normalize the service object structure
+        servicesObj[service.id] = {
+          id: service.id,
+          name: service.name,
+          description: service.description || service.desc || '',
+          duration: service.duration || service.time || '',
+          price: service.price || '',
+          category: service.category || 'Uncategorized'
+        };
+      }
+    });
     
-    const serviceToSave = {
-      ...serviceData,
-      id: id || serviceRef.key,
-      updatedAt: firebase.database.ServerValue.TIMESTAMP
-    };
-
-    await serviceRef.set(serviceToSave);
-    console.log('Service saved successfully');
-    return true;
+    // Save to Firebase
+    await database.ref(SERVICES_DB_PATH).set(servicesObj);
+    console.log('Services saved to Firebase');
   } catch (error) {
-    console.error("Error saving service:", error);
-    alert('Failed to save service. Please try again.');
-    return false;
+    console.error("Error saving services:", error);
+    alert('Failed to save services. Please try again.');
   } finally {
     loadingIndicator.style.display = 'none';
   }
@@ -515,19 +518,25 @@ function handleServiceSubmit(e) {
     description: desc,
     duration: time,
     price,
-    category,
-    createdAt: editId ? undefined : firebase.database.ServerValue.TIMESTAMP
+    category 
   };
   
-  saveService(serviceData, editId).then(success => {
-    if (success) {
-      addServiceForm.reset();
-      if (editId) {
-        editId = null;
-        addUpdateBtn.textContent = 'Add Service';
-      }
+  if (editId) {
+    // Update existing service
+    const index = services.findIndex(s => s && s.id === editId);
+    if (index !== -1) {
+      services[index] = { ...services[index], ...serviceData };
     }
-  });
+    editId = null;
+    addUpdateBtn.textContent = 'Add Service';
+  } else {
+    // Add new service
+    const id = Date.now().toString() + Math.floor(Math.random()*10000).toString();
+    services.push({ ...serviceData, id });
+  }
+  
+  saveAllServicesToDB();
+  addServiceForm.reset();
 }
 
 // Global functions for inline event handlers
@@ -549,48 +558,157 @@ window.editService = function(id) {
 window.deleteService = function(id) {
   if (!confirm('Are you sure you want to delete this service?')) return;
   
-  database.ref(`${SERVICES_DB_PATH}/${id}`).remove()
-    .then(() => console.log('Service deleted'))
-    .catch(error => {
-      console.error('Error deleting service:', error);
-      alert('Failed to delete service. Please try again.');
-    });
+  services = services.filter(service => service && service.id !== id);
+  saveAllServicesToDB();
 };
 
 // --- CATEGORY MANAGEMENT ---
-// [Keep all your existing category management functions as they are]
-// Just ensure they use the same database paths
+function renderCategories() {
+  if (!Array.isArray(categories)) {
+    console.error("Categories is not an array:", categories);
+    return;
+  }
+
+  categoriesList.innerHTML = categories.map((category, index) => `
+    <div class="category-item">
+      <span class="category-name">${category}</span>
+      <button class="delete-category-btn" data-index="${index}">Delete</button>
+    </div>
+  `).join('');
+
+  // Add event listeners to delete buttons
+  document.querySelectorAll('.delete-category-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const index = parseInt(e.target.getAttribute('data-index'));
+      deleteCategory(index);
+    });
+  });
+}
+
+function addNewCategory() {
+  const name = newCategoryName.value.trim();
+  if (!name) return;
+
+  if (categories.includes(name)) {
+    alert('This category already exists!');
+    return;
+  }
+
+  categories.push(name);
+  database.ref(CATEGORIES_DB_PATH).set(categories)
+    .then(() => {
+      newCategoryName.value = '';
+      renderCategories();
+      updateCategoryDropdowns();
+    })
+    .catch(error => {
+      console.error("Error adding category:", error);
+      alert('Failed to add category. Please try again.');
+    });
+}
+
+function deleteCategory(index) {
+  if (index < 0 || index >= categories.length) return;
+  
+  const categoryName = categories[index];
+  if (!confirm(`Are you sure you want to delete the category "${categoryName}"? This will not affect existing services.`)) {
+    return;
+  }
+
+  categories.splice(index, 1);
+  database.ref(CATEGORIES_DB_PATH).set(categories)
+    .then(() => {
+      renderCategories();
+      updateCategoryDropdowns();
+    })
+    .catch(error => {
+      console.error("Error deleting category:", error);
+      alert('Failed to delete category. Please try again.');
+    });
+}
+
+function updateCategoryDropdowns() {
+  const categorySelects = [
+    document.getElementById('serviceCategory'),
+    document.getElementById('filterCategory')
+  ];
+
+  categorySelects.forEach((select, i) => {
+    if (!select) return;
+    
+    const isFilter = select.id === 'filterCategory';
+    const currentValue = select.value;
+    
+    // Clear and rebuild the dropdown
+    select.innerHTML = isFilter 
+      ? '<option value="all">All</option>' 
+      : '<option value="">Choose...</option>';
+    
+    // Add categories
+    if (Array.isArray(categories)) {
+      categories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category;
+        option.textContent = category;
+        select.appendChild(option);
+      });
+    }
+    
+    // Restore selection if possible
+    if ((isFilter && currentValue === 'all') || 
+        (!isFilter && currentValue === '')) {
+      return;
+    }
+    
+    if (categories.includes(currentValue)) {
+      select.value = currentValue;
+    }
+  });
+}
 
 // --- DATA FETCHING ---
-function setupRealtimeListeners() {
-  // Listen for services changes
+function fetchServices() {
+  loadingIndicator.style.display = 'block';
   database.ref(SERVICES_DB_PATH).on('value', (snapshot) => {
     loadingIndicator.style.display = 'none';
     if (snapshot.exists()) {
       const data = snapshot.val();
-      services = data ? Object.values(data) : [];
-      renderServices(filterCategory.value);
+      if (data && typeof data === 'object') {
+        // Convert object to array
+        services = Object.values(data);
+      } else {
+        services = [];
+      }
     } else {
-      services = [];
-      renderServices();
+      // Initialize with default services if none exist
+      services = [...defaultServices];
+      saveAllServicesToDB();
     }
+    renderServices(filterCategory.value);
   }, (error) => {
     console.error("Error fetching services:", error);
     loadingIndicator.style.display = 'none';
   });
+}
 
-  // Listen for categories changes
+function fetchCategories() {
   database.ref(CATEGORIES_DB_PATH).on('value', (snapshot) => {
     if (snapshot.exists()) {
       const data = snapshot.val();
-      categories = Array.isArray(data) ? data : (data ? Object.values(data) : []);
-      updateCategoryDropdowns();
-      renderCategories();
+      if (Array.isArray(data)) {
+        categories = data;
+      } else if (data && typeof data === 'object') {
+        categories = Object.values(data);
+      } else {
+        categories = [];
+      }
     } else {
-      categories = [];
-      updateCategoryDropdowns();
-      renderCategories();
+      // Initialize with default categories if none exist
+      categories = [...new Set(defaultServices.map(service => service.category))];
+      database.ref(CATEGORIES_DB_PATH).set(categories);
     }
+    renderCategories();
+    updateCategoryDropdowns();
   }, (error) => {
     console.error("Error fetching categories:", error);
   });
@@ -636,9 +754,29 @@ function initApp() {
     }
   });
 
-  // Set up real-time listeners
-  setupRealtimeListeners();
+  // Load data
+  fetchServices();
+  fetchCategories();
 }
+
+// Default services (used for initialization)
+const defaultServices = [
+  { id: '1', name: "Haircut", description: "Classic cut & style", duration: "30 min", price: "$25", category: "Hair" },
+  { id: '2', name: "Hair Color", description: "Full colour service", duration: "60 min", price: "$60", category: "Hair" },
+  { id: '3', name: "Beard Trim", description: "Shape & line-up", duration: "20 min", price: "$15", category: "Beard" },
+  { id: '4', name: "Facial", description: "Deep cleansing facial", duration: "45 min", price: "$40", category: "Skin" },
+  { id: '5', name: "Manicure", description: "Clean & polish nails", duration: "30 min", price: "$22", category: "Nails" },
+  { id: '6', name: "Pedicure", description: "Spa pedicure treatment", duration: "40 min", price: "$28", category: "Nails" },
+  { id: '7', name: "Make-up", description: "Event/party glam look", duration: "60 min", price: "$55", category: "Makeup" },
+  { id: '8', name: "Blow-dry", description: "Quick styling session", duration: "25 min", price: "$18", category: "Hair" },
+  { id: '9', name: "Hair Spa", description: "Nourishing mask therapy", duration: "50 min", price: "$50", category: "Hair" },
+  { id: '10', name: "Nail Art", description: "Creative nail designs", duration: "45 min", price: "$30", category: "Nails" },
+  { id: '11', name: "Eyebrow Wax", description: "Precision shaping", duration: "15 min", price: "$12", category: "Brows" },
+  { id: '12', name: "Eyelash Extension", description: "Natural look", duration: "60 min", price: "$70", category: "Lashes" },
+  { id: '13', name: "Eyebrow Tint", description: "Enhance your brows", duration: "20 min", price: "$15", category: "Brows" },
+  { id: '14', name: "Eyelash Tint", description: "Enhance your lashes", duration: "20 min", price: "$15", category: "Lashes" },
+  { id: '15', name: "Full Body Massage", description: "Relaxing therapy", duration: "90 min", price: "$80", category: "Massage" }
+];
 
 // Start the application when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', initApp);
