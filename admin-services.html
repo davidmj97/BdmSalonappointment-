@@ -476,9 +476,19 @@ async function saveAllServicesToDB() {
     const servicesObj = {};
     services.forEach(service => {
       if (service && service.id) {
-        servicesObj[service.id] = service;
+        // Normalize the service object structure
+        servicesObj[service.id] = {
+          id: service.id,
+          name: service.name,
+          description: service.description || service.desc || '',
+          duration: service.duration || service.time || '',
+          price: service.price || '',
+          category: service.category || 'Uncategorized'
+        };
       }
     });
+    
+    // Save to Firebase
     await database.ref(SERVICES_DB_PATH).set(servicesObj);
     console.log('Services saved to Firebase');
   } catch (error) {
@@ -675,6 +685,9 @@ function fetchServices() {
       saveAllServicesToDB();
     }
     renderServices(filterCategory.value);
+  }, (error) => {
+    console.error("Error fetching services:", error);
+    loadingIndicator.style.display = 'none';
   });
 }
 
@@ -696,6 +709,8 @@ function fetchCategories() {
     }
     renderCategories();
     updateCategoryDropdowns();
+  }, (error) => {
+    console.error("Error fetching categories:", error);
   });
 }
 
