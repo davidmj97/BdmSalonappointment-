@@ -308,7 +308,7 @@
               <div class="service-name">${service.name || "Not selected"}</div>
               ${service.description ? `<div class="service-description">${service.description}</div>` : ''}
               <div class="service-details">
-                <span>${service.time || "Not specified"}</span>
+                <span>${service.duration || service.time || "Not specified"}</span>
                 <span>${service.price || "Not specified"}</span>
               </div>
             `;
