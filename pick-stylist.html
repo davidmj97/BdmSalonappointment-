@@ -7,29 +7,103 @@
 <!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 <script src="auth.js"></script>
 <script>
   // Firebase configuration (replace with your actual config)
-const firebaseConfig = {
-  apiKey: "AIzaSyAmimDsjW_pF2NGw-w-40QzTsgmf1tdqyI",
-  authDomain: "bdmsalonappointment.firebaseapp.com",
-  projectId: "bdmsalonappointment"
-};
-  
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-  
+  const firebaseConfig = {
+    apiKey: "AIzaSyAmimDsjW_pF2NGw-w-40QzTsgmf1tdqyI",
+    authDomain: "bdmsalonappointment.firebaseapp.com",
+    databaseURL: "https://bdmsalonappointment-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "bdmsalonappointment"
+  };
+
+  // Initialize Firebase if not already
+  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+
   // Auth state listener
   firebase.auth().onAuthStateChanged(function(user) {
     if (user) {
-      // User is signed in, set login flag
       localStorage.setItem('isLoggedIn', 'true');
     } else {
-      // User is signed out, clear flag and redirect
       localStorage.removeItem('isLoggedIn');
       window.location.href = 'index.html';
     }
   });
+
+  // DOM refs
+  let stylists = [];
+  let selectedStylist = null;
+  const stylistsGrid = document.getElementById('stylistsGrid');
+  const nextBtn = document.getElementById('nextBtn');
+
+  // Listen to stylists in realtime from DB
+  firebase.database().ref('stylists').on('value', snapshot => {
+    stylists = [];
+    snapshot.forEach(child => {
+      stylists.push({ id: child.key, ...child.val() });
+    });
+    stylists.sort((a, b) => (a.name||'').localeCompare(b.name||''));
+    renderStylists(stylists);
+
+    // Auto-select first available stylist if none selected
+    if (!selectedStylist || !stylists.find(s => s.id === selectedStylist.id && s.available)) {
+      const firstAvailable = stylists.find(stylist => stylist.available);
+      if (firstAvailable) selectStylist(firstAvailable.id);
+      else { selectedStylist = null; updateNextButton(); }
+    }
+  });
+
+  function renderStylists(stylistsToRender) {
+    stylistsGrid.innerHTML = '';
+    stylistsToRender.forEach(stylist => {
+      const isSelected = selectedStylist && selectedStylist.id === stylist.id;
+      const card = document.createElement('div');
+      card.className = `stylist-card${isSelected ? ' selected' : ''}`;
+      card.dataset.stylistId = stylist.id;
+
+      // Days pills
+      let daysHTML = '';
+      if (Array.isArray(stylist.availableDays) && stylist.availableDays.length > 0) {
+        daysHTML = `<div class="stylist-days-box">${stylist.availableDays.map(day => `<span class="stylist-day-pill">${day}</span>`).join('')}</div>`;
+      } else {
+        daysHTML = `<div class="stylist-days-box"><span class="stylist-day-pill" style="background:#a00;color:#fff;">No Days</span></div>`;
+      }
+
+      card.onclick = () => {
+        if (stylist.available) selectStylist(stylist.id);
+      };
+      card.innerHTML = `
+        <strong class="stylist-name">${stylist.name || ""}</strong>
+        <p class="stylist-specialty">${stylist.specialty || ""}</p>
+        ${daysHTML}
+        <div>
+          <span class="availability ${stylist.available ? 'available' : 'unavailable'}"></span>
+          ${stylist.available ? 'Available' : 'Not Available'}
+        </div>
+      `;
+      stylistsGrid.appendChild(card);
+    });
+    updateNextButton();
+  }
+
+  function selectStylist(stylistId) {
+    document.querySelectorAll('.stylist-card').forEach(card => card.classList.remove('selected'));
+    selectedStylist = stylists.find(s => s.id === stylistId);
+    const selectedCard = document.querySelector(`.stylist-card[data-stylist-id="${stylistId}"]`);
+    if (selectedCard) selectedCard.classList.add('selected');
+    updateNextButton();
+  }
+
+  function updateNextButton() {
+    nextBtn.disabled = !selectedStylist;
+  }
+
+  nextBtn.onclick = () => {
+    if (!selectedStylist) return;
+    localStorage.setItem('selectedStylist', JSON.stringify(selectedStylist));
+    window.location.href = 'select-date-time.html';
+  };
 </script>
 <style>
 :root {
@@ -38,13 +112,7 @@ const firebaseConfig = {
   --accent: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
   --border-color: #444;
 }
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
+* { margin: 0; padding: 0; box-sizing: border-box; }
 body {
   font-family: 'Helvetica Neue', Arial, sans-serif;
   background: var(--bg);
@@ -54,7 +122,6 @@ body {
   flex-direction: column;
   padding-top: 150px;
 }
-
 /* Fixed Header */
 .header-container {
   position: fixed;
@@ -66,14 +133,12 @@ body {
   padding: 15px 0;
   box-shadow: 0 2px 10px rgba(0,0,0,0.5);
 }
-
 .step-heading {
   text-align: center;
   margin: 5px 0 15px;
   font-size: 20px;
   color: white;
 }
-
 /* Navigation Buttons */
 .btn-container {
   display: flex;
@@ -81,7 +146,6 @@ body {
   margin: 0 16px;
   padding: 0;
 }
-
 .btn-prev,
 .next-btn {
   flex: 1;
@@ -93,23 +157,10 @@ body {
   cursor: pointer;
   transition: all 0.2s ease;
 }
-
-.btn-prev {
-  background: #444;
-  color: #fff;
-}
-
-.next-btn {
-  background: var(--accent);
-  color: #fff;
-}
-
+.btn-prev { background: #444; color: #fff; }
+.next-btn { background: var(--accent); color: #fff; }
 .btn-prev:disabled,
-.next-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
+.next-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 /* Main Container */
 .container {
   flex: 1;
@@ -117,7 +168,6 @@ body {
   display: flex;
   flex-direction: column;
 }
-
 /* Stylists Grid */
 .stylists-container {
   flex: 1;
@@ -126,13 +176,11 @@ body {
   gap: 16px;
   overflow-y: auto;
 }
-
 .stylists-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 16px;
 }
-
 /* Stylist Card */
 .stylist-card {
   background: #111;
@@ -143,49 +191,19 @@ body {
   gap: 12px;
   position: relative;
   cursor: pointer;
-  transition: all 0.2s ease; /* Added transition for smooth color change */
+  transition: all 0.2s ease;
 }
-
 .stylist-name {
   font-size: 16px;
   font-weight: 700;
   margin: 0;
 }
-
 .stylist-specialty {
   font-size: 12px;
   color: #ccc;
   line-height: 1.4;
   margin: 0;
 }
-
-/* Availability indicator */
-.availability {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  margin-right: 6px;
-}
-
-.available {
-  background-color: #4CAF50;
-}
-
-.unavailable {
-  background-color: #F44336;
-}
-
-/* Updated selected stylist card */
-.stylist-card.selected {
-  background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
-  color: white;
-}
-
-.stylist-card.selected .stylist-specialty {
-  color: rgba(255, 255, 255, 0.9);
-}
-
 .stylist-days-box {
   display: flex;
   flex-wrap: wrap;
@@ -193,7 +211,6 @@ body {
   margin-bottom: 2px;
   margin-top: 2px;
 }
-
 .stylist-day-pill {
   background: #222;
   color: #87cefa;
@@ -204,36 +221,38 @@ body {
   border: 1px solid #1a237e;
   letter-spacing: 0.5px;
 }
-
 .stylist-card.selected .stylist-day-pill {
   background: #1936af;
   color: #fff;
   border-color: #0d47a1;
 }
-
+/* Availability indicator */
+.availability {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+.available { background-color: #4CAF50; }
+.unavailable { background-color: #F44336; }
+/* Updated selected stylist card */
+.stylist-card.selected {
+  background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+  color: white;
+}
+.stylist-card.selected .stylist-specialty {
+  color: rgba(255, 255, 255, 0.9);
+}
 /* Mobile adjustments */
 @media (max-width: 900px) {
-  body {
-    padding-top: 140px;
-  }
-  
-  .stylist-card {
-    padding: 12px;
-  }
-  
-  .stylist-name {
-    font-size: 14px;
-  }
-  
-  .stylist-specialty {
-    font-size: 11px;
-  }
+  body { padding-top: 140px; }
+  .stylist-card { padding: 12px; }
+  .stylist-name { font-size: 14px; }
+  .stylist-specialty { font-size: 11px; }
 }
-
 /* Hide scrollbar */
-::-webkit-scrollbar {
-  display: none;
-}
+::-webkit-scrollbar { display: none; }
 </style>
 </head>
 <body>
@@ -241,14 +260,11 @@ body {
 <!-- Fixed Header -->
 <div class="header-container">
   <h1 class="step-heading">Step 2: Pick Stylist</h1>
-  
-  <!-- Navigation Buttons -->
   <div class="btn-container">
     <button class="btn-prev" onclick="window.history.back()">Back</button>
     <button class="next-btn" id="nextBtn" disabled>Next</button>
   </div>
 </div>
-
 <!-- Main Container -->
 <div class="container">
   <div class="stylists-container">
@@ -257,151 +273,5 @@ body {
     </div>
   </div>
 </div>
-
-<script>
-// DOM refs
-const stylistsGrid = document.getElementById('stylistsGrid');
-const nextBtn = document.getElementById('nextBtn');
-
-// Stylists data with availability and availableDays
-const stylists = [
-  { 
-    id: 'anyone', 
-    name: "Anyone", 
-    specialty: "First available stylist",
-    available: true,
-    availableDays: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-  },
-  { 
-    id: '1', 
-    name: "Emma", 
-    specialty: "Hair Coloring Specialist",
-    available: true,
-    availableDays: ["Monday", "Tuesday", "Thursday"]
-  },
-  { 
-    id: '2', 
-    name: "James", 
-    specialty: "Men's Grooming Expert",
-    available: true,
-    availableDays: ["Wednesday", "Thursday", "Friday", "Saturday"]
-  },
-  { 
-    id: '3', 
-    name: "Sophia", 
-    specialty: "Extensions & Styling",
-    available: false,  // Not available
-    availableDays: ["Tuesday", "Friday"]
-  },
-  { 
-    id: '4', 
-    name: "Michael", 
-    specialty: "Classic Barbering",
-    available: true,
-    availableDays: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
-  },
-  { 
-    id: '5', 
-    name: "Olivia", 
-    specialty: "Creative Hair Design",
-    available: true,
-    availableDays: ["Monday", "Wednesday", "Saturday"]
-  },
-  { 
-    id: '6', 
-    name: "William", 
-    specialty: "Beard & Mustache Specialist",
-    available: true,
-    availableDays: ["Thursday", "Friday", "Saturday"]
-  }
-];
-
-// Selected stylist
-let selectedStylist = null;
-
-// Initialize UI with stylists
-renderStylists(stylists);
-
-// Automatically select the first available stylist on page load
-window.addEventListener('DOMContentLoaded', () => {
-  // Find the first available stylist
-  const firstAvailable = stylists.find(stylist => stylist.available);
-  if (firstAvailable) {
-    selectStylist(firstAvailable.id);
-  }
-});
-
-// Render stylists to the grid
-function renderStylists(stylistsToRender) {
-  stylistsGrid.innerHTML = '';
-  stylistsToRender.forEach(stylist => {
-    const isSelected = selectedStylist && selectedStylist.id === stylist.id;
-    const card = document.createElement('div');
-    card.className = `stylist-card ${isSelected ? 'selected' : ''}`;
-    card.dataset.stylistId = stylist.id; // Add ID to dataset
-
-    // Small box for days (pill style)
-    let daysHTML = '';
-    if (Array.isArray(stylist.availableDays) && stylist.availableDays.length > 0) {
-      daysHTML = `<div class="stylist-days-box">${stylist.availableDays.map(day => `<span class="stylist-day-pill">${day}</span>`).join('')}</div>`;
-    } else {
-      daysHTML = `<div class="stylist-days-box"><span class="stylist-day-pill" style="background:#a00;color:#fff;">No Days</span></div>`;
-    }
-
-    // Add click handler for selection
-    card.onclick = () => {
-      if (stylist.available) {
-        selectStylist(stylist.id);
-      }
-    };
-
-    card.innerHTML = `
-      <strong class="stylist-name">${stylist.name}</strong>
-      <p class="stylist-specialty">${stylist.specialty}</p>
-      ${daysHTML}
-      <div>
-        <span class="availability ${stylist.available ? 'available' : 'unavailable'}"></span>
-        ${stylist.available ? 'Available' : 'Not Available'}
-      </div>
-    `;
-
-    stylistsGrid.appendChild(card);
-  });
-}
-
-// Select stylist function
-function selectStylist(stylistId) {
-  // Remove selection from all cards
-  document.querySelectorAll('.stylist-card').forEach(card => {
-    card.classList.remove('selected');
-  });
-
-  // Select new stylist
-  selectedStylist = stylists.find(s => s.id === stylistId);
-
-  // Add selection class to the clicked card
-  const selectedCard = document.querySelector(`.stylist-card[data-stylist-id="${stylistId}"]`);
-  if (selectedCard) {
-    selectedCard.classList.add('selected');
-  }
-
-  // Enable/disable next button
-  updateNextButton();
-}
-
-// Update next button state
-function updateNextButton() {
-  nextBtn.disabled = !selectedStylist;
-}
-
-// Next button handler
-nextBtn.onclick = () => {
-  if (!selectedStylist) return;
-  // Store selected stylist in localStorage
-  localStorage.setItem('selectedStylist', JSON.stringify(selectedStylist));
-  // Redirect to Select Date & Time page
-  window.location.href = 'select-date-time.html';
-};
-</script>
 </body>
 </html>
