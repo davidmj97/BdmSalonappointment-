@@ -186,6 +186,31 @@ body {
   color: rgba(255, 255, 255, 0.9);
 }
 
+.stylist-days-box {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 2px;
+  margin-top: 2px;
+}
+
+.stylist-day-pill {
+  background: #222;
+  color: #87cefa;
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 11px;
+  display: inline-block;
+  border: 1px solid #1a237e;
+  letter-spacing: 0.5px;
+}
+
+.stylist-card.selected .stylist-day-pill {
+  background: #1936af;
+  color: #fff;
+  border-color: #0d47a1;
+}
+
 /* Mobile adjustments */
 @media (max-width: 900px) {
   body {
@@ -238,49 +263,56 @@ body {
 const stylistsGrid = document.getElementById('stylistsGrid');
 const nextBtn = document.getElementById('nextBtn');
 
-// Stylists data with availability
+// Stylists data with availability and availableDays
 const stylists = [
   { 
     id: 'anyone', 
     name: "Anyone", 
     specialty: "First available stylist",
-    available: true
+    available: true,
+    availableDays: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
   },
   { 
     id: '1', 
     name: "Emma", 
     specialty: "Hair Coloring Specialist",
-    available: true
+    available: true,
+    availableDays: ["Monday", "Tuesday", "Thursday"]
   },
   { 
     id: '2', 
     name: "James", 
     specialty: "Men's Grooming Expert",
-    available: true
+    available: true,
+    availableDays: ["Wednesday", "Thursday", "Friday", "Saturday"]
   },
   { 
     id: '3', 
     name: "Sophia", 
     specialty: "Extensions & Styling",
-    available: false  // Not available
+    available: false,  // Not available
+    availableDays: ["Tuesday", "Friday"]
   },
   { 
     id: '4', 
     name: "Michael", 
     specialty: "Classic Barbering",
-    available: true
+    available: true,
+    availableDays: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
   },
   { 
     id: '5', 
     name: "Olivia", 
     specialty: "Creative Hair Design",
-    available: true
+    available: true,
+    availableDays: ["Monday", "Wednesday", "Saturday"]
   },
   { 
     id: '6', 
     name: "William", 
     specialty: "Beard & Mustache Specialist",
-    available: true
+    available: true,
+    availableDays: ["Thursday", "Friday", "Saturday"]
   }
 ];
 
@@ -294,7 +326,6 @@ renderStylists(stylists);
 window.addEventListener('DOMContentLoaded', () => {
   // Find the first available stylist
   const firstAvailable = stylists.find(stylist => stylist.available);
-  
   if (firstAvailable) {
     selectStylist(firstAvailable.id);
   }
@@ -308,23 +339,32 @@ function renderStylists(stylistsToRender) {
     const card = document.createElement('div');
     card.className = `stylist-card ${isSelected ? 'selected' : ''}`;
     card.dataset.stylistId = stylist.id; // Add ID to dataset
-    
+
+    // Small box for days (pill style)
+    let daysHTML = '';
+    if (Array.isArray(stylist.availableDays) && stylist.availableDays.length > 0) {
+      daysHTML = `<div class="stylist-days-box">${stylist.availableDays.map(day => `<span class="stylist-day-pill">${day}</span>`).join('')}</div>`;
+    } else {
+      daysHTML = `<div class="stylist-days-box"><span class="stylist-day-pill" style="background:#a00;color:#fff;">No Days</span></div>`;
+    }
+
     // Add click handler for selection
     card.onclick = () => {
       if (stylist.available) {
         selectStylist(stylist.id);
       }
     };
-    
+
     card.innerHTML = `
       <strong class="stylist-name">${stylist.name}</strong>
       <p class="stylist-specialty">${stylist.specialty}</p>
+      ${daysHTML}
       <div>
         <span class="availability ${stylist.available ? 'available' : 'unavailable'}"></span>
         ${stylist.available ? 'Available' : 'Not Available'}
       </div>
     `;
-    
+
     stylistsGrid.appendChild(card);
   });
 }
@@ -335,16 +375,16 @@ function selectStylist(stylistId) {
   document.querySelectorAll('.stylist-card').forEach(card => {
     card.classList.remove('selected');
   });
-  
+
   // Select new stylist
   selectedStylist = stylists.find(s => s.id === stylistId);
-  
+
   // Add selection class to the clicked card
   const selectedCard = document.querySelector(`.stylist-card[data-stylist-id="${stylistId}"]`);
   if (selectedCard) {
     selectedCard.classList.add('selected');
   }
-  
+
   // Enable/disable next button
   updateNextButton();
 }
@@ -357,10 +397,8 @@ function updateNextButton() {
 // Next button handler
 nextBtn.onclick = () => {
   if (!selectedStylist) return;
-  
   // Store selected stylist in localStorage
   localStorage.setItem('selectedStylist', JSON.stringify(selectedStylist));
-  
   // Redirect to Select Date & Time page
   window.location.href = 'select-date-time.html';
 };
