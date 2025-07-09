@@ -10,6 +10,7 @@
       --fg: #fff;
       --accent: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
       --border-color: #444;
+      --card-bg: #1a1a1a;
     }
     * {
       margin: 0;
@@ -23,7 +24,8 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      padding-top: 120px;
+      padding-top: 100px;
+      line-height: 1.6;
     }
     .header-container {
       position: fixed;
@@ -32,37 +34,37 @@
       right: 0;
       background: #000;
       z-index: 100;
-      padding: 15px 0;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+      padding: 12px 0;
+      box-shadow: 0 2px 15px rgba(0,0,0,0.3);
+      border-bottom: 1px solid #333;
     }
     .step-heading {
       text-align: center;
-      margin: 5px 0 15px;
+      margin: 8px 0 16px;
       font-size: 20px;
       color: white;
-      word-break: break-word;
-      line-height: 1.1;
-      transition: font-size 0.2s;
+      font-weight: 600;
+      letter-spacing: 0.5px;
     }
     .btn-container {
       display: flex;
-      gap: 16px;
-      margin: 0 16px;
+      gap: 12px;
+      margin: 0 20px;
       padding: 0;
     }
     .btn-prev,
     .confirm-btn {
       flex: 1;
-      padding: 12px 24px;
+      padding: 14px 24px;
       border: none;
       border-radius: 8px;
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s ease;
     }
     .btn-prev {
-      background: #444;
+      background: #333;
       color: #fff;
     }
     .confirm-btn {
@@ -76,149 +78,103 @@
     }
     .container {
       flex: 1;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
+      padding: 20px;
+      max-width: 600px;
+      width: 100%;
+      margin: 0 auto;
     }
     .booking-card {
-      background: #111;
-      border-radius: 16px;
-      margin: 0 auto;
-      margin-top: 30px;
-      padding: 32px 20px;
-      max-width: 480px;
-      width: 100%;
-      box-shadow: 0 2px 24px rgba(0,0,0,0.25);
-      display: flex;
-      flex-direction: column;
-      gap: 32px;
-    }
-    .booking-section {
+      background: var(--card-bg);
+      border-radius: 12px;
+      overflow: hidden;
       margin-bottom: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+    .section-header {
+      padding: 16px 20px;
+      background: rgba(26, 35, 126, 0.1);
+      border-bottom: 1px solid #333;
     }
     .section-title {
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 12px;
-      padding: 0 8px;
-      color: #90caf9;
-    }
-    .booking-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-      justify-content: space-between;
-    }
-    .booking-item {
-      background: #222;
-      border-radius: 10px;
-      padding: 16px 14px;
-      min-width: 120px;
-      flex: 1 1 40%;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.09);
-    }
-    .item-label {
-      font-size: 13px;
-      color: #bbb;
-      margin-bottom: 8px;
-    }
-    .item-value {
       font-size: 16px;
-      font-weight: 500;
+      font-weight: 600;
+      color: #90caf9;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .section-content {
+      padding: 20px;
+    }
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #2a2a2a;
+    }
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+    .detail-label {
+      color: #aaa;
+      font-size: 14px;
+      min-width: 100px;
+    }
+    .detail-value {
       color: #fff;
-      word-break: break-word;
+      font-weight: 500;
+      text-align: right;
+      flex: 1;
+      padding-left: 10px;
     }
     .service-item {
-      background: #1a237e;
-      color: #fff;
+      background: rgba(26, 35, 126, 0.2);
       border-radius: 8px;
       padding: 16px;
       margin-bottom: 12px;
-      box-shadow: 0 1px 6px rgba(26,35,126,0.12);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
     }
-    .service-property {
+    .service-name {
+      font-weight: 600;
+      font-size: 16px;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+    .service-details {
       display: flex;
       justify-content: space-between;
       font-size: 14px;
-    }
-    .service-name {
-      font-weight: bold;
-      font-size: 16px;
-      margin-bottom: 8px;
+      color: #ccc;
     }
 
     /* MOBILE STYLES */
     @media (max-width: 600px) {
-      body {
-        padding-top: 120px;
-      }
-      .header-container {
-        padding: 15px 0;
+      .container {
+        padding: 15px;
       }
       .step-heading {
-        font-size: 13px;
-        margin: 4px 0 7px;
-        max-width: 95vw;
+        font-size: 18px;
+        margin: 5px 0 12px;
       }
       .btn-container {
-        gap: 8px;
-        margin: 0 5px 6px;
+        margin: 0 10px;
       }
       .btn-prev, .confirm-btn {
-        font-size: 11px;
-        padding: 8px 6px;
-        border-radius: 6px;
+        padding: 12px 10px;
+        font-size: 14px;
       }
-      .container {
-        padding: 2px;
+      .section-header {
+        padding: 14px 16px;
       }
-      .booking-card {
-        padding: 10px 3px;
-        max-width: 99vw;
-        margin-top: 8px;
-        border-radius: 10px;
-        gap: 12px;
+      .section-content {
+        padding: 16px;
       }
-      .section-title {
+      .detail-label {
         font-size: 13px;
-        margin-bottom: 5px;
-        padding: 0 3px;
       }
-      .booking-grid {
-        flex-direction: column;
-        gap: 6px;
-      }
-      .booking-item {
-        min-width: 60px;
-        padding: 7px 5px;
-        width: 100%;
-        margin-bottom: 4px;
-        border-radius: 6px;
-      }
-      .item-label {
-        font-size: 10px;
-        margin-bottom: 3px;
-      }
-      .item-value {
-        font-size: 13px;
+      .detail-value {
+        font-size: 14px;
       }
       .service-item {
-        padding: 10px 8px;
-        margin-bottom: 8px;
-        border-radius: 6px;
-      }
-      .service-property {
-        font-size: 11px;
-      }
-      .service-name {
-        font-size: 13px;
-        margin-bottom: 4px;
+        padding: 14px;
       }
     }
 
@@ -229,63 +185,78 @@
 </head>
 <body>
   <div class="header-container">
-    <h1 class="step-heading">Step 5: Confirm Booking</h1>
+    <h1 class="step-heading">Confirm Your Booking</h1>
     <div class="btn-container">
       <button class="btn-prev" onclick="window.history.back()">Back</button>
-      <button class="confirm-btn" id="confirmBtn">Confirm and Book Appointment</button>
+      <button class="confirm-btn" id="confirmBtn">Confirm Booking</button>
     </div>
   </div>
   <div class="container">
+    <!-- Service Details Section -->
     <div class="booking-card">
-      <div class="booking-section">
+      <div class="section-header">
         <h2 class="section-title">Service Details</h2>
-        <div id="servicesContainer"></div>
       </div>
-      <div class="booking-section">
-        <h2 class="section-title">Stylist</h2>
-        <div class="booking-grid">
-          <div class="booking-item">
-            <div class="item-label">Stylist</div>
-            <div class="item-value" id="stylistValue"></div>
-          </div>
-          <div class="booking-item">
-            <div class="item-label">Specialty</div>
-            <div class="item-value" id="stylistSpecialty"></div>
-          </div>
+      <div class="section-content" id="servicesContainer">
+        <!-- Services will be inserted here by JavaScript -->
+      </div>
+    </div>
+
+    <!-- Stylist Section -->
+    <div class="booking-card">
+      <div class="section-header">
+        <h2 class="section-title">Your Stylist</h2>
+      </div>
+      <div class="section-content" id="stylistContainer">
+        <div class="detail-row">
+          <span class="detail-label">Name</span>
+          <span class="detail-value" id="stylistValue">Not selected</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Specialty</span>
+          <span class="detail-value" id="stylistSpecialty">Not specified</span>
         </div>
       </div>
-      <div class="booking-section">
-        <h2 class="section-title">Date & Time</h2>
-        <div class="booking-grid">
-          <div class="booking-item">
-            <div class="item-label">Date</div>
-            <div class="item-value" id="dateValue"></div>
-          </div>
-          <div class="booking-item">
-            <div class="item-label">Time</div>
-            <div class="item-value" id="timeValue"></div>
-          </div>
-          <div class="booking-item">
-            <div class="item-label">Location</div>
-            <div class="item-value">BDM Salon, Main Street</div>
-          </div>
+    </div>
+
+    <!-- Date & Time Section -->
+    <div class="booking-card">
+      <div class="section-header">
+        <h2 class="section-title">Appointment</h2>
+      </div>
+      <div class="section-content">
+        <div class="detail-row">
+          <span class="detail-label">Date</span>
+          <span class="detail-value" id="dateValue">Not selected</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Time</span>
+          <span class="detail-value" id="timeValue">Not selected</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Location</span>
+          <span class="detail-value">BDM Salon, Main Street</span>
         </div>
       </div>
-      <div class="booking-section">
-        <h2 class="section-title">Personal Details</h2>
-        <div class="booking-grid">
-          <div class="booking-item">
-            <div class="item-label">Name</div>
-            <div class="item-value" id="nameValue"></div>
-          </div>
-          <div class="booking-item">
-            <div class="item-label">Phone</div>
-            <div class="item-value" id="phoneValue"></div>
-          </div>
-          <div class="booking-item">
-            <div class="item-label">Email</div>
-            <div class="item-value" id="emailValue"></div>
-          </div>
+    </div>
+
+    <!-- Personal Details Section -->
+    <div class="booking-card">
+      <div class="section-header">
+        <h2 class="section-title">Your Details</h2>
+      </div>
+      <div class="section-content">
+        <div class="detail-row">
+          <span class="detail-label">Name</span>
+          <span class="detail-value" id="nameValue">Not provided</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Phone</span>
+          <span class="detail-value" id="phoneValue">Not provided</span>
+        </div>
+        <div class="detail-value">
+          <span class="detail-label">Email</span>
+          <span class="detail-value" id="emailValue">Not provided</span>
         </div>
       </div>
     </div>
@@ -309,18 +280,16 @@
     const database = firebase.database();
   </script>
   <script>
-    // Function to show only the starting time in AM/PM
+    // Function to format time
     function formatTimeOnlyStart(timeStr) {
       if (!timeStr) return 'Not selected';
       let timePart = timeStr.split('-')[0].trim();
-      // If already in AM/PM, standardize
       if (/(AM|PM)$/i.test(timePart)) {
         let [h, mAP] = timePart.split(':');
         let m = mAP ? mAP.match(/\d+/)?.[0] || "00" : "00";
         let ap = mAP ? mAP.match(/(AM|PM)/i)?.[0].toUpperCase() : "";
         return `${h.padStart(2, '0')}:${m.padStart(2, '0')} ${ap}`;
       }
-      // If 24h format
       const [hours, minutes] = timePart.split(':');
       if (!hours || !minutes) return timePart;
       let h = parseInt(hours, 10);
@@ -329,92 +298,86 @@
       return `${hour12.toString().padStart(2, '0')}:${minutes.padStart(2, '0')} ${ampm}`;
     }
 
-    // DOM Elements
-    const servicesContainer = document.getElementById('servicesContainer');
-    const stylistValue = document.getElementById('stylistValue');
-    const stylistSpecialty = document.getElementById('stylistSpecialty');
-    const dateValue = document.getElementById('dateValue');
-    const timeValue = document.getElementById('timeValue');
-    const nameValue = document.getElementById('nameValue');
-    const phoneValue = document.getElementById('phoneValue');
-    const emailValue = document.getElementById('emailValue');
-    const confirmBtn = document.getElementById('confirmBtn');
+    // Format duration to be more readable
+    function formatDuration(duration) {
+      if (!duration) return "Not specified";
+      // Convert "1h 30m" to "1 hour 30 minutes" format
+      return duration
+        .replace(/(\d+)\s*h/gi, (_, p1) => p1 === '1' ? '1 hour' : `${p1} hours`)
+        .replace(/(\d+)\s*m/gi, (_, p1) => p1 === '1' ? '1 minute' : `${p1} minutes`);
+    }
 
     // Load booking details
     const loadBookingDetails = () => {
+      // Load services
       const servicesData = localStorage.getItem('selectedServices');
+      const servicesContainer = document.getElementById('servicesContainer');
+      
       if (servicesData) {
         try {
           const services = JSON.parse(servicesData);
           servicesContainer.innerHTML = '';
+          
           services.forEach(service => {
             const serviceItem = document.createElement('div');
-            serviceItem.classList.add('service-item');
+            serviceItem.className = 'service-item';
             serviceItem.innerHTML = `
               <div class="service-name">${service.name || "Not selected"}</div>
-              <div class="service-property">
-                <span>Duration:</span>
-                <span>${service.time || "Not selected"}</span>
-              </div>
-              <div class="service-property">
-                <span>Price:</span>
-                <span>${service.price || "Not selected"}</span>
+              <div class="service-details">
+                <span>${formatDuration(service.time)}</span>
+                <span>${service.price || "Price not available"}</span>
               </div>
             `;
             servicesContainer.appendChild(serviceItem);
           });
         } catch (e) {
           console.error("Error parsing services:", e);
-          servicesContainer.innerHTML = '<div class="booking-item">Error loading services</div>';
+          servicesContainer.innerHTML = '<div class="service-item">Error loading services</div>';
         }
       } else {
-        servicesContainer.innerHTML = '<div class="booking-item">No services selected</div>';
+        servicesContainer.innerHTML = '<div class="service-item">No services selected</div>';
       }
 
+      // Load stylist
       const stylistData = localStorage.getItem('selectedStylist');
       if (stylistData) {
         try {
           const stylist = JSON.parse(stylistData);
-          stylistValue.textContent = stylist.name || "Not selected";
-          stylistSpecialty.textContent = stylist.specialty || "Not specified";
+          document.getElementById('stylistValue').textContent = stylist.name || "Not selected";
+          document.getElementById('stylistSpecialty').textContent = stylist.specialty || "Not specified";
         } catch (e) {
           console.error("Error parsing stylist:", e);
-          stylistValue.textContent = "Error loading stylist";
-          stylistSpecialty.textContent = "Error loading specialty";
         }
-      } else {
-        stylistValue.textContent = "Not selected";
-        stylistSpecialty.textContent = "Not specified";
       }
 
+      // Load date and time
       const formattedDate = localStorage.getItem('formattedDate');
-      dateValue.textContent = formattedDate || "Not selected";
+      if (formattedDate) {
+        document.getElementById('dateValue').textContent = formattedDate;
+      }
 
       const selectedTime = localStorage.getItem('selectedTime');
-      timeValue.textContent = formatTimeOnlyStart(selectedTime) || "Not selected";
+      if (selectedTime) {
+        document.getElementById('timeValue').textContent = formatTimeOnlyStart(selectedTime);
+      }
 
+      // Load user details
       const userDetails = localStorage.getItem('userDetails');
       if (userDetails) {
         try {
           const user = JSON.parse(userDetails);
-          nameValue.textContent = user.name || "Not provided";
-          phoneValue.textContent = user.phone || "Not provided";
-          emailValue.textContent = user.email || "Not provided";
+          if (user.name) document.getElementById('nameValue').textContent = user.name;
+          if (user.phone) document.getElementById('phoneValue').textContent = user.phone;
+          if (user.email) document.getElementById('emailValue').textContent = user.email;
         } catch (e) {
           console.error("Error parsing user details:", e);
-          nameValue.textContent = "Error loading name";
-          phoneValue.textContent = "Error loading phone";
-          emailValue.textContent = "Error loading email";
         }
-      } else {
-        nameValue.textContent = "Not provided";
-        phoneValue.textContent = "Not provided";
-        emailValue.textContent = "Not provided";
       }
     };
 
     // Confirm booking function
     const confirmBooking = async () => {
+      const confirmBtn = document.getElementById('confirmBtn');
       const originalText = confirmBtn.textContent;
       confirmBtn.disabled = true;
       confirmBtn.textContent = 'Processing...';
@@ -465,8 +428,11 @@
       }
     };
 
-    document.addEventListener('DOMContentLoaded', loadBookingDetails);
-    confirmBtn.addEventListener('click', confirmBooking);
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', () => {
+      loadBookingDetails();
+      document.getElementById('confirmBtn').addEventListener('click', confirmBooking);
+    });
   </script>
 </body>
 </html>
