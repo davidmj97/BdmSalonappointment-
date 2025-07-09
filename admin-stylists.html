@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Stylists - BDM Salon</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --bg: #000;
+            --fg: #fff;
+            --card-bg: #111;
+            --accent: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+            --border-color: #333;
+            --text-muted: #bbb;
+            --success: #2e7d32;
+            --danger: #c62828;
+            --warning: #ff9800;
+            --primary-blue: #1a73e8;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--fg);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        .header-container {
+            background: #000;
+            padding: 15px 20px;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: start;
+            align-items: center;
+        }
+        .page-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: white;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 80px auto 20px;
+            padding: 0 15px;
+        }
+        .action-bar {
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        .btn-edit {
+            background: var(--warning);
+            color: #000;
+        }
+        .btn-secondary {
+            background: #444;
+            color: white;
+        }
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        .stylists-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 16px;
+            margin-top: 15px;
+        }
+        .stylist-card {
+            background: #111;
+            border-radius: 10px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            position: relative;
+            border: 2px solid var(--border-color);
+            transition: all 0.2s;
+        }
+        .stylist-name {
+            font-size: 16px;
+            font-weight: 700;
+            margin: 0;
+            color: #90caf9;
+        }
+        .stylist-specialty {
+            font-size: 12px;
+            color: #ccc;
+            line-height: 1.4;
+            margin: 0;
+        }
+        .stylist-days-box {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 2px;
+            margin-top: 2px;
+        }
+        .stylist-day-pill {
+            background: #222;
+            color: #87cefa;
+            border-radius: 6px;
+            padding: 3px 8px;
+            font-size: 11px;
+            display: inline-block;
+            border: 1px solid #1a237e;
+            letter-spacing: 0.5px;
+        }
+        .availability {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+        .available { background-color: #4CAF50; }
+        .unavailable { background-color: #F44336; }
+        .stylist-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-color);
+        }
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px 0;
+        }
+        .modal-content {
+            background: var(--card-bg);
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 95%;
+            max-width: 500px;
+            position: relative;
+        }
+        .close-modal {
+            position: absolute;
+            top: 15px; right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            background: none; border: none;
+            color: var(--text-muted);
+        }
+        .modal-title {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #90caf9;
+            font-weight: 600;
+        }
+        .form-group { margin-bottom: 15px; }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+        .form-control {
+            width: 100%;
+            padding: 8px 12px;
+            background: #222;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--fg);
+            font-size: 14px;
+        }
+        .form-control:focus {
+            outline: none; border-color: #1a73e8;
+        }
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px; height: 24px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px; width: 16px;
+            left: 4px; bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider { background-color: #4caf50; }
+        input:checked + .slider:before { transform: translateX(26px); }
+        .switch-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .switch-label { font-size: 14px; }
+        .days-selection { margin-top: 15px; }
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .day-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .day-checkbox input[type="checkbox"] {
+            width: 16px; height: 16px;
+        }
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top: 3px solid #3498db;
+            width: 20px; height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @media (max-width: 768px) {
+            .stylists-grid { grid-template-columns: 1fr; }
+            .action-bar { flex-direction: column; }
+            .btn { width: 100%; justify-content: center; }
+            .days-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header-container">
+        <div class="header-content">
+            <h1 class="page-title">Manage Stylists</h1>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="action-bar">
+            <button id="addStylistBtn" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add New Stylist
+            </button>
+        </div>
+        <div class="stylists-grid" id="stylistsGrid">
+            <div class="loading">Loading stylists...</div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Stylist Modal -->
+    <div id="stylistModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" type="button">&times;</button>
+            <h3 class="modal-title" id="modalTitle">Add New Stylist</h3>
+            <form id="stylistForm" autocomplete="off">
+                <input type="hidden" id="stylistId">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="specialty">Specialty</label>
+                    <input type="text" id="specialty" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Availability</label>
+                    <div class="switch-container">
+                        <label class="switch">
+                            <input type="checkbox" id="isAvailable" checked>
+                            <span class="slider"></span>
+                        </label>
+                        <span class="switch-label" id="availabilityLabel">Available</span>
+                    </div>
+                </div>
+                <div class="days-selection">
+                    <label>Available Days</label>
+                    <div class="days-grid" id="availableDays">
+                        <label class="day-checkbox">
+                            <input type="checkbox" name="days" value="Monday" checked>
+                            Monday
+                        </label>
+                        <label class="day-checkbox">
+                            <input type="checkbox" name="days" value="Tuesday" checked>
+                            Tuesday
+                        </label>
+                        <label class="day-checkbox">
+                            <input type="checkbox" name="days" value="Wednesday" checked>
+                            Wednesday
+                        </label>
+                        <label class="day-checkbox">
+                            <input type="checkbox" name="days" value="Thursday" checked>
+                            Thursday
+                        </label>
+                        <label class="day-checkbox">
+                            <input type="checkbox" name="days" value="Friday" checked>
+                            Friday
+                        </label>
+                        <label class="day-checkbox">
+                            <input type="checkbox" name="days" value="Saturday" checked>
+                            Saturday
+                        </label>
+                        <label class="day-checkbox">
+                            <input type="checkbox" name="days" value="Sunday">
+                            Sunday
+                        </label>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="saveBtn">Save Stylist</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <button class="close-modal" type="button">&times;</button>
+            <h3 class="modal-title">Confirm Deletion</h3>
+            <p>Are you sure you want to delete this stylist? This action cannot be undone.</p>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" id="cancelDeleteBtn">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAmimDsjW_pF2NGw-w-40QzTsgmf1tdqyI",
+            authDomain: "bdmsalonappointment.firebaseapp.com",
+            databaseURL: "https://bdmsalonappointment-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "bdmsalonappointment"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const stylistsRef = database.ref('stylists');
+
+        const stylistsGrid = document.getElementById('stylistsGrid');
+        const addStylistBtn = document.getElementById('addStylistBtn');
+        const stylistModal = document.getElementById('stylistModal');
+        const deleteModal = document.getElementById('deleteModal');
+        const closeModalBtns = document.querySelectorAll('.close-modal, #cancelBtn, #cancelDeleteBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+        const stylistForm = document.getElementById('stylistForm');
+        const isAvailableSwitch = document.getElementById('isAvailable');
+        const availabilityLabel = document.getElementById('availabilityLabel');
+        const modalTitle = document.getElementById('modalTitle');
+        const availableDaysContainer = document.getElementById('availableDays');
+
+        const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+        let selectedStylistId = null;
+        let isEditMode = false;
+
+        addStylistBtn.addEventListener('click', openAddModal);
+        stylistForm.addEventListener('submit', saveStylist);
+        isAvailableSwitch.addEventListener('change', updateAvailabilityLabel);
+        confirmDeleteBtn.addEventListener('click', deleteStylist);
+
+        window.addEventListener('click', (e) => {
+            if (e.target === stylistModal) closeModal(stylistModal);
+            if (e.target === deleteModal) closeModal(deleteModal);
+        });
+
+        closeModalBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (stylistModal.style.display === 'block') closeModal(stylistModal);
+                if (deleteModal.style.display === 'block') closeModal(deleteModal);
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', loadStylists);
+
+        function openAddModal() {
+            isEditMode = false;
+            selectedStylistId = null;
+            stylistForm.reset();
+            modalTitle.textContent = 'Add New Stylist';
+            saveBtn.textContent = 'Save Stylist';
+            document.getElementById('isAvailable').checked = true;
+            updateAvailabilityLabel();
+
+            // Check all days by default
+            document.querySelectorAll('#availableDays input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = true;
+            });
+
+            openModal(stylistModal);
+        }
+
+        function openEditModal(stylist) {
+            isEditMode = true;
+            selectedStylistId = stylist.id;
+            document.getElementById('stylistId').value = stylist.id;
+            document.getElementById('name').value = stylist.name || '';
+            document.getElementById('specialty').value = stylist.specialty || '';
+            document.getElementById('isAvailable').checked = stylist.available !== false;
+            updateAvailabilityLabel();
+            modalTitle.textContent = 'Edit Stylist';
+            saveBtn.textContent = 'Update Stylist';
+
+            // Set available days
+            if (stylist.availableDays) {
+                document.querySelectorAll('#availableDays input[type="checkbox"]').forEach(checkbox => {
+                    checkbox.checked = stylist.availableDays.includes(checkbox.value);
+                });
+            } else {
+                document.querySelectorAll('#availableDays input[type="checkbox"]').forEach(checkbox => {
+                    checkbox.checked = true;
+                });
+            }
+
+            openModal(stylistModal);
+        }
+
+        function openDeleteModal(stylistId) {
+            selectedStylistId = stylistId;
+            openModal(deleteModal);
+        }
+
+        function openModal(modal) {
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modal) {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function updateAvailabilityLabel() {
+            const isAvailable = isAvailableSwitch.checked;
+            availabilityLabel.textContent = isAvailable ? 'Available' : 'Not Available';
+        }
+
+        function loadStylists() {
+            stylistsGrid.innerHTML = '<div class="loading">Loading stylists...</div>';
+            stylistsRef.on('value', (snapshot) => {
+                const stylists = [];
+                snapshot.forEach((childSnapshot) => {
+                    const stylist = childSnapshot.val();
+                    stylist.id = childSnapshot.key;
+                    stylists.push(stylist);
+                });
+                renderStylists(stylists);
+            }, (error) => {
+                console.error('Error loading stylists:', error);
+                stylistsGrid.innerHTML = '<div class="error">Error loading stylists. Please try again.</div>';
+            });
+        }
+
+        function renderStylists(stylists) {
+            if (stylists.length === 0) {
+                stylistsGrid.innerHTML = '<div class="no-stylists">No stylists found. Click "Add New Stylist" to get started.</div>';
+                return;
+            }
+            stylists.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+            stylistsGrid.innerHTML = '';
+            stylists.forEach(stylist => {
+                const card = document.createElement('div');
+                card.className = 'stylist-card';
+                const availableDays = stylist.availableDays || [];
+                let daysHTML = '';
+                if (Array.isArray(availableDays) && availableDays.length > 0) {
+                    daysHTML = `<div class="stylist-days-box">${availableDays.map(day => `<span class="stylist-day-pill">${day}</span>`).join('')}</div>`;
+                } else {
+                    daysHTML = `<div class="stylist-days-box"><span class="stylist-day-pill" style="background:#a00;color:#fff;">No Days</span></div>`;
+                }
+                card.innerHTML = `
+                    <strong class="stylist-name">${stylist.name || 'Unnamed Stylist'}</strong>
+                    <p class="stylist-specialty">${stylist.specialty || 'No specialty specified'}</p>
+                    ${daysHTML}
+                    <div>
+                        <span class="availability ${stylist.available !== false ? 'available' : 'unavailable'}"></span>
+                        ${stylist.available !== false ? 'Available' : 'Not Available'}
+                    </div>
+                    <div class="stylist-actions">
+                        <button class="btn btn-edit edit-btn" data-id="${stylist.id}">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn btn-danger delete-btn" data-id="${stylist.id}">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                `;
+                const editBtn = card.querySelector('.edit-btn');
+                const deleteBtn = card.querySelector('.delete-btn');
+                editBtn.addEventListener('click', () => openEditModal(stylist));
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openDeleteModal(stylist.id);
+                });
+                stylistsGrid.appendChild(card);
+            });
+        }
+
+        function saveStylist(e) {
+            e.preventDefault();
+            const name = document.getElementById('name').value.trim();
+            const specialty = document.getElementById('specialty').value.trim();
+            const isAvailable = document.getElementById('isAvailable').checked;
+            const selectedDays = Array.from(document.querySelectorAll('#availableDays input[type="checkbox"]:checked'))
+                .map(checkbox => checkbox.value);
+            if (!name) {
+                alert('Please enter a name for the stylist');
+                return;
+            }
+            if (selectedDays.length === 0) {
+                alert('Please select at least one available day');
+                return;
+            }
+            const stylistData = {
+                name,
+                specialty,
+                available: isAvailable,
+                availableDays: selectedDays,
+                updatedAt: firebase.database.ServerValue.TIMESTAMP
+            };
+            const originalBtnText = saveBtn.innerHTML;
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<span class="spinner"></span> Saving...';
+            try {
+                if (isEditMode && selectedStylistId) {
+                    database.ref(`stylists/${selectedStylistId}`).update(stylistData)
+                        .then(() => {
+                            showNotification('Stylist updated successfully!', 'success');
+                            closeModal(stylistModal);
+                        })
+                        .catch((error) => {
+                            console.error('Error updating stylist:', error);
+                            showNotification('Failed to update stylist. Please try again.', 'error');
+                        })
+                        .finally(() => {
+                            saveBtn.disabled = false;
+                            saveBtn.innerHTML = originalBtnText;
+                        });
+                } else {
+                    stylistData.createdAt = firebase.database.ServerValue.TIMESTAMP;
+                    stylistsRef.push(stylistData)
+                        .then(() => {
+                            showNotification('Stylist added successfully!', 'success');
+                            closeModal(stylistModal);
+                        })
+                        .catch((error) => {
+                            console.error('Error adding stylist:', error);
+                            showNotification('Failed to add stylist. Please try again.', 'error');
+                        })
+                        .finally(() => {
+                            saveBtn.disabled = false;
+                            saveBtn.innerHTML = originalBtnText;
+                        });
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = originalBtnText;
+            }
+        }
+
+        function deleteStylist() {
+            if (!selectedStylistId) {
+                closeModal(deleteModal);
+                return;
+            }
+            const originalBtnText = confirmDeleteBtn.innerHTML;
+            confirmDeleteBtn.disabled = true;
+            confirmDeleteBtn.innerHTML = '<span class="spinner"></span> Deleting...';
+            database.ref(`stylists/${selectedStylistId}`).remove()
+                .then(() => {
+                    showNotification('Stylist deleted successfully!', 'success');
+                    closeModal(deleteModal);
+                })
+                .catch((error) => {
+                    console.error('Error deleting stylist:', error);
+                    showNotification('Failed to delete stylist. Please try again.', 'error');
+                })
+                .finally(() => {
+                    confirmDeleteBtn.disabled = false;
+                    confirmDeleteBtn.innerHTML = originalBtnText;
+                });
+        }
+
+        function showNotification(message, type = 'info') {
+            alert(`${type.toUpperCase()}: ${message}`);
+        }
+    </script>
+</body>
+</html>
