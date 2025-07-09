@@ -926,22 +926,23 @@
         document.getElementById('modal-time').textContent = formatTime(order.time) || 'N/A';
         document.getElementById('modal-stylist').textContent = order.stylist?.name || 'N/A';
         document.getElementById('modal-booking-time').textContent = order.createdAt ? (new Date(order.createdAt)).toLocaleString() : 'N/A';
-        const servicesContainer = document.getElementById('modal-services');
-        servicesContainer.innerHTML = '';
-        if (order.services && order.services.length) {
-            order.services.forEach(service => {
-                const serviceEl = document.createElement('div');
-                serviceEl.className = 'service-item';
-                serviceEl.innerHTML = `
-                    <div class="service-name">${service.name || 'N/A'}</div>
-                    <div>Duration: ${service.time || 'N/A'}</div>
-                    <div>Price: ${service.price || 'N/A'}</div>
-                `;
-                servicesContainer.appendChild(serviceEl);
-            });
-        } else {
-            servicesContainer.innerHTML = '<div class="service-item">No services selected</div>';
-        }
+      // In the openOrderModal function, update the services rendering part:
+const servicesContainer = document.getElementById('modal-services');
+servicesContainer.innerHTML = '';
+if (order.services && order.services.length) {
+    order.services.forEach(service => {
+        const serviceEl = document.createElement('div');
+        serviceEl.className = 'service-item';
+        serviceEl.innerHTML = `
+            <div class="service-name">${service.name || 'N/A'}</div>
+            <div>Duration: ${service.duration || service.time || 'N/A'}</div>
+            <div>Price: ${service.price || 'N/A'}</div>
+        `;
+        servicesContainer.appendChild(serviceEl);
+    });
+} else {
+    servicesContainer.innerHTML = '<div class="service-item">No services selected</div>';
+}
         const totalPrice = calculateTotal(order.services);
         document.getElementById('modal-total-price').textContent = formatPrice(totalPrice);
         const modalFooter = document.getElementById('modal-footer');
