@@ -95,10 +95,23 @@
       border-radius: 4px;
       transition: var(--transition);
       margin-left: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
     }
     
     .toggle-btn:hover {
       background: var(--sidebar-hover);
+    }
+    
+    .toggle-btn i {
+      transition: var(--transition);
+    }
+    
+    .sidebar.expanded .toggle-btn i {
+      transform: rotate(180deg);
     }
     
     .sidebar-menu {
@@ -213,82 +226,71 @@
     }
   </style>
 </head>
-<body>
-  <nav class="sidebar">
-    <div class="sidebar-header">
-      <h2>BDM Salon</h2>
-      <button class="toggle-btn" id="toggleSidebar">
-        <i class="fas fa-bars"></i>
-      </button>
-    </div>
-    <ul class="sidebar-menu">
-      <li>
-        <a class="sidebar-link active" id="menu-home">
-          <i class="fas fa-home"></i>
-          <span>Home</span>
-        </a>
-      </li>
-      <li>
-        <a class="sidebar-link" id="menu-orders">
-          <i class="fas fa-shopping-cart"></i>
-          <span>Orders</span>
-          <span class="menu-badge" id="newOrdersBadge">3</span>
-        </a>
-      </li>
-      <li>
-        <a class="sidebar-link" id="menu-stylists">
-          <i class="fas fa-user-friends"></i>
-          <span>Stylists</span>
-        </a>
-      </li>
-      <li>
-        <a class="sidebar-link" id="menu-slots">
-          <i class="fas fa-clock"></i>
-          <span>Slots</span>
-        </a>
-      </li>
-      <li>
-        <a class="sidebar-link" id="menu-services">
-          <i class="fas fa-cut"></i>
-          <span>Services</span>
-        </a>
-      </li>
-    </ul>
-  </nav>
-  
-  <main class="main-content">
-    <div id="pit-screen">
-      <!-- Content will be loaded here -->
-    </div>
-  </main>
+  <body>
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <h2>BDM Salon</h2>
+        <button class="toggle-btn" id="toggleSidebar">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+      <ul class="sidebar-menu">
+        <li>
+          <a class="sidebar-link active" href="admin-home.html">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+          </a>
+        </li>
+        <li>
+          <a class="sidebar-link" href="orders.html">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Orders</span>
+          </a>
+        </li>
+        <li>
+          <a class="sidebar-link" href="admin-stylists.html">
+            <i class="fas fa-user-friends"></i>
+            <span>Stylists</span>
+          </a>
+        </li>
+        <li>
+          <a class="sidebar-link" href="admin-slots.html">
+            <i class="fas fa-clock"></i>
+            <span>Slots</span>
+          </a>
+        </li>
+        <li>
+          <a class="sidebar-link" href="admin-services.html">
+            <i class="fas fa-cut"></i>
+            <span>Services</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
 
-  <script>
-    // DOM Elements
-    const toggleBtn = document.getElementById('toggleSidebar');
-    const sidebar = document.querySelector('.sidebar');
-    const newOrdersBadge = document.getElementById('newOrdersBadge');
-    
-    // Toggle sidebar
-    function toggleSidebar() {
-      sidebar.classList.toggle('expanded');
-      localStorage.setItem('sidebarExpanded', sidebar.classList.contains('expanded'));
-    }
-    
-    // Initialize sidebar state
-    if (localStorage.getItem('sidebarExpanded') === 'true') {
-      sidebar.classList.add('expanded');
-    }
-    
-    toggleBtn.addEventListener('click', toggleSidebar);
-    
-    // Close sidebar when clicking outside on mobile
-    document.addEventListener('click', (e) => {
-      if (window.innerWidth <= 992 && 
-          !sidebar.contains(e.target) && 
-          !e.target.classList.contains('toggle-btn')) {
-        sidebar.classList.remove('expanded');
+    <main class="main-content">
+      <div id="pit-screen">
+        <!-- Content will be loaded here -->
+      </div>
+    </main>
+
+    <script>
+      // DOM Elements
+      const toggleBtn = document.getElementById('toggleSidebar');
+      const sidebar = document.querySelector('.sidebar');
+
+      // Toggle sidebar
+      function toggleSidebar() {
+        console.log('Toggle button clicked');
+        sidebar.classList.toggle('expanded');
+        console.log('Sidebar expanded:', sidebar.classList.contains('expanded'));
       }
-    });
+
+      // Add click event listener to toggle button
+      toggleBtn.addEventListener('click', function() {
+        console.log('Adding click event listener');
+        toggleSidebar();
+      });
 
     // Sidebar navigation
     const sidebarLinks = document.querySelectorAll('.sidebar-link');
@@ -301,43 +303,26 @@
       }
     }
     
-    function loadContent(url) {
-      fetch(url)
-        .then(response => response.text())
-        .then(html => {
-          pitScreen.innerHTML = html;
-          if (url === 'home.html') {
-            initializeCharts();
-          }
-        })
-        .catch(err => {
-          console.error('Error loading content:', err);
-          pitScreen.innerHTML = `<div class="error">Error loading content. Please try again.</div>`;
-        });
+    // Sidebar navigation
+    const sidebarLinks = document.querySelectorAll('.sidebar-link');
+    
+    function setActiveLink(clickedLink) {
+      sidebarLinks.forEach(link => link.classList.remove('active'));
+      if (clickedLink) {
+        clickedLink.classList.add('active');
+      }
     }
 
     sidebarLinks.forEach(link => {
       link.addEventListener('click', function(e) {
         e.preventDefault();
         setActiveLink(this);
-        
-        const contentMap = {
-          'menu-home': 'home.html',
-          'menu-orders': 'orders.html',
-          'menu-stylists': 'stylists.html',
-          'menu-slots': 'slots.html',
-          'menu-services': 'services.html'
-        };
-        
-        const url = contentMap[this.id];
-        if (url) {
-          loadContent(url);
-        }
+        window.location.href = this.getAttribute('href');
       });
     });
 
-    // Initialize with home content
-    loadContent('home.html');
+    // Initialize with home page
+    window.location.href = 'admin-home.html';
   </script>
 </body>
 </html>
