@@ -33,6 +33,7 @@
       display: flex;
       min-height: 100vh;
     }
+    /* --- SIDEBAR GOES IN FRONT OF HEADER --- */
     .sidebar {
       position: fixed;
       left: 0; top: 0; bottom: 0;
@@ -40,7 +41,7 @@
       background: var(--sidebar-bg);
       color: var(--sidebar-text);
       transition: var(--transition);
-      z-index: 100;
+      z-index: 102; /* higher than header's 101 */
       display: flex;
       flex-direction: column;
       height: 100vh;
@@ -146,6 +147,7 @@
     .sidebar.collapsed ~ .main-content {
       margin-left: var(--sidebar-collapsed-width);
     }
+    /* --- HEADER IS UNDER SIDEBAR NOW --- */
     .top-header {
       position: fixed;
       left: 0;
@@ -154,13 +156,14 @@
       height: var(--header-height);
       background: #161a22;
       color: #fff;
-      z-index: 101;
+      z-index: 101; /* lower than sidebar */
       padding-left: var(--sidebar-width);
       display: flex;
       align-items: center;
       justify-content: flex-end;
       border-bottom: 1px solid #23272f;
       transition: padding-left var(--transition);
+      /* No pointer-events: none; header is still interactive */
     }
     .sidebar.collapsed ~ .top-header {
       padding-left: var(--sidebar-collapsed-width);
@@ -202,6 +205,7 @@
         left: -220px;
         width: var(--sidebar-width);
         transition: left var(--transition), width var(--transition);
+        z-index: 102;
       }
       .sidebar.collapsed {
         left: 0;
