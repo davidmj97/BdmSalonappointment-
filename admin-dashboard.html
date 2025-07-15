@@ -1,220 +1,419 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BDM Salon Admin Dashboard</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        :root {
-            --sidebar-bg: #121212;
-            --sidebar-hover: #2a2a2a;
-            --sidebar-active: #1a73e8;
-            --main-bg: #1e1e1e;
-            --text-color: #ffffff;
-            --transition: all 0.3s ease;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background: var(--main-bg);
-            color: var(--text-color);
-            display: flex;
-            min-height: 100vh;
-        }
-
-        .sidebar {
-            width: 70px;
-            background: var(--sidebar-bg);
-            position: fixed;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            padding: 20px 0;
-            transition: var(--transition);
-        }
-
-        .sidebar.expanded {
-            width: 250px;
-        }
-
-        .toggle-btn {
-            background: none;
-            border: none;
-            color: var(--text-color);
-            font-size: 1.5rem;
-            padding: 10px;
-            cursor: pointer;
-            border-radius: 5px;
-            margin-left: auto;
-        }
-
-        .nav-item {
-            padding: 15px 20px;
-            display: flex;
-            align-items: center;
-            color: var(--text-color);
-            text-decoration: none;
-            transition: var(--transition);
-            border-radius: 5px;
-            margin: 5px 0;
-        }
-
-        .nav-item:hover {
-            background: var(--sidebar-hover);
-        }
-
-        .nav-item.active {
-            background: var(--sidebar-active);
-            color: white;
-        }
-
-        .nav-item i {
-            margin-right: 15px;
-            width: 24px;
-            text-align: center;
-        }
-
-        .nav-item span {
-            opacity: 0;
-            width: 0;
-            transition: var(--transition);
-        }
-
-        .sidebar.expanded .nav-item span {
-            opacity: 1;
-            width: auto;
-        }
-
-        .main-content {
-            flex: 1;
-            margin-left: 70px;
-            padding: 20px;
-            transition: var(--transition);
-        }
-
-        .sidebar.expanded ~ .main-content {
-            margin-left: 250px;
-        }
-
-        .page-content {
-            display: none;
-            min-height: 80vh;
-        }
-
-        .page-content.active {
-            display: block;
-        }
-
-        .card {
-            background: var(--sidebar-bg);
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        }
-
-        .card h3 {
-            color: var(--sidebar-active);
-            margin-bottom: 15px;
-        }
-
-        .blue-btn {
-            background: var(--sidebar-active);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .blue-btn:hover {
-            background: #1557b0;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin Dashboard</title>
+  <style>
+    :root {
+      --sidebar-width: 220px;
+      --sidebar-collapsed-width: 60px;
+      --sidebar-bg: #111;
+      --sidebar-text: #fff;
+      --main-bg: #181c20;
+      --btn-gradient: linear-gradient(90deg, #233dff 0%, #1a237e 100%);
+      --btn-hover: linear-gradient(90deg, #1a237e 0%, #233dff 100%);
+      --transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+      --border-radius: 10px;
+      --header-height: 68px;
+      --badge-bg: #2979ff;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0; padding: 0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+    }
+    html, body {
+      height: 100%;
+      background: var(--main-bg);
+      color: var(--sidebar-text);
+      min-height: 100vh;
+    }
+    body {
+      display: flex;
+      min-height: 100vh;
+    }
+    .sidebar {
+      position: fixed;
+      left: 0; top: 0; bottom: 0;
+      width: var(--sidebar-width);
+      background: var(--sidebar-bg);
+      color: var(--sidebar-text);
+      transition: var(--transition);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    .sidebar.collapsed {
+      width: var(--sidebar-collapsed-width);
+    }
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 20px 16px 20px;
+      background: #181c20;
+      border-bottom: 1px solid #222;
+      height: var(--header-height);
+      min-height: var(--header-height);
+    }
+    .sidebar-logo {
+      font-size: 1.3em;
+      font-weight: bold;
+      letter-spacing: 2px;
+      opacity: 0.9;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+    .sidebar.collapsed .sidebar-logo {
+      opacity: 0;
+      width: 0;
+      overflow: hidden;
+      transition: var(--transition);
+    }
+    .sidebar-toggle {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1.7em;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .sidebar-toggle:focus { outline: none; }
+    .sidebar-menu {
+      display: flex;
+      flex-direction: column;
+      padding: 18px 0;
+      gap: 6px;
+      flex: 1;
+    }
+    .sidebar-menu button {
+      background: none;
+      border: none;
+      color: var(--sidebar-text);
+      text-align: left;
+      padding: 14px 28px;
+      font-size: 1.04em;
+      width: 100%;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: background 0.15s, color 0.15s, font-weight 0.2s;
+      font-weight: 400;
+      position: relative;
+    }
+    .sidebar-menu button.active,
+    .sidebar-menu button:hover {
+      background: var(--btn-gradient);
+      color: #fff;
+      font-weight: 600;
+    }
+    .sidebar.collapsed .sidebar-menu button span.label {
+      display: none;
+    }
+    .sidebar.collapsed .sidebar-menu button {
+      justify-content: center;
+      padding: 14px 0;
+    }
+    .sidebar-footer {
+      padding: 24px 20px;
+      font-size: 0.85em;
+      opacity: 0.7;
+      text-align: center;
+      border-top: 1px solid #222;
+      transition: opacity 0.2s;
+    }
+    .sidebar.collapsed .sidebar-footer {
+      opacity: 0;
+      height: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    .main-content {
+      margin-left: var(--sidebar-width);
+      padding: calc(var(--header-height) + 20px) 32px 32px 32px;
+      flex: 1;
+      min-height: 100vh;
+      background: var(--main-bg);
+      transition: margin-left var(--transition), padding var(--transition);
+      overflow: auto;
+      width: 100%;
+      position: relative;
+    }
+    .sidebar.collapsed ~ .main-content {
+      margin-left: var(--sidebar-collapsed-width);
+    }
+    .top-header {
+      position: fixed;
+      left: 0;
+      top: 0;
+      right: 0;
+      height: var(--header-height);
+      background: #161a22;
+      color: #fff;
+      z-index: 101;
+      padding-left: var(--sidebar-width);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      border-bottom: 1px solid #23272f;
+      transition: padding-left var(--transition);
+    }
+    .sidebar.collapsed ~ .top-header {
+      padding-left: var(--sidebar-collapsed-width);
+    }
+    .header-title {
+      font-size: 1.2em;
+      font-weight: bold;
+      margin-right: auto;
+      margin-left: 24px;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+    }
+    .header-orders {
+      display: flex;
+      align-items: center;
+      margin-right: 36px;
+      position: relative;
+    }
+    .order-icon {
+      font-size: 2em;
+      color: #fff;
+      margin-right: 10px;
+    }
+    .order-badge {
+      background: var(--badge-bg);
+      color: #fff;
+      font-weight: bold;
+      font-size: 1em;
+      border-radius: 22px;
+      padding: 2px 14px;
+      box-shadow: 0 2px 8px 0 rgba(24, 40, 128, 0.17);
+      margin-left: 6px;
+      display: inline-block;
+    }
+    /* Responsive styles */
+    @media (max-width: 900px) {
+      .sidebar {
+        left: -220px;
+        width: var(--sidebar-width);
+        transition: left var(--transition), width var(--transition);
+      }
+      .sidebar.collapsed {
+        left: 0;
+        width: var(--sidebar-width);
+      }
+      .main-content {
+        margin-left: 0;
+        transition: margin-left var(--transition);
+        padding: calc(var(--header-height) + 12px) 6vw 32px 6vw;
+      }
+      .sidebar ~ .main-content {
+        margin-left: 0;
+      }
+      .top-header {
+        padding-left: 0;
+        transition: padding-left var(--transition);
+      }
+      .sidebar.collapsed ~ .top-header {
+        padding-left: 0;
+      }
+    }
+    @media (max-width: 600px) {
+      .main-content {
+        padding: calc(var(--header-height) + 8px) 4vw 10vw 4vw;
+      }
+      .sidebar-footer { display: none; }
+      .header-title { margin-left: 8px; }
+      .header-orders { margin-right: 10px; }
+    }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-thumb { background: #262c35; border-radius: 6px; }
+    ::-webkit-scrollbar-track { background: #16181b; }
+    /* Button gradient styles */
+    .btn {
+      background: var(--btn-gradient);
+      color: #fff;
+      border: none;
+      border-radius: var(--border-radius);
+      padding: 10px 32px;
+      font-size: 1em;
+      font-weight: 600;
+      margin-top: 24px;
+      cursor: pointer;
+      transition: background 0.2s;
+      box-shadow: 0 2px 8px 0 rgba(24, 40, 128, 0.17);
+    }
+    .btn:hover {
+      background: var(--btn-hover);
+    }
+    /* Sidebar icons */
+    .sidebar-menu .icon {
+      font-size: 1.5em;
+      display: inline-block;
+      width: 24px;
+      text-align: center;
+      opacity: 0.78;
+      margin-right: 4px;
+    }
+    /* Hide shadows for iframe */
+    .iframe-content {
+      border: none;
+      width: 100%;
+      min-height: calc(100vh - var(--header-height) - 40px);
+      background: transparent;
+      display: block;
+      border-radius: var(--border-radius);
+      margin-top: 0;
+      transition: box-shadow 0.2s;
+      box-shadow: none;
+    }
+  </style>
+  <!-- Google Material Icons CDN -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
-    <div class="sidebar">
-        <div class="logo">
-            <button class="toggle-btn" onclick="toggleSidebar()">
-                <i class="fas fa-bars"></i>
-            </button>
-        </div>
-
-        <a href="#" class="nav-item" onclick="loadPage('home')">
-            <i class="fas fa-home"></i>
-            <span>Home</span>
-        </a>
-
-        <a href="#" class="nav-item" onclick="loadPage('orders')">
-            <i class="fas fa-shopping-cart"></i>
-            <span>Orders</span>
-        </a>
-
-        <a href="#" class="nav-item" onclick="loadPage('stylists')">
-            <i class="fas fa-user-tie"></i>
-            <span>Stylists</span>
-        </a>
-
-        <a href="#" class="nav-item" onclick="loadPage('slots')">
-            <i class="fas fa-clock"></i>
-            <span>Slots</span>
-        </a>
-
-        <a href="#" class="nav-item" onclick="loadPage('services')">
-            <i class="fas fa-cut"></i>
-            <span>Services</span>
-        </a>
+  <!-- Sidebar -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <span class="sidebar-logo">ADMIN</span>
+      <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle Sidebar">
+        <span class="material-icons" id="toggleIcon">menu</span>
+      </button>
     </div>
-
-    <div class="main-content">
-        <div class="content-area">
-            <!-- Content will be loaded here dynamically -->
-        </div>
+    <div class="sidebar-menu" id="sidebarMenu">
+      <button class="active" data-page="home">
+        <span class="icon material-icons">home</span>
+        <span class="label">Home</span>
+      </button>
+      <button data-page="orders">
+        <span class="icon material-icons">receipt_long</span>
+        <span class="label">Orders</span>
+      </button>
+      <button data-page="stylists">
+        <span class="icon material-icons">people</span>
+        <span class="label">Stylists</span>
+      </button>
+      <button data-page="slots">
+        <span class="icon material-icons">event</span>
+        <span class="label">Slots</span>
+      </button>
+      <button data-page="services">
+        <span class="icon material-icons">build</span>
+        <span class="label">Services</span>
+      </button>
     </div>
+    <div class="sidebar-footer">
+      &copy; 2025 Admin Dashboard
+    </div>
+  </nav>
 
-    <script>
-        function toggleSidebar() {
-            document.querySelector('.sidebar').classList.toggle('expanded');
+  <!-- Top Header -->
+  <header class="top-header" id="topHeader">
+    <span class="header-title">Admin Dashboard</span>
+    <div class="header-orders">
+      <span class="order-icon material-icons">notifications</span>
+      <span class="order-badge" id="orderBadge">5</span>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content" id="mainContent">
+    <iframe src="admin-home.html" id="pageFrame" class="iframe-content" frameborder="0"></iframe>
+  </main>
+
+  <script>
+    // Sidebar open/close for desktop & mobile
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const toggleIcon = document.getElementById('toggleIcon');
+    const mainContent = document.getElementById('mainContent');
+    const topHeader = document.getElementById('topHeader');
+    let sidebarOpen = true; // true: open (desktop), false: closed/minimized
+
+    // Responsive: On mobile, sidebar is hidden by default
+    function isMobile() {
+      return window.innerWidth <= 900;
+    }
+    function setSidebarState(open) {
+      sidebarOpen = open;
+      if (isMobile()) {
+        sidebar.classList.toggle('collapsed', open);
+        // Top header stays full width
+        topHeader.classList.toggle('sidebar-collapsed', false);
+        toggleIcon.textContent = open ? 'close' : 'menu';
+      } else {
+        sidebar.classList.toggle('collapsed', !open);
+        topHeader.classList.toggle('sidebar-collapsed', !open);
+        toggleIcon.textContent = !open ? 'menu' : 'close';
+      }
+    }
+    sidebarToggle.addEventListener('click', () => {
+      setSidebarState(isMobile() ? !sidebar.classList.contains('collapsed') : sidebar.classList.contains('collapsed'));
+    });
+    // Close sidebar on mobile if click outside
+    document.addEventListener('click', (e) => {
+      if (isMobile() && sidebar.classList.contains('collapsed')) {
+        if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
+          setSidebarState(false);
         }
+      }
+    });
+    // Open sidebar on resize if desktop, close if mobile
+    window.addEventListener('resize', () => {
+      setSidebarState(!isMobile());
+    });
+    // On load, set correct sidebar state
+    window.addEventListener('DOMContentLoaded', () => {
+      setSidebarState(!isMobile());
+    });
 
-        function loadPage(page) {
-            // Update active navigation item
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            event.currentTarget.classList.add('active');
+    // Sidebar navigation and content loading
+    const menuBtns = document.querySelectorAll('.sidebar-menu button');
+    const pageFrame = document.getElementById('pageFrame');
 
-            // Load the content from the corresponding HTML file
-            const contentArea = document.querySelector('.content-area');
-            const pageFile = `${page}.html`;
-            
-            fetch(pageFile)
-                .then(response => response.text())
-                .then(html => {
-                    contentArea.innerHTML = html;
-                })
-                .catch(error => {
-                    contentArea.innerHTML = `<div class="card">
-                        <h3>Error</h3>
-                        <p>Failed to load ${pageFile}</p>
-                    </div>`;
-                });
+    const pageMap = {
+      home: "admin-home.html",
+      orders: "orders.html",
+      stylists: "admin-stylists.html",
+      slots: "admin-slots.html",
+      services: "admin-services.html"
+    };
+
+    menuBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Active class for button
+        menuBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        // Show relevant page in iframe
+        const pageKey = btn.getAttribute('data-page');
+        const src = pageMap[pageKey];
+        if (src) {
+          pageFrame.src = src;
         }
+        // On mobile, auto close sidebar after click
+        if (isMobile()) setSidebarState(false);
+      });
+    });
 
-        // Load home page by default
-        window.onload = function() {
-            document.querySelector('.content-area').innerHTML = `
-                <div class="card">
-                    <h3>Welcome to BDM Salon Admin Dashboard</h3>
-                    <p>Manage your salon operations efficiently with our admin dashboard.</p>
-                </div>`;
-        }
-    </script>
+    // Demo: update order badge (simulate new orders)
+    // In production, fetch this from server or WebSocket
+    let orderCount = 5;
+    const orderBadge = document.getElementById('orderBadge');
+    function setOrderCount(n) {
+      orderCount = n;
+      orderBadge.textContent = n;
+      // Hide if 0
+      orderBadge.style.display = (n > 0) ? "inline-block" : "none";
+    }
+    // Example: Simulate new orders every 20 seconds
+    // setInterval(() => setOrderCount(orderCount + 1), 20000);
+    setOrderCount(orderCount);
+  </script>
 </body>
 </html>
