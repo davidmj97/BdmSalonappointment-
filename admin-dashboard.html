@@ -49,6 +49,14 @@
     .sidebar.collapsed {
       width: var(--sidebar-collapsed-width);
     }
+    .sidebar.mobile-hidden {
+      left: -220px !important;
+      transition: left var(--transition), width var(--transition);
+    }
+    .sidebar.mobile-visible {
+      left: 0 !important;
+      transition: left var(--transition), width var(--transition);
+    }
     .sidebar-header {
       display: flex;
       align-items: center;
@@ -163,7 +171,6 @@
       justify-content: flex-end;
       border-bottom: 1px solid #23272f;
       transition: padding-left var(--transition);
-      /* No pointer-events: none; header is still interactive */
     }
     .sidebar.collapsed ~ .top-header {
       padding-left: var(--sidebar-collapsed-width);
@@ -199,6 +206,16 @@
       margin-left: 6px;
       display: inline-block;
     }
+    .header-new-orders {
+      font-size: 1em;
+      color: #2979ff;
+      font-weight: 600;
+      margin-right: 16px;
+      margin-left: 10px;
+      letter-spacing: 1px;
+      display: inline-block;
+      vertical-align: middle;
+    }
     /* Responsive styles */
     @media (max-width: 900px) {
       .sidebar {
@@ -207,8 +224,8 @@
         transition: left var(--transition), width var(--transition);
         z-index: 102;
       }
-      .sidebar.collapsed {
-        left: 0;
+      .sidebar.mobile-visible {
+        left: 0 !important;
         width: var(--sidebar-width);
       }
       .main-content {
@@ -226,6 +243,10 @@
       .sidebar.collapsed ~ .top-header {
         padding-left: 0;
       }
+      .sidebar.collapsed {
+        /* On mobile, collapse does not affect width, only left position */
+        width: var(--sidebar-width) !important;
+      }
     }
     @media (max-width: 600px) {
       .main-content {
@@ -234,6 +255,7 @@
       .sidebar-footer { display: none; }
       .header-title { margin-left: 8px; }
       .header-orders { margin-right: 10px; }
+      .header-new-orders { margin-right: 4px; }
     }
     /* Custom scrollbar */
     ::-webkit-scrollbar { width: 8px; }
@@ -287,7 +309,7 @@
     <div class="sidebar-header">
       <span class="sidebar-logo">ADMIN</span>
       <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle Sidebar">
-        <span class="material-icons" id="toggleIcon">menu</span>
+        <span id="toggleIcon">☰</span>
       </button>
     </div>
     <div class="sidebar-menu" id="sidebarMenu">
@@ -321,6 +343,7 @@
   <header class="top-header" id="topHeader">
     <span class="header-title">Admin Dashboard</span>
     <div class="header-orders">
+      <span class="header-new-orders">New Orders</span>
       <span class="order-icon material-icons">notifications</span>
       <span class="order-badge" id="orderBadge">5</span>
     </div>
@@ -340,38 +363,57 @@
     const topHeader = document.getElementById('topHeader');
     let sidebarOpen = true; // true: open (desktop), false: closed/minimized
 
-    // Responsive: On mobile, sidebar is hidden by default
+    // Helper to check if on mobile viewport
     function isMobile() {
       return window.innerWidth <= 900;
     }
+
     function setSidebarState(open) {
       sidebarOpen = open;
       if (isMobile()) {
-        sidebar.classList.toggle('collapsed', open);
-        // Top header stays full width
-        topHeader.classList.toggle('sidebar-collapsed', false);
-        toggleIcon.textContent = open ? 'close' : 'menu';
+        // On mobile, use classes to slide sidebar in and out
+        if (open) {
+          sidebar.classList.add('mobile-visible');
+          sidebar.classList.remove('mobile-hidden');
+        } else {
+          sidebar.classList.remove('mobile-visible');
+          sidebar.classList.add('mobile-hidden');
+        }
+        // Always show hamburger on mobile
+        toggleIcon.textContent = "☰";
       } else {
+        // Desktop: collapse/expand
+        sidebar.classList.remove('mobile-visible','mobile-hidden');
         sidebar.classList.toggle('collapsed', !open);
         topHeader.classList.toggle('sidebar-collapsed', !open);
-        toggleIcon.textContent = !open ? 'menu' : 'close';
+        toggleIcon.textContent = "☰";
       }
     }
-    sidebarToggle.addEventListener('click', () => {
-      setSidebarState(isMobile() ? !sidebar.classList.contains('collapsed') : sidebar.classList.contains('collapsed'));
+
+    // Toggle sidebar when clicking the toggle button
+    sidebarToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (isMobile()) {
+        setSidebarState(!sidebar.classList.contains('mobile-visible'));
+      } else {
+        setSidebarState(sidebar.classList.contains('collapsed'));
+      }
     });
+
     // Close sidebar on mobile if click outside
     document.addEventListener('click', (e) => {
-      if (isMobile() && sidebar.classList.contains('collapsed')) {
+      if (isMobile() && sidebar.classList.contains('mobile-visible')) {
         if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
           setSidebarState(false);
         }
       }
     });
-    // Open sidebar on resize if desktop, close if mobile
+
+    // Open/close sidebar on resize
     window.addEventListener('resize', () => {
       setSidebarState(!isMobile());
     });
+
     // On load, set correct sidebar state
     window.addEventListener('DOMContentLoaded', () => {
       setSidebarState(!isMobile());
@@ -406,17 +448,13 @@
     });
 
     // Demo: update order badge (simulate new orders)
-    // In production, fetch this from server or WebSocket
     let orderCount = 5;
     const orderBadge = document.getElementById('orderBadge');
     function setOrderCount(n) {
       orderCount = n;
       orderBadge.textContent = n;
-      // Hide if 0
       orderBadge.style.display = (n > 0) ? "inline-block" : "none";
     }
-    // Example: Simulate new orders every 20 seconds
-    // setInterval(() => setOrderCount(orderCount + 1), 20000);
     setOrderCount(orderCount);
   </script>
 </body>
