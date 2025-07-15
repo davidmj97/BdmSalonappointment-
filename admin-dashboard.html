@@ -17,6 +17,7 @@
       --border-radius: 10px;
       --header-height: 68px;
       --badge-bg: #2979ff;
+      --sidebar-z: 102;
     }
     * {
       box-sizing: border-box;
@@ -33,7 +34,6 @@
       display: flex;
       min-height: 100vh;
     }
-    /* --- SIDEBAR GOES IN FRONT OF HEADER --- */
     .sidebar {
       position: fixed;
       left: 0; top: 0; bottom: 0;
@@ -41,21 +41,13 @@
       background: var(--sidebar-bg);
       color: var(--sidebar-text);
       transition: var(--transition);
-      z-index: 102; /* higher than header's 101 */
+      z-index: var(--sidebar-z);
       display: flex;
       flex-direction: column;
       height: 100vh;
     }
     .sidebar.collapsed {
       width: var(--sidebar-collapsed-width);
-    }
-    .sidebar.mobile-hidden {
-      left: -220px !important;
-      transition: left var(--transition), width var(--transition);
-    }
-    .sidebar.mobile-visible {
-      left: 0 !important;
-      transition: left var(--transition), width var(--transition);
     }
     .sidebar-header {
       display: flex;
@@ -88,6 +80,7 @@
       font-size: 1.7em;
       cursor: pointer;
       transition: color 0.2s;
+      z-index: 200;
     }
     .sidebar-toggle:focus { outline: none; }
     .sidebar-menu {
@@ -155,7 +148,6 @@
     .sidebar.collapsed ~ .main-content {
       margin-left: var(--sidebar-collapsed-width);
     }
-    /* --- HEADER IS UNDER SIDEBAR NOW --- */
     .top-header {
       position: fixed;
       left: 0;
@@ -164,7 +156,7 @@
       height: var(--header-height);
       background: #161a22;
       color: #fff;
-      z-index: 101; /* lower than sidebar */
+      z-index: 101;
       padding-left: var(--sidebar-width);
       display: flex;
       align-items: center;
@@ -218,41 +210,75 @@
     }
     /* Responsive styles */
     @media (max-width: 900px) {
+      /* SIDEBAR: show only icons by default, expand on .expanded */
       .sidebar {
-        left: -220px;
+        left: 0;
+        width: var(--sidebar-collapsed-width);
+        z-index: var(--sidebar-z);
+        transition: width var(--transition), left var(--transition);
+      }
+      .sidebar.expanded {
         width: var(--sidebar-width);
-        transition: left var(--transition), width var(--transition);
-        z-index: 102;
-      }
-      .sidebar.mobile-visible {
-        left: 0 !important;
-        width: var(--sidebar-width);
-      }
-      .main-content {
-        margin-left: 0;
-        transition: margin-left var(--transition);
-        padding: calc(var(--header-height) + 12px) 6vw 32px 6vw;
-      }
-      .sidebar ~ .main-content {
-        margin-left: 0;
-      }
-      .top-header {
-        padding-left: 0;
-        transition: padding-left var(--transition);
-      }
-      .sidebar.collapsed ~ .top-header {
-        padding-left: 0;
       }
       .sidebar.collapsed {
-        /* On mobile, collapse does not affect width, only left position */
-        width: var(--sidebar-width) !important;
+        width: var(--sidebar-collapsed-width);
+      }
+      .sidebar-logo {
+        opacity: 0;
+        width: 0;
+        overflow: hidden;
+      }
+      .sidebar.expanded .sidebar-logo {
+        opacity: 0.9;
+        width: auto;
+        overflow: visible;
+      }
+      .sidebar-menu button span.label {
+        display: none;
+      }
+      .sidebar.expanded .sidebar-menu button span.label {
+        display: inline;
+      }
+      .sidebar-menu button {
+        justify-content: center;
+        padding: 14px 0;
+        gap: 0;
+      }
+      .sidebar.expanded .sidebar-menu button {
+        justify-content: flex-start;
+        padding: 14px 28px;
+        gap: 14px;
+      }
+      .sidebar-footer {
+        opacity: 0;
+        height: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+      .sidebar.expanded .sidebar-footer {
+        opacity: 0.7;
+        height: auto;
+        padding: 24px 20px;
+        overflow: visible;
+      }
+      .main-content {
+        margin-left: var(--sidebar-collapsed-width);
+        padding: calc(var(--header-height) + 12px) 6vw 32px 6vw;
+      }
+      .sidebar.expanded ~ .main-content {
+        margin-left: var(--sidebar-width);
+      }
+      .top-header {
+        padding-left: var(--sidebar-collapsed-width);
+      }
+      .sidebar.expanded ~ .top-header {
+        padding-left: var(--sidebar-width);
       }
     }
     @media (max-width: 600px) {
       .main-content {
         padding: calc(var(--header-height) + 8px) 4vw 10vw 4vw;
       }
-      .sidebar-footer { display: none; }
       .header-title { margin-left: 8px; }
       .header-orders { margin-right: 10px; }
       .header-new-orders { margin-right: 4px; }
@@ -298,6 +324,12 @@
       margin-top: 0;
       transition: box-shadow 0.2s;
       box-shadow: none;
+    }
+    /* Hamburger always visible on mobile */
+    @media (max-width: 900px) {
+      .sidebar-toggle {
+        display: block;
+      }
     }
   </style>
   <!-- Google Material Icons CDN -->
@@ -361,32 +393,19 @@
     const toggleIcon = document.getElementById('toggleIcon');
     const mainContent = document.getElementById('mainContent');
     const topHeader = document.getElementById('topHeader');
-    let sidebarOpen = true; // true: open (desktop), false: closed/minimized
 
-    // Helper to check if on mobile viewport
+    // Responsive: On mobile, sidebar is collapsed (icons only) by default
     function isMobile() {
       return window.innerWidth <= 900;
     }
 
-    function setSidebarState(open) {
-      sidebarOpen = open;
+    function setSidebarState(expanded) {
       if (isMobile()) {
-        // On mobile, use classes to slide sidebar in and out
-        if (open) {
-          sidebar.classList.add('mobile-visible');
-          sidebar.classList.remove('mobile-hidden');
-        } else {
-          sidebar.classList.remove('mobile-visible');
-          sidebar.classList.add('mobile-hidden');
-        }
-        // Always show hamburger on mobile
-        toggleIcon.textContent = "☰";
+        sidebar.classList.toggle('expanded', expanded);
       } else {
-        // Desktop: collapse/expand
-        sidebar.classList.remove('mobile-visible','mobile-hidden');
-        sidebar.classList.toggle('collapsed', !open);
-        topHeader.classList.toggle('sidebar-collapsed', !open);
-        toggleIcon.textContent = "☰";
+        sidebar.classList.toggle('collapsed', !expanded);
+        sidebar.classList.remove('expanded');
+        topHeader.classList.toggle('sidebar-collapsed', !expanded);
       }
     }
 
@@ -394,30 +413,34 @@
     sidebarToggle.addEventListener('click', (e) => {
       e.stopPropagation();
       if (isMobile()) {
-        setSidebarState(!sidebar.classList.contains('mobile-visible'));
+        sidebar.classList.toggle('expanded');
       } else {
-        setSidebarState(sidebar.classList.contains('collapsed'));
+        sidebar.classList.toggle('collapsed');
       }
     });
 
-    // Close sidebar on mobile if click outside
+    // Close sidebar if click outside in mobile and expanded
     document.addEventListener('click', (e) => {
-      if (isMobile() && sidebar.classList.contains('mobile-visible')) {
+      if (isMobile() && sidebar.classList.contains('expanded')) {
         if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
-          setSidebarState(false);
+          sidebar.classList.remove('expanded');
         }
       }
     });
 
-    // Open/close sidebar on resize
-    window.addEventListener('resize', () => {
-      setSidebarState(!isMobile());
-    });
-
-    // On load, set correct sidebar state
-    window.addEventListener('DOMContentLoaded', () => {
-      setSidebarState(!isMobile());
-    });
+    // On resize, set correct sidebar state
+    function updateSidebarOnResize() {
+      if (isMobile()) {
+        sidebar.classList.remove('collapsed');
+        sidebar.classList.remove('expanded');
+      } else {
+        sidebar.classList.remove('expanded');
+        sidebar.classList.remove('collapsed');
+        setSidebarState(true);
+      }
+    }
+    window.addEventListener('resize', updateSidebarOnResize);
+    window.addEventListener('DOMContentLoaded', updateSidebarOnResize);
 
     // Sidebar navigation and content loading
     const menuBtns = document.querySelectorAll('.sidebar-menu button');
@@ -443,7 +466,7 @@
           pageFrame.src = src;
         }
         // On mobile, auto close sidebar after click
-        if (isMobile()) setSidebarState(false);
+        if (isMobile()) sidebar.classList.remove('expanded');
       });
     });
 
