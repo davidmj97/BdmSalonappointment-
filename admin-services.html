@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Admin: Manage Services – BDM Salon</title>
+<title>Manage Services – BDM Salon</title>
 <!-- Firebase for realtime sync -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -12,58 +12,82 @@
 :root {
   --bg: #000;
   --fg: #fff;
-  --accent: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
-  --border-color: #232b44;
   --card-bg: #111;
-  --box-bg: #181f35;
-  --badge-bg: #22336b;
+  --accent: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+  --border: #333;
+  --text-muted: #bbb;
+  --success: #2e7d32;
+  --danger: #c62828;
+  --warning: #ff9800;
+  --primary-blue: #1a73e8;
+  --toolbox-bg: #000;
+  --category-btn-bg: #ff9800;
+  --category-btn-bg-hover: #e68900;
 }
 
 body {
-  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: var(--bg);
   color: var(--fg);
   min-height: 100vh;
   margin: 0;
   padding: 0;
 }
+
 .header-fixed {
   position: fixed;
   top: 0; left: 0; right: 0;
   background: var(--bg);
   z-index: 100;
   box-shadow: 0 2px 10px #0a121e7a;
+  border-bottom: 1px solid var(--border);
+  display: block;
 }
+
 .header-details {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 0 20px 0;
+}
+
+.header-title {
+  font-size: 20px;
+  color: var(--fg);
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 1px;
+  width: 100%;
+  text-align: center;
+}
+
+.admin-toolbar {
+  margin-top: 74px;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 17px 0 2px 0;
+  gap: 16px;
+  background: var(--card-bg);
+  padding: 11px 10px 17px 10px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  z-index: 50;
 }
-.header-title {
-  font-size: 18px;
-  color: #fff;
-  font-weight: 700;
-  margin: 0 0 2px 0;
-  letter-spacing: 1px;
-}
-.header-desc {
-  font-size: 12px;
-  color: #a8c9fe;
-  margin-bottom: 0;
-}
-.admin-toolbar {
+
+.toolbar-row {
+  width: 100%;
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
   justify-content: center;
   gap: 10px 18px;
-  background: #10152a;
-  padding: 11px 10px 17px 10px;
-  border-bottom: 1px solid var(--border-color);
+  overflow-x: auto;
 }
+
 .add-service-form {
-  background: var(--box-bg);
+  background: #222;
   border-radius: 10px;
   box-shadow: 0 2px 8px #0a121e2e;
   display: flex;
@@ -71,7 +95,9 @@ body {
   gap: 10px 12px;
   align-items: flex-end;
   padding: 10px 12px 10px 12px;
+  border: 1px solid var(--border);
 }
+
 .add-service-form .form-field {
   display: flex;
   flex-direction: column;
@@ -79,24 +105,27 @@ body {
   min-width: 90px;
   max-width: 160px;
 }
+
 .add-service-form label {
   color: #90caf9;
   font-size: 11px;
   font-weight: 500;
   margin-bottom: 2px;
 }
+
 .add-service-form input,
 .add-service-form select {
   border-radius: 6px;
-  border: 1px solid #333a55;
-  background: #10152a;
-  color: #fff;
+  border: 1px solid var(--border);
+  background: #222;
+  color: var(--fg);
   padding: 6px 8px;
   font-size: 13px;
   margin-bottom: 0;
 }
+
 .add-service-form button {
-  background: var(--accent);
+  background: var(--primary-blue);
   color: #fff;
   border-radius: 6px;
   border: none;
@@ -107,34 +136,83 @@ body {
   margin-left: 8px;
   margin-top: 13px;
   white-space: nowrap;
+  transition: all 0.3s ease;
 }
+.add-service-form button:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+
+.toolbox {
+  width: 100%;
+  background: var(--toolbox-bg);
+  padding: 16px 10px 10px 10px;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 18px;
+  margin-top: 0;
+  /* No border */
+}
+
 .category-filter-admin {
   min-width: 110px;
 }
+
 .category-select-admin {
   width: 100%;
   min-width: 90px;
   padding: 6px 10px;
   border-radius: 6px;
-  background: #181f35;
-  color: white;
-  border: 1px solid #333a55;
+  background: #222;
+  color: var(--fg);
+  border: 1px solid var(--border);
   font-size: 13px;
   margin-left: 2px;
 }
+
+.category-management {
+  margin-left: 10px;
+  display: flex;
+  align-items: flex-end;
+}
+
+#manageCategoriesBtn {
+  background: var(--category-btn-bg);
+  border: none;
+  color: white;
+  padding: 7px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  margin-bottom: 2px;
+  margin-left: 0;
+  transition: background .2s;
+  box-shadow: 0 1px 4px #c6282822;
+}
+#manageCategoriesBtn:hover {
+  background: var(--category-btn-bg-hover);
+}
+
 .main-content-admin {
   max-width: 1050px;
-  margin: 165px auto 0 auto;
-  padding: 0 10px 24px 10px;
+  margin: 0 auto;
+  padding: 32px 10px 24px 10px; /* space after toolbar */
+  padding-top: 14px;
 }
+
 .admin-service-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px,1fr));
   gap: 13px;
   margin-bottom: 20px;
 }
+
 .admin-service-card {
-  background: var(--box-bg);
+  background: var(--card-bg);
   border-radius: 10px;
   padding: 13px 13px 38px 13px;
   position: relative;
@@ -142,17 +220,19 @@ body {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--border);
   transition: box-shadow 0.15s;
 }
+
 .admin-service-card:hover {
   box-shadow: 0 3px 18px #1a237e33;
 }
+
 .admin-service-card .service-category-badge {
   position: absolute;
   top: 9px;
   right: 12px;
-  background: var(--badge-bg);
+  background: var(--primary-blue);
   color: #fff;
   font-size: 11px;
   padding: 2px 9px;
@@ -161,29 +241,34 @@ body {
   opacity: 0.9;
   letter-spacing: 0.5px;
 }
+
 .admin-service-name {
   font-size: 15px;
   font-weight: 700;
   margin-bottom: 1px;
 }
+
 .admin-service-desc {
   font-size: 11px;
-  color: #a9b7ca;
+  color: var(--text-muted);
   margin-bottom: 2px;
   line-height: 1.5;
 }
+
 .admin-service-meta {
   font-size: 11px;
-  color: #8ef;
+  color: #90caf9;
   margin-bottom: 2px;
 }
+
 .admin-service-actions {
   display: flex;
   gap: 8px;
   margin-top: 3px;
 }
+
 .admin-service-actions button {
-  background: var(--accent);
+  background: var(--primary-blue);
   border: none;
   color: #fff;
   border-radius: 6px;
@@ -195,25 +280,12 @@ body {
   transition: opacity 0.2s;
 }
 .admin-service-actions button.delete-btn {
-  background: #b92929;
+  background: var(--danger);
 }
 .admin-service-actions button:active {
   opacity: 0.7;
 }
-.category-management {
-  margin-left: 10px;
-}
-#manageCategoriesBtn {
-  background: #4caf50;
-  border: none;
-  color: white;
-  padding: 7px 15px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 500;
-  white-space: nowrap;
-}
+
 #categoryModal {
   display: none;
   position: fixed;
@@ -227,7 +299,7 @@ body {
   align-items: center;
 }
 .modal-content {
-  background: #1a1f35;
+  background: var(--card-bg);
   padding: 20px;
   border-radius: 10px;
   width: 90%;
@@ -246,7 +318,7 @@ body {
   color: #fff;
 }
 .close-modal {
-  background: #f44336;
+  background: var(--danger);
   border: none;
   color: white;
   border-radius: 4px;
@@ -269,7 +341,7 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 8px;
-  background: #0f1324;
+  background: #222;
   margin-bottom: 5px;
   border-radius: 4px;
 }
@@ -277,7 +349,7 @@ body {
   color: #fff;
 }
 .delete-category-btn {
-  background: #f44336;
+  background: var(--danger);
   color: white;
   border: none;
   border-radius: 4px;
@@ -295,7 +367,7 @@ body {
   padding: 8px;
   border-radius: 4px;
   border: 1px solid #333;
-  background: #0f1324;
+  background: #222;
   color: #fff;
 }
 #addCategoryBtn {
@@ -310,30 +382,40 @@ body {
 .loading {
   text-align: center;
   padding: 20px;
-  color: #888;
+  color: var(--text-muted);
   grid-column: 1 / -1;
   display: none;
 }
+
 @media (max-width: 800px) {
   .main-content-admin { padding: 0 2px 14px 2px; }
 }
+
 @media (max-width: 600px) {
-  .main-content-admin { margin-top: 210px; }
-  .header-title { font-size: 15px; }
+  .main-content-admin { margin-top: 210px; padding: 32px 2px 14px 2px;}
+  .header-title { font-size: 18px; }
   .admin-service-grid { gap: 7px; }
   .admin-service-card { padding: 9px 6px 30px 6px; border-radius: 7px; gap: 5px; }
   .add-service-form { gap: 7px 6px; padding: 7px 2px 7px 2px; }
+  .toolbox { flex-direction: column; gap: 10px; }
+  .category-management { margin-left: 0; margin-top: 8px; }
 }
+
+@media (max-width: 480px) {
+  .header-title { font-size: 16px; }
+}
+
 ::-webkit-scrollbar { display: none; }
 </style>
 </head>
 <body>
 <div class="header-fixed">
   <div class="header-details">
-    <h1 class="header-title">Admin: Manage Services</h1>
-    <span class="header-desc">Add, edit, or remove salon services. Changes update live for all users.</span>
+    <h1 class="header-title">Manage Services</h1>
   </div>
-  <div class="admin-toolbar">
+</div>
+<div class="admin-toolbar">
+  <div class="toolbar-row">
     <form class="add-service-form" id="addServiceForm" autocomplete="off">
       <div class="form-field">
         <label for="serviceName">Service Name</label>
@@ -359,15 +441,17 @@ body {
       </div>
       <button type="submit" id="addUpdateBtn">Add Service</button>
     </form>
-    <div class="category-filter-admin">
-      <label style="color:#90caf9;font-size:11px;margin-right:4px;">Filter:</label>
-      <select class="category-select-admin" id="filterCategory">
-        <option value="all">All</option>
-      </select>
-    </div>
-    <div class="category-management">
-      <button id="manageCategoriesBtn">Manage Categories</button>
-    </div>
+  </div>
+</div>
+<div class="toolbox">
+  <div class="category-filter-admin">
+    <label style="color:#90caf9;font-size:11px;margin-right:4px;">Filter:</label>
+    <select class="category-select-admin" id="filterCategory">
+      <option value="all">All</option>
+    </select>
+  </div>
+  <div class="category-management">
+    <button id="manageCategoriesBtn">Manage Categories</button>
   </div>
 </div>
 <div class="main-content-admin">
