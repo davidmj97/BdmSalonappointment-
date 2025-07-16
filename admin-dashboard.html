@@ -182,33 +182,49 @@
       margin-right: 36px;
       position: relative;
     }
-    .order-icon {
-      font-size: 2em;
+    /* Style new orders as button in mobile */
+    .header-orders-btn {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--btn-gradient);
+      border-radius: 999px;
+      padding: 5px 15px;
       color: #fff;
-      margin-right: 10px;
-    }
-    .order-badge {
-      background: var(--badge-bg);
-      color: #fff;
-      font-weight: bold;
-      font-size: 1em;
-      border-radius: 22px;
-      padding: 2px 14px;
-      box-shadow: 0 2px 8px 0 rgba(24, 40, 128, 0.17);
-      margin-left: 6px;
-      display: inline-block;
-    }
-    .header-new-orders {
-      font-size: 1em;
-      color: #2979ff;
       font-weight: 600;
-      margin-right: 16px;
-      margin-left: 10px;
-      letter-spacing: 1px;
-      display: inline-block;
-      vertical-align: middle;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 2px 8px 0 rgba(24, 40, 128, 0.12);
+      transition: background 0.2s;
     }
-    /* Responsive styles */
+    .header-orders-btn:hover {
+      background: var(--btn-hover);
+    }
+    .header-orders-btn .order-icon {
+      font-size: 1.2em;
+      margin: 0 4px 0 0;
+      color: #fff;
+    }
+    .header-orders-btn .header-new-orders {
+      font-size: inherit;
+      color: inherit;
+      font-weight: inherit;
+      margin: 0 2px 0 0;
+      letter-spacing: 1px;
+      vertical-align: middle;
+      display: inline-block;
+    }
+    .header-orders-btn .order-badge {
+      background: #fff;
+      color: var(--badge-bg);
+      font-weight: bold;
+      font-size: inherit;
+      border-radius: 22px;
+      padding: 2px 11px;
+      margin-left: 0;
+      box-shadow: none;
+      display: inline-block;
+    }
     @media (max-width: 900px) {
       .sidebar {
         left: 0;
@@ -273,18 +289,20 @@
       .sidebar.expanded ~ .top-header {
         padding-left: var(--sidebar-width);
       }
-      /* Make only Admin Dashboard and New Orders smaller in one line on mobile */
-      .header-title,
-      .header-new-orders {
-        font-size: 0.35em !important;
+      /* Reduce size to 0.65em and keep one line */
+      .header-title {
+        font-size: 0.65em !important;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
       }
-      /* Keep header-orders section together in one line and allow it to shrink */
+      .header-orders-btn,
+      .header-orders-btn .header-new-orders,
+      .header-orders-btn .order-badge {
+        font-size: 0.65em !important;
+      }
       .header-orders {
-        flex-shrink: 1;
-        min-width: 0;
+        margin-right: 12px;
       }
     }
     @media (max-width: 600px) {
@@ -292,18 +310,17 @@
         padding: calc(var(--header-height) + 8px) 4vw 10vw 4vw;
       }
       .header-title { margin-left: 8px; }
-      .header-orders { margin-right: 10px; }
-      .header-new-orders { margin-right: 4px; }
-      .header-title,
-      .header-new-orders {
-        font-size: 0.45em !important;
+      .header-orders { margin-right: 6px; }
+      .header-orders-btn,
+      .header-orders-btn .header-new-orders,
+      .header-orders-btn .order-badge {
+        font-size: 0.65em !important;
+      }
+      .header-title {
+        font-size: 0.65em !important;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-      }
-      .header-orders {
-        flex-shrink: 1;
-        min-width: 0;
       }
     }
     /* Custom scrollbar */
@@ -398,9 +415,13 @@
   <header class="top-header" id="topHeader">
     <span class="header-title">Admin Dashboard</span>
     <div class="header-orders">
-      <span class="header-new-orders">New Orders</span>
-      <span class="order-icon material-icons">notifications</span>
-      <span class="order-badge" id="orderBadge">5</span>
+      <!-- Button for mobile (visible always) -->
+      <button class="header-orders-btn" id="headerOrdersBtn" type="button">
+        <span class="header-new-orders">New Orders</span>
+        <span class="order-icon material-icons">notifications</span>
+        <span class="order-badge" id="orderBadgeBtn">5</span>
+      </button>
+      <!-- REMOVED: old layout for desktop (label, icon, badge as separate elements) -->
     </div>
   </header>
 
@@ -495,11 +516,11 @@
 
     // Demo: update order badge (simulate new orders)
     let orderCount = 5;
-    const orderBadge = document.getElementById('orderBadge');
+    const orderBadgeBtn = document.getElementById('orderBadgeBtn');
     function setOrderCount(n) {
       orderCount = n;
-      orderBadge.textContent = n;
-      orderBadge.style.display = (n > 0) ? "inline-block" : "none";
+      orderBadgeBtn.textContent = n;
+      orderBadgeBtn.style.display = (n > 0) ? "inline-block" : "none";
     }
     setOrderCount(orderCount);
   </script>
