@@ -210,7 +210,6 @@
     }
     /* Responsive styles */
     @media (max-width: 900px) {
-      /* SIDEBAR: show only icons by default, expand on .expanded */
       .sidebar {
         left: 0;
         width: var(--sidebar-collapsed-width);
@@ -274,10 +273,18 @@
       .sidebar.expanded ~ .top-header {
         padding-left: var(--sidebar-width);
       }
-      /* Make only Admin Dashboard and New Orders smaller on mobile */
+      /* Make only Admin Dashboard and New Orders smaller in one line on mobile */
       .header-title,
       .header-new-orders {
         font-size: 1em !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      /* Keep header-orders section together in one line and allow it to shrink */
+      .header-orders {
+        flex-shrink: 1;
+        min-width: 0;
       }
     }
     @media (max-width: 600px) {
@@ -287,10 +294,16 @@
       .header-title { margin-left: 8px; }
       .header-orders { margin-right: 10px; }
       .header-new-orders { margin-right: 4px; }
-      /* Make only Admin Dashboard and New Orders even smaller on extra small screens */
       .header-title,
       .header-new-orders {
         font-size: 0.95em !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .header-orders {
+        flex-shrink: 1;
+        min-width: 0;
       }
     }
     /* Custom scrollbar */
