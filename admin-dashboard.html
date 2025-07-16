@@ -167,35 +167,27 @@
     .sidebar.collapsed ~ .top-header {
       padding-left: var(--sidebar-collapsed-width);
     }
-    .header-title {
-      font-size: 1.2em;
-      font-weight: bold;
-      margin-right: auto;
-      margin-left: 24px;
-      letter-spacing: 1px;
-      display: flex;
-      align-items: center;
-    }
     .header-orders {
       display: flex;
       align-items: center;
       margin-right: 36px;
       position: relative;
     }
-    /* Style new orders as button in mobile */
+    /* Style new orders as button */
     .header-orders-btn {
       display: flex;
       align-items: center;
       gap: 4px;
       background: var(--btn-gradient);
-      border-radius: 999px;
-      padding: 5px 15px;
+      border-radius: 10px;
+      padding: 7px 18px;
       color: #fff;
       font-weight: 600;
       cursor: pointer;
       border: none;
       box-shadow: 0 2px 8px 0 rgba(24, 40, 128, 0.12);
       transition: background 0.2s;
+      font-size: 16px;
     }
     .header-orders-btn:hover {
       background: var(--btn-hover);
@@ -289,38 +281,22 @@
       .sidebar.expanded ~ .top-header {
         padding-left: var(--sidebar-width);
       }
-      /* Reduce size to 0.65em and keep one line */
-      .header-title {
-        font-size: 0.65em !important;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-      .header-orders-btn,
-      .header-orders-btn .header-new-orders,
-      .header-orders-btn .order-badge {
-        font-size: 0.65em !important;
-      }
       .header-orders {
         margin-right: 12px;
+      }
+      .header-orders-btn {
+        font-size: 16px !important;
+        border-radius: 10px !important;
       }
     }
     @media (max-width: 600px) {
       .main-content {
         padding: calc(var(--header-height) + 8px) 4vw 10vw 4vw;
       }
-      .header-title { margin-left: 8px; }
       .header-orders { margin-right: 6px; }
-      .header-orders-btn,
-      .header-orders-btn .header-new-orders,
-      .header-orders-btn .order-badge {
-        font-size: 0.65em !important;
-      }
-      .header-title {
-        font-size: 0.65em !important;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+      .header-orders-btn {
+        font-size: 16px !important;
+        border-radius: 10px !important;
       }
     }
     /* Custom scrollbar */
@@ -413,15 +389,12 @@
 
   <!-- Top Header -->
   <header class="top-header" id="topHeader">
-    <span class="header-title">Admin Dashboard</span>
     <div class="header-orders">
-      <!-- Button for mobile (visible always) -->
       <button class="header-orders-btn" id="headerOrdersBtn" type="button">
         <span class="header-new-orders">New Orders</span>
         <span class="order-icon material-icons">notifications</span>
         <span class="order-badge" id="orderBadgeBtn">5</span>
       </button>
-      <!-- REMOVED: old layout for desktop (label, icon, badge as separate elements) -->
     </div>
   </header>
 
