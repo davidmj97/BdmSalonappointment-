@@ -404,7 +404,14 @@ body {
 }
 
 @media (max-width: 600px) {
-  .main-content-admin { margin-top: 210px; padding: 32px 2px 14px 2px;}
+  body {
+    padding-left: 9px;
+    padding-right: 9px;
+  }
+  .main-content-admin {
+    margin-top: 210px;
+    padding: 20px 0 14px 0;
+  }
   .header-title { font-size: 18px; }
   .admin-service-grid { gap: 7px; }
   .admin-service-card { padding: 9px 6px 30px 6px; border-radius: 7px; gap: 5px; }
@@ -412,22 +419,39 @@ body {
   .admin-toolbar { padding: 8px 2px 12px 2px; }
   .toolbox {
     flex-direction: column;
-    gap: 10px;
-    padding: 14px 2px 7px 2px;
+    gap: 0px;
+    padding: 14px 0px 0px 0px;
     align-items: stretch;
+    margin-bottom: 0;
+  }
+  .category-filter-admin {
+    margin-bottom: 0px;
+    width: 100%;
+    justify-content: flex-end;
   }
   .category-management {
     margin-left: 0;
-    margin-top: 6px;
-    align-items: flex-end;
+    margin-top: 12px;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
   }
-  .category-filter-admin {
-    margin-bottom: 6px;
+  #manageCategoriesBtn {
+    margin-left: 0;
+    margin-bottom: 0;
+    display: block;
+    margin-right: auto;
+    margin-left: auto;
+    text-align: center;
   }
 }
 
 @media (max-width: 480px) {
   .header-title { font-size: 16px; }
+  body {
+    padding-left: 5px;
+    padding-right: 5px;
+  }
 }
 
 ::-webkit-scrollbar { display: none; }
