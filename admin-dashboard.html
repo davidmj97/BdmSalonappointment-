@@ -284,10 +284,9 @@
       .header-orders {
         margin-right: 12px;
       }
-      /* Slightly larger button on mobile and corner 10px */
       .header-orders-btn {
-        font-size: 1em !important; /* 16px if root is 16px */
-        padding: 8px 22px !important;
+        font-size: 1em !important;
+        padding: 9px 26px !important;
         border-radius: 10px !important;
       }
       .header-orders-btn .order-icon {
@@ -303,10 +302,9 @@
         padding: calc(var(--header-height) + 8px) 4vw 10vw 4vw;
       }
       .header-orders { margin-right: 6px; }
-      /* Slightly larger button and text for very small screens, but keep corner at 10px */
       .header-orders-btn {
-        font-size: 0.95em !important; /* ≈15px */
-        padding: 7px 18px !important;
+        font-size: 0.95em !important;
+        padding: 8px 20px !important;
         border-radius: 10px !important;
       }
       .header-orders-btn .order-icon {
@@ -368,6 +366,10 @@
   </style>
   <!-- Google Material Icons CDN -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 </head>
 <body>
   <!-- Sidebar -->
@@ -411,7 +413,7 @@
       <button class="header-orders-btn" id="headerOrdersBtn" type="button">
         <span class="header-new-orders">New Orders</span>
         <span class="order-icon material-icons">notifications</span>
-        <span class="order-badge" id="orderBadgeBtn">5</span>
+        <span class="order-badge" id="orderBadgeBtn">...</span>
       </button>
     </div>
   </header>
@@ -505,15 +507,43 @@
       });
     });
 
-    // Demo: update order badge (simulate new orders)
-    let orderCount = 5;
-    const orderBadgeBtn = document.getElementById('orderBadgeBtn');
-    function setOrderCount(n) {
-      orderCount = n;
-      orderBadgeBtn.textContent = n;
-      orderBadgeBtn.style.display = (n > 0) ? "inline-block" : "none";
+    // Firebase: Show new order count in header button
+    const firebaseConfig = {
+        apiKey: "AIzaSyAmimDsjW_pF2NGw-w-40QzTsgmf1tdqyI",
+        authDomain: "bdmsalonappointment.firebaseapp.com",
+        databaseURL: "https://bdmsalonappointment-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "bdmsalonappointment",
+        storageBucket: "bdmsalonappointment.firebasestorage.app",
+        messagingSenderId: "123933913893",
+        appId: "1:123933913893:web:c1f57caf4dc2a5440ba0cc",
+        measurementId: "G-Q0FVZRVS64"
+    };
+    const app = firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    function fetchNewOrderCount(callback) {
+        database.ref('bookings').orderByChild('status').equalTo('pending').once('value', function(snapshot) {
+            let count = 0;
+            snapshot.forEach(function(childSnapshot) {
+                count++;
+            });
+            callback(count);
+        });
     }
-    setOrderCount(orderCount);
+
+    function updateOrderCount(count) {
+      const orderBadgeBtn = document.getElementById('orderBadgeBtn');
+      orderBadgeBtn.textContent = count;
+      orderBadgeBtn.style.display = (count > 0) ? "inline-block" : "none";
+    }
+
+    // Initial load
+    fetchNewOrderCount(updateOrderCount);
+
+    // Optional: periodically refresh the count every 60s
+    setInterval(() => {
+      fetchNewOrderCount(updateOrderCount);
+    }, 60000);
   </script>
 </body>
 </html>
