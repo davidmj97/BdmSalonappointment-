@@ -559,7 +559,7 @@
         <div class="tabs">
             <div class="tab active" data-tab="pending">
                 <span class="new-order-indicator"></span>
-                Pending
+                New Order
                 <span class="badge">0</span>
             </div>
             <div class="tab" data-tab="accepted">
@@ -585,7 +585,7 @@
         </div>
     </div>
     
-    <!-- Order Details Modal -->
+   <!-- Order Details Modal -->
     <div id="orderModal" class="modal">
         <div class="modal-content">
             <button class="close-modal">&times;</button>
@@ -637,11 +637,12 @@
         </div>
     </div>
 
+
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     
-    <script>
+     <script>
     // Firebase configuration
     const firebaseConfig = {
         apiKey: "AIzaSyAmimDsjW_pF2NGw-w-40QzTsgmf1tdqyI",
@@ -828,7 +829,8 @@
         card.dataset.id = id;
         const orderNumber = order.orderNumber && String(order.orderNumber).length === 8 ? order.orderNumber : 'N/A';
         const statusClass = `status-${status}`;
-        const statusText = status.charAt(0).toUpperCase() + status.slice(1);
+        // --- Only this line below changed for status text ---
+        const statusText = status === 'pending' ? 'New Order' : status.charAt(0).toUpperCase() + status.slice(1);
         const firstService = order.services?.[0]?.name || 'No Service';
         const serviceCount = order.services?.length || 0;
         const totalPrice = calculateTotal(order.services);
@@ -927,22 +929,22 @@
         document.getElementById('modal-stylist').textContent = order.stylist?.name || 'N/A';
         document.getElementById('modal-booking-time').textContent = order.createdAt ? (new Date(order.createdAt)).toLocaleString() : 'N/A';
       // In the openOrderModal function, update the services rendering part:
-const servicesContainer = document.getElementById('modal-services');
-servicesContainer.innerHTML = '';
-if (order.services && order.services.length) {
-    order.services.forEach(service => {
-        const serviceEl = document.createElement('div');
-        serviceEl.className = 'service-item';
-        serviceEl.innerHTML = `
-            <div class="service-name">${service.name || 'N/A'}</div>
-            <div>Duration: ${service.duration || service.time || 'N/A'}</div>
-            <div>Price: ${service.price || 'N/A'}</div>
-        `;
-        servicesContainer.appendChild(serviceEl);
-    });
-} else {
-    servicesContainer.innerHTML = '<div class="service-item">No services selected</div>';
-}
+        const servicesContainer = document.getElementById('modal-services');
+        servicesContainer.innerHTML = '';
+        if (order.services && order.services.length) {
+            order.services.forEach(service => {
+                const serviceEl = document.createElement('div');
+                serviceEl.className = 'service-item';
+                serviceEl.innerHTML = `
+                    <div class="service-name">${service.name || 'N/A'}</div>
+                    <div>Duration: ${service.duration || service.time || 'N/A'}</div>
+                    <div>Price: ${service.price || 'N/A'}</div>
+                `;
+                servicesContainer.appendChild(serviceEl);
+            });
+        } else {
+            servicesContainer.innerHTML = '<div class="service-item">No services selected</div>';
+        }
         const totalPrice = calculateTotal(order.services);
         document.getElementById('modal-total-price').textContent = formatPrice(totalPrice);
         const modalFooter = document.getElementById('modal-footer');
@@ -1049,7 +1051,8 @@ if (order.services && order.services.length) {
                     if (orders.length === 0) {
                         const noOrders = document.createElement('div');
                         noOrders.className = 'no-orders';
-                        noOrders.textContent = `No ${status} orders found.`;
+                        // --- Only this line changed for pending tab ---
+                        noOrders.textContent = status === 'pending' ? 'No New Order orders found.' : `No ${status} orders found.`;
                         grid.appendChild(noOrders);
                     } else {
                         orders.forEach(order => {
