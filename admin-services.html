@@ -23,6 +23,7 @@
   --toolbox-bg: #000;
   --category-btn-bg: #ff9800;
   --category-btn-bg-hover: #e68900;
+  --toolbar-bg: #000;
 }
 
 body {
@@ -69,7 +70,7 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 16px;
-  background: var(--card-bg);
+  background: var(--toolbar-bg); /* Black background */
   padding: 11px 10px 17px 10px;
   border-bottom: 1px solid var(--border);
   position: relative;
@@ -87,7 +88,7 @@ body {
 }
 
 .add-service-form {
-  background: #222;
+  background: transparent; /* Remove its own background, use toolbar's bg */
   border-radius: 10px;
   box-shadow: 0 2px 8px #0a121e2e;
   display: flex;
@@ -96,6 +97,8 @@ body {
   align-items: flex-end;
   padding: 10px 12px 10px 12px;
   border: 1px solid var(--border);
+  width: 100%;
+  max-width: 950px;
 }
 
 .add-service-form .form-field {
@@ -153,11 +156,17 @@ body {
   justify-content: center;
   gap: 18px;
   margin-top: 0;
-  /* No border */
 }
 
 .category-filter-admin {
   min-width: 110px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.category-filter-admin label {
+  margin-bottom: 2px;
 }
 
 .category-select-admin {
@@ -192,6 +201,7 @@ body {
   margin-left: 0;
   transition: background .2s;
   box-shadow: 0 1px 4px #c6282822;
+  display: inline-block;
 }
 #manageCategoriesBtn:hover {
   background: var(--category-btn-bg-hover);
@@ -200,7 +210,7 @@ body {
 .main-content-admin {
   max-width: 1050px;
   margin: 0 auto;
-  padding: 32px 10px 24px 10px; /* space after toolbar */
+  padding: 32px 10px 24px 10px;
   padding-top: 14px;
 }
 
@@ -387,8 +397,10 @@ body {
   display: none;
 }
 
+/* Responsive adjustments for toolbar/toolbox on mobile */
 @media (max-width: 800px) {
   .main-content-admin { padding: 0 2px 14px 2px; }
+  .add-service-form { max-width: 100%; }
 }
 
 @media (max-width: 600px) {
@@ -396,9 +408,22 @@ body {
   .header-title { font-size: 18px; }
   .admin-service-grid { gap: 7px; }
   .admin-service-card { padding: 9px 6px 30px 6px; border-radius: 7px; gap: 5px; }
-  .add-service-form { gap: 7px 6px; padding: 7px 2px 7px 2px; }
-  .toolbox { flex-direction: column; gap: 10px; }
-  .category-management { margin-left: 0; margin-top: 8px; }
+  .add-service-form { gap: 7px 6px; padding: 7px 2px 7px 2px; max-width: 100%; }
+  .admin-toolbar { padding: 8px 2px 12px 2px; }
+  .toolbox {
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px 2px 7px 2px;
+    align-items: stretch;
+  }
+  .category-management {
+    margin-left: 0;
+    margin-top: 6px;
+    align-items: flex-end;
+  }
+  .category-filter-admin {
+    margin-bottom: 6px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -414,7 +439,7 @@ body {
     <h1 class="header-title">Manage Services</h1>
   </div>
 </div>
-<div class="admin-toolbar">
+<div class="admin-toolbar" id="adminToolbar">
   <div class="toolbar-row">
     <form class="add-service-form" id="addServiceForm" autocomplete="off">
       <div class="form-field">
@@ -515,6 +540,7 @@ const closeModal = document.getElementById('closeModal');
 const categoriesList = document.getElementById('categoriesList');
 const newCategoryName = document.getElementById('newCategoryName');
 const addCategoryBtn = document.getElementById('addCategoryBtn');
+const adminToolbar = document.getElementById('adminToolbar');
 
 // --- SERVICE MANAGEMENT ---
 function renderServices(filter = "all") {
@@ -546,11 +572,28 @@ function renderServices(filter = "all") {
       <div class="admin-service-desc">${service.description || service.desc || 'No description'}</div>
       <div class="admin-service-meta">${service.duration || service.time || ''} ${service.price ? '| ' + service.price : ''}</div>
       <div class="admin-service-actions">
-        <button onclick="editService('${service.id}')" title="Edit">Edit</button>
+        <button class="edit-btn" data-id="${service.id}" title="Edit">Edit</button>
         <button class="delete-btn" onclick="deleteService('${service.id}')" title="Delete">Delete</button>
       </div>
     `;
     serviceGrid.appendChild(el);
+  });
+
+  // Add scroll-to-toolbar on edit (for all edit buttons)
+  document.querySelectorAll('.edit-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      window.editService(btn.getAttribute('data-id'));
+      // Scroll to toolbar after rendering form
+      setTimeout(() => {
+        const toolbar = document.getElementById('adminToolbar');
+        if (toolbar) {
+          const header = document.querySelector('.header-fixed');
+          const headerHeight = header ? header.offsetHeight : 0;
+          const y = toolbar.getBoundingClientRect().top + window.pageYOffset - headerHeight - 12;
+          window.scrollTo({ top: y, behavior: "smooth" });
+        }
+      }, 50);
+    });
   });
 }
 
@@ -636,7 +679,6 @@ window.editService = function(id) {
   
   editId = id;
   addUpdateBtn.textContent = 'Update Service';
-  addServiceForm.scrollIntoView({ behavior: "smooth" });
 };
 
 window.deleteService = function(id) {
