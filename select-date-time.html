@@ -109,6 +109,14 @@
       opacity: 0.5;
       cursor: not-allowed;
     }
+    .date-dayname {
+      font-size: 13px;
+      font-weight: 600;
+      color: #90caf9;
+      margin-bottom: 2px;
+      text-transform: lowercase;
+      letter-spacing: 0.5px;
+    }
     .date-number {
       font-size: 22px;
       font-weight: 700;
@@ -416,8 +424,11 @@
         dateCard.dataset.date = isoStr;
 
         const monthName = monthNames[month - 1].substring(0, 3);
-        
+        const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        const dayName = dayNames[date.getDay()];
+
         dateCard.innerHTML = `
+          <div class="date-dayname">${dayName}</div>
           <div class="date-number">${day}</div>
           <div class="date-month">${monthName}</div>
         `;
