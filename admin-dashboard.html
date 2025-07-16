@@ -381,11 +381,11 @@
       </button>
     </div>
     <div class="sidebar-menu" id="sidebarMenu">
-      <button class="active" data-page="home">
+      <button class="active" data-page="home" id="sidebarHomeBtn">
         <span class="icon material-icons">home</span>
         <span class="label">Home</span>
       </button>
-      <button data-page="orders">
+      <button data-page="orders" id="sidebarOrdersBtn">
         <span class="icon material-icons">receipt_long</span>
         <span class="label">Orders</span>
       </button>
@@ -507,7 +507,7 @@
       });
     });
 
-    // Firebase: Show new order count in header button
+    // Firebase: Show new order count in header button, auto update in realtime
     const firebaseConfig = {
         apiKey: "AIzaSyAmimDsjW_pF2NGw-w-40QzTsgmf1tdqyI",
         authDomain: "bdmsalonappointment.firebaseapp.com",
@@ -521,14 +521,15 @@
     const app = firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    function fetchNewOrderCount(callback) {
-        database.ref('bookings').orderByChild('status').equalTo('pending').once('value', function(snapshot) {
-            let count = 0;
-            snapshot.forEach(function(childSnapshot) {
-                count++;
-            });
-            callback(count);
+    function listenNewOrderCount(callback) {
+      // Listen for changes in bookings with status 'pending'
+      database.ref('bookings').orderByChild('status').equalTo('pending').on('value', function(snapshot) {
+        let count = 0;
+        snapshot.forEach(function(childSnapshot) {
+            count++;
         });
+        callback(count);
+      });
     }
 
     function updateOrderCount(count) {
@@ -537,13 +538,14 @@
       orderBadgeBtn.style.display = (count > 0) ? "inline-block" : "none";
     }
 
-    // Initial load
-    fetchNewOrderCount(updateOrderCount);
+    // Start listening for real-time new order count
+    listenNewOrderCount(updateOrderCount);
 
-    // Optional: periodically refresh the count every 60s
-    setInterval(() => {
-      fetchNewOrderCount(updateOrderCount);
-    }, 60000);
+    // Make top right button behave like sidebar "Orders" button
+    document.getElementById('headerOrdersBtn').addEventListener('click', function() {
+      // Simulate sidebar orders button click
+      document.getElementById('sidebarOrdersBtn').click();
+    });
   </script>
 </body>
 </html>
