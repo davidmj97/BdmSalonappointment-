@@ -47,7 +47,7 @@
             padding-bottom: 10px;
             border-bottom: 1px solid var(--border);
             display: flex;
-            justify-content: space-between;
+            justify-content: center; /* Center contents horizontally */
             align-items: center;
         }
 
@@ -55,7 +55,11 @@
             font-size: 20px;
             font-weight: 600;
             color: var(--fg);
+            width: 100%;
+            text-align: center; /* Center text in desktop and mobile */
         }
+
+        /* Remove back button styling, not needed anymore */
 
         .btn {
             display: inline-flex;
@@ -89,17 +93,6 @@
 
         .btn-danger:hover {
             opacity: 0.9;
-            transform: translateY(-2px);
-        }
-
-        .btn-back {
-            background: #333;
-            color: white;
-            font-size: 14px;
-        }
-
-        .btn-back:hover {
-            background: #444;
             transform: translateY(-2px);
         }
 
@@ -361,6 +354,15 @@
                 font-size: 14px;
             }
 
+            header {
+                padding-bottom: 8px;
+            }
+
+            h1 {
+                font-size: 18px;
+                text-align: center;
+            }
+
             .time-slots-grid {
                 grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
                 gap: 8px;
@@ -418,6 +420,15 @@
         }
 
         @media (max-width: 480px) {
+            header {
+                padding-bottom: 6px;
+            }
+
+            h1 {
+                font-size: 16px;
+                text-align: center;
+            }
+
             .time-slots-grid {
                 grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
                 gap: 6px;
@@ -450,9 +461,7 @@
 <body>
     <header>
         <h1>Manage Time Slots</h1>
-        <a href="orders.html" class="btn btn-back">
-            <i class="fas fa-arrow-left"></i> Back
-        </a>
+        <!-- Back button removed -->
     </header>
 
     <div class="container">
