@@ -274,15 +274,11 @@
       .sidebar.expanded ~ .top-header {
         padding-left: var(--sidebar-width);
       }
-      /* Make heading smaller in mobile view */
-      .sidebar-logo,
+      /* Make only Admin Dashboard and New Orders smaller on mobile */
       .header-title,
-      .sidebar-menu button span.label,
       .header-new-orders {
         font-size: 1em !important;
       }
-      /* Optionally adjust font-size for <h1>, <h2>, <h3> in iframe pages if you control them */
-      /* iframe contents can't be styled from parent, unless you inject CSS in those pages */
     }
     @media (max-width: 600px) {
       .main-content {
@@ -291,10 +287,8 @@
       .header-title { margin-left: 8px; }
       .header-orders { margin-right: 10px; }
       .header-new-orders { margin-right: 4px; }
-      /* Make heading even smaller for extra small screens */
-      .sidebar-logo,
+      /* Make only Admin Dashboard and New Orders even smaller on extra small screens */
       .header-title,
-      .sidebar-menu button span.label,
       .header-new-orders {
         font-size: 0.95em !important;
       }
