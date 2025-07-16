@@ -88,7 +88,7 @@ body {
 }
 
 .add-service-form {
-  background: transparent; /* Remove its own background, use toolbar's bg */
+  background: transparent;
   border-radius: 10px;
   box-shadow: 0 2px 8px #0a121e2e;
   display: flex;
@@ -407,6 +407,11 @@ body {
   body {
     padding-left: 9px;
     padding-right: 9px;
+    background: var(--bg);
+  }
+  .header-fixed {
+    left: 0;
+    right: 0;
   }
   .main-content-admin {
     margin-top: 210px;
@@ -422,12 +427,18 @@ body {
     gap: 0px;
     padding: 14px 0px 0px 0px;
     align-items: stretch;
-    margin-bottom: 0;
+    margin-left: -9px;
+    margin-right: -9px;
+    width: calc(100% + 18px);
+    box-sizing: border-box;
   }
   .category-filter-admin {
     margin-bottom: 0px;
     width: 100%;
     justify-content: flex-end;
+    padding-left: 9px;
+    padding-right: 9px;
+    box-sizing: border-box;
   }
   .category-management {
     margin-left: 0;
@@ -435,6 +446,9 @@ body {
     align-items: center;
     justify-content: center;
     width: 100%;
+    padding-left: 9px;
+    padding-right: 9px;
+    box-sizing: border-box;
   }
   #manageCategoriesBtn {
     margin-left: 0;
@@ -449,6 +463,16 @@ body {
 @media (max-width: 480px) {
   .header-title { font-size: 16px; }
   body {
+    padding-left: 5px;
+    padding-right: 5px;
+    background: var(--bg);
+  }
+  .toolbox {
+    margin-left: -5px;
+    margin-right: -5px;
+    width: calc(100% + 10px);
+  }
+  .category-filter-admin, .category-management {
     padding-left: 5px;
     padding-right: 5px;
   }
