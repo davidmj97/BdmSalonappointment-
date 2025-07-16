@@ -284,9 +284,17 @@
       .header-orders {
         margin-right: 12px;
       }
+      /* Smaller button and text on mobile */
       .header-orders-btn {
-        font-size: 16px !important;
-        border-radius: 10px !important;
+        font-size: 0.85em !important; /* ≈13.6px if root is 16px */
+        padding: 5px 12px !important;
+      }
+      .header-orders-btn .order-icon {
+        font-size: 1em !important;
+      }
+      .header-orders-btn .order-badge {
+        padding: 2px 8px !important;
+        font-size: 0.85em !important;
       }
     }
     @media (max-width: 600px) {
@@ -294,9 +302,17 @@
         padding: calc(var(--header-height) + 8px) 4vw 10vw 4vw;
       }
       .header-orders { margin-right: 6px; }
+      /* Even smaller button and text for very small screens */
       .header-orders-btn {
-        font-size: 16px !important;
-        border-radius: 10px !important;
+        font-size: 0.75em !important; /* ≈12px if root is 16px */
+        padding: 4px 8px !important;
+      }
+      .header-orders-btn .order-icon {
+        font-size: 0.95em !important;
+      }
+      .header-orders-btn .order-badge {
+        padding: 2px 6px !important;
+        font-size: 0.75em !important;
       }
     }
     /* Custom scrollbar */
