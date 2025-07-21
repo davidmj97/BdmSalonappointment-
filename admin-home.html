@@ -15,9 +15,6 @@
             --card-bg: #181818;
             --accent: #1a73e8;
             --border: #333;
-            --pending: #ff9800;
-            --completed: #2e7d32;
-            --cancelled: #d32f2f;
             --box-padding: 16px;
         }
         body {
@@ -38,10 +35,9 @@
             margin-bottom: 22px;
             flex-wrap: wrap;
         }
-        .summary-box, .filter-box {
+        .summary-box {
             flex: 1;
             min-width: 120px;
-            background: var(--card-bg);
             box-shadow: 0 2px 8px #0003;
             border-radius: 8px;
             padding: var(--box-padding);
@@ -49,46 +45,80 @@
             flex-direction: column;
             align-items: center;
             cursor: pointer;
-            transition: box-shadow .2s, transform .2s;
+            transition: box-shadow .2s, transform .2s, border-bottom .2s;
             border: 2px solid transparent;
             position: relative;
+            background: linear-gradient(90deg, #fbc02d 0%, #ff9800 100%);
+            color: #fff;
         }
-        .summary-box.selected, .filter-box.selected {
-            border-color: var(--accent);
-            box-shadow: 0 4px 18px #1a73e81a;
-            transform: translateY(-2px) scale(1.03);
+        .summary-box.pending {
+            background: linear-gradient(90deg, #fbc02d 0%, #ff9800 100%);
+        }
+        .summary-box.completed {
+            background: linear-gradient(90deg, #43ea7a 0%, #205c26 100%);
+        }
+        .summary-box.cancelled {
+            background: linear-gradient(90deg, #ff3d3d 0%, #992424 100%);
+        }
+        .summary-box:hover {
+            box-shadow: 0 4px 18px #0006;
+            transform: scale(1.04);
+        }
+        .summary-box.selected {
+            border-bottom: 4px solid #fff;
         }
         .summary-box .icon {
             font-size: 22px;
             margin-bottom: 4px;
         }
-        .summary-box.pending { color: var(--pending);}
-        .summary-box.completed { color: var(--completed);}
-        .summary-box.cancelled { color: var(--cancelled);}
         .summary-box .count {
-            font-size: 24px;
-            font-weight: 700;
+            font-family: 'Montserrat', 'Arial', sans-serif;
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
         }
         .summary-box .label {
-            font-size: 14px;
-            color: #bbb;
-            margin-top: 2px;
-        }
-        .filter-box {
             font-size: 15px;
-            color: var(--fg);
+            color: #fff;
+            margin-top: 2px;
+            font-family: 'Montserrat', 'Arial', sans-serif;
+            letter-spacing: 0.5px;
+        }
+
+        /* Filter Boxes */
+        .filter-box {
+            flex: 1;
+            min-width: 120px;
+            background: linear-gradient(90deg, #233dff 0%, #1a237e 100%);
+            box-shadow: 0 2px 8px #0003;
+            border-radius: 8px;
+            padding: var(--box-padding);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            font-size: 16px;
+            color: #fff;
             justify-content: center;
+            transition: box-shadow .2s, transform .2s, border-bottom .2s;
+            border: 2px solid transparent;
+            font-family: 'Montserrat', 'Arial', sans-serif;
         }
         .filter-box .count {
-            font-size: 20px;
-            font-weight: 600;
+            font-size: 22px;
+            font-weight: 700;
             margin-bottom: 3px;
+            font-family: 'Montserrat', 'Arial', sans-serif;
         }
-        .filter-box.today { border-left: 5px solid var(--accent);}
-        .filter-box.tomorrow { border-left: 5px solid #7e57c2;}
-        .filter-box.week { border-left: 5px solid #1de9b6;}
-        .filter-box.nextweek { border-left: 5px solid #ffb300;}
-        .filter-box.month { border-left: 5px solid #e57373;}
+        .filter-box.selected {
+            border-bottom: 4px solid #fff;
+        }
+        .filter-box:hover {
+            box-shadow: 0 4px 18px #0006;
+            transform: scale(1.04);
+        }
+
         .date-selector-row {
             margin-bottom: 12px;
             display: flex;
@@ -122,13 +152,32 @@
             border-collapse: collapse;
             background: transparent;
         }
-        th, td {
+        thead tr {
+            background: linear-gradient(90deg, #233dff 0%, #1a237e 100%);
+            border-radius: 10px;
+        }
+        th {
+            color: #fff;
+            letter-spacing: 0.5px;
+            padding: 11px 7px;
+            text-align: left;
+            font-size: 14px;
+            border-bottom: 1px solid var(--border);
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+        th:first-child {
+            border-top-left-radius: 10px;
+        }
+        th:last-child {
+            border-top-right-radius: 10px;
+        }
+        td {
             padding: 11px 7px;
             text-align: left;
             border-bottom: 1px solid var(--border);
             font-size: 14px;
         }
-        th { color: #90caf9; letter-spacing: 0.5px;}
         td.status-cell { font-weight: 600;}
         .badge {
             padding: 4px 10px;
@@ -138,9 +187,9 @@
             display: inline-block;
             font-weight: 500;
         }
-        .badge.pending { background: var(--pending);}
-        .badge.completed { background: var(--completed);}
-        .badge.cancelled { background: var(--cancelled);}
+        .badge.pending { background: #ff9800;}
+        .badge.completed { background: #205c26;}
+        .badge.cancelled { background: #992424;}
         .view-btn {
             background: var(--accent);
             color: #fff;
@@ -167,9 +216,10 @@
         .charts-row {
             display: flex;
             gap: 30px;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
             margin-top: 45px;
             margin-bottom: 30px;
+            justify-content: space-between;
         }
         .chart-container {
             background: var(--card-bg);
@@ -177,14 +227,68 @@
             padding: 18px;
             box-shadow: 0 2px 8px #0002;
             flex: 1;
-            min-width: 300px;
+            min-width: 340px;
             max-width: 530px;
         }
+        .chart-header {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(90deg, #233dff 0%, #1a237e 100%);
+            color: #fff;
+            border-radius: 6px;
+            padding: 15px 18px 10px 18px;
+            margin-bottom: 12px;
+        }
+        .chart-header-left {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            flex: 1;
+        }
+        .chart-header-title {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+        }
+        .chart-header-details {
+            display: none;
+        }
+        .chart-header-total {
+            font-size: 14px;
+            font-weight: 700;
+            opacity: 1;
+        }
+        .chart-header-year {
+            font-size: 18px;
+            font-weight: 900;
+            margin-left: 16px;
+            opacity: 0.95;
+        }
         .chart-title {
-            text-align: center;
-            color: #90caf9;
-            margin-bottom: 10px;
-            font-size: 16px;
+            display: none;
+        }
+        .chart-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 12px;
+            gap: 15px;
+        }
+        .chart-dropdown {
+            background: var(--card-bg);
+            color: var(--fg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 14px;
+            outline: none;
+        }
+        /* Space after heading */
+        .table-container table {
+            margin-top: 12px;
         }
         @media (max-width: 1100px) {
             .charts-row { flex-direction: column; gap: 20px;}
@@ -196,9 +300,52 @@
             .summary-box, .filter-box { min-width: 100px; padding: 11px;}
         }
         @media (max-width: 650px) {
-            .summary-row, .filter-row, .date-selector-group { flex-direction: column;}
-            .summary-box, .filter-box { min-width: unset; width: 100%; }
-            .table-container { padding: 5px;}
+            .container {
+                max-width: 100vw;
+                padding: 0 2px;
+            }
+            .summary-row,
+            .filter-row,
+            .date-selector-group {
+                flex-direction: column;
+                gap: 8px;
+            }
+            .summary-box,
+            .filter-box {
+                min-width: unset;
+                width: 100%;
+                padding: 8px;
+                font-size: 13px;
+            }
+            .summary-box .count,
+            .filter-box .count {
+                font-size: 18px;
+            }
+            .summary-box .label,
+            .filter-box {
+                font-size: 12px;
+            }
+            .table-container { padding: 2px;}
+            th, td {
+                padding: 6px 2px;
+                font-size: 12px;
+            }
+            .charts-row {
+                flex-direction: column;
+                gap: 13px;
+                margin-top: 18px;
+                margin-bottom: 18px;
+            }
+            .chart-container {
+                min-width: unset;
+                max-width: 100vw;
+                padding: 8px;
+            }
+            .chart-header-title { font-size: 14px; }
+            .chart-header-details, .chart-header-total { font-size: 11px; }
+            .chart-header-year { font-size: 14px; margin-left: 7px; }
+            .chart-controls label { font-size: 13px;}
+            .chart-dropdown { font-size: 11px; padding: 5px 8px;}
         }
         /* Modal styles, similar to orders.html */
         .modal {
@@ -288,6 +435,8 @@
             border-top: 1px solid var(--border);
             flex-wrap: wrap;
         }
+        /* import Montserrat for summary/filter box fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&display=swap');
     </style>
 </head>
 <body>
@@ -362,11 +511,37 @@
     <!-- Charts -->
     <div class="charts-row">
         <div class="chart-container">
-            <div class="chart-title">Sales Report: Next 7 Days</div>
+            <div class="chart-header" id="weekChartHeader">
+                <div class="chart-header-left">
+                    <span class="chart-header-title" id="weekChartHeaderTitle">Sales Report: Next 7 Days</span>
+                    <span class="chart-header-total" id="weekChartHeaderTotal"></span>
+                </div>
+                <span class="chart-header-year" id="weekChartHeaderYear"></span>
+            </div>
+            <div class="chart-controls">
+                <label for="weekChartDropdown">Show:</label>
+                <select id="weekChartDropdown" class="chart-dropdown">
+                    <option value="sales">Total Sales</option>
+                    <option value="appointments">Total Appointments</option>
+                </select>
+            </div>
             <canvas id="weekChart" height="120"></canvas>
         </div>
         <div class="chart-container">
-            <div class="chart-title">Sales Report: Jan - Dec</div>
+            <div class="chart-header" id="yearChartHeader">
+                <div class="chart-header-left">
+                    <span class="chart-header-title" id="yearChartHeaderTitle">Sales Report: Jan - Dec</span>
+                    <span class="chart-header-total" id="yearChartHeaderTotal"></span>
+                </div>
+                <span class="chart-header-year" id="yearChartHeaderYear"></span>
+            </div>
+            <div class="chart-controls">
+                <label for="yearChartDropdown">Show:</label>
+                <select id="yearChartDropdown" class="chart-dropdown">
+                    <option value="sales">Total Sales</option>
+                    <option value="appointments">Total Appointments</option>
+                </select>
+            </div>
             <canvas id="yearChart" height="120"></canvas>
         </div>
     </div>
@@ -442,6 +617,10 @@ const db = firebase.database();
 const months = [
     "January","February","March","April","May","June",
     "July","August","September","October","November","December"
+];
+const monthAbbrs = [
+    "Jan","Feb","Mar","Apr","May","Jun",
+    "Jul","Aug","Sep","Oct","Nov","Dec"
 ];
 function formatTime(timeStr) {
     if (!timeStr) return 'N/A';
@@ -523,6 +702,17 @@ const weekChartCtx = document.getElementById('weekChart').getContext('2d');
 const yearChartCtx = document.getElementById('yearChart').getContext('2d');
 let weekChart, yearChart;
 
+const weekChartDropdown = document.getElementById('weekChartDropdown');
+const yearChartDropdown = document.getElementById('yearChartDropdown');
+
+// Chart header elements
+const weekChartHeaderTitle = document.getElementById('weekChartHeaderTitle');
+const weekChartHeaderTotal = document.getElementById('weekChartHeaderTotal');
+const weekChartHeaderYear = document.getElementById('weekChartHeaderYear');
+const yearChartHeaderTitle = document.getElementById('yearChartHeaderTitle');
+const yearChartHeaderTotal = document.getElementById('yearChartHeaderTotal');
+const yearChartHeaderYear = document.getElementById('yearChartHeaderYear');
+
 // Modal fields
 const modalOrderNumber = document.getElementById('modal-order-number');
 const modalCustomerName = document.getElementById('modal-customer-name');
@@ -541,7 +731,6 @@ let currentView = {type: 'status', value: 'pending'}; // status or filter/date/m
 let monthFilter = ""; // value is month index as string or ""
 let dateFilter = ""; // value is date number 1-31 as string or ""
 
-// Disable click-selected for summary/filter boxes when using month/date selector
 function clearBoxSelection() {
     summaryBoxes.forEach(b=>b.classList.remove('selected'));
     filterBoxes.forEach(b=>b.classList.remove('selected'));
@@ -822,31 +1011,65 @@ function loadOrders() {
     });
 }
 
+function formatDateChart(d) {
+    // Returns "21 Jul"
+    return `${d.getDate()} ${monthAbbrs[d.getMonth()]}`;
+}
+
 function renderCharts() {
-    // Sales report for next 7 days (from tomorrow)
+    // --- WEEKLY CHART HEADER DETAILS ---
+    let today = new Date();
+    let weekYear = today.getFullYear();
     let weekLabels = [];
     let weekSales = [];
-    let today = new Date();
+    let weekCompleted = [];
+    let weekCancelled = [];
+    let weekAppointments = [];
+    let weekTotalSales = 0;
+    let weekTotalAppointments = 0;
+
     for(let i=1; i<=7; i++) {
         let d = new Date(today);
         d.setDate(today.getDate() + i);
-        weekLabels.push(`${d.getDate()}/${d.getMonth()+1}`);
+        weekLabels.push(formatDateChart(d));
         let total = 0;
+        let completed = 0;
+        let cancelled = 0;
+        let appointments = 0;
         orders.forEach(order=>{
             if(!order.date) return;
             let od = new Date(order.date);
             if(od.getFullYear() === d.getFullYear() && od.getMonth() === d.getMonth() && od.getDate() === d.getDate()) {
+                appointments++;
+                if(order._tableStatus === 'completed') {
+                    completed += calculateTotal(order.services);
+                }
+                if(order._tableStatus === 'cancelled') {
+                    cancelled += calculateTotal(order.services);
+                }
                 total += calculateTotal(order.services);
             }
         });
         weekSales.push(parseFloat(total.toFixed(2)));
+        weekCompleted.push(parseFloat(completed.toFixed(2)));
+        weekCancelled.push(parseFloat(cancelled.toFixed(2)));
+        weekAppointments.push(appointments);
+        weekTotalSales += total;
+        weekTotalAppointments += appointments;
     }
+    weekChartHeaderYear.textContent = weekYear;
+    if(weekChartDropdown.value === 'sales') {
+        weekChartHeaderTotal.textContent = `Total Sales: $${weekTotalSales.toFixed(2)}`;
+    } else {
+        weekChartHeaderTotal.textContent = `Total Appointments: ${weekTotalAppointments}`;
+    }
+
     if(weekChart) weekChart.destroy();
-    weekChart = new Chart(weekChartCtx, {
-        type: 'line',
-        data: {
-            labels: weekLabels,
-            datasets: [{
+    let weekType = weekChartDropdown.value;
+    let weekDataSets = [];
+    if(weekType === 'sales') {
+        weekDataSets = [
+            {
                 label: 'Total Sales',
                 data: weekSales,
                 borderColor: '#1a73e8',
@@ -855,57 +1078,260 @@ function renderCharts() {
                 tension: .35,
                 pointBackgroundColor: '#fff',
                 borderWidth: 3,
-            }]
-        },
-        options: {
-            plugins: {legend: {display: false}},
-            scales: {
-                y: {beginAtZero: true, color:'#fff', grid:{color:'#444'}},
-                x: {color:'#fff', grid:{color:'#444'}}
-            }
-        }
-    });
-
-    // Sale report for year (Jan-Dec)
-    let yearLabels = months;
-    let yearSales = [];
-    let year = new Date().getFullYear();
-    for(let m=0; m<12; m++) {
-        let total = 0;
-        orders.forEach(order=>{
-            if(!order.date) return;
-            let od = new Date(order.date);
-            if(od.getFullYear() === year && od.getMonth() === m) {
-                total += calculateTotal(order.services);
-            }
-        });
-        yearSales.push(parseFloat(total.toFixed(2)));
-    }
-    if(yearChart) yearChart.destroy();
-    yearChart = new Chart(yearChartCtx, {
-        type: 'line',
-        data: {
-            labels: yearLabels,
-            datasets: [{
-                label: 'Total Sales',
-                data: yearSales,
+            },
+            {
+                label: 'Completed Sales',
+                data: weekCompleted,
                 borderColor: '#2e7d32',
                 backgroundColor: 'rgba(46,125,50,0.11)',
+                fill: false,
+                tension: .35,
+                pointBackgroundColor: '#fff',
+                borderWidth: 2,
+            },
+            {
+                label: 'Cancelled Sales',
+                data: weekCancelled,
+                borderColor: '#d32f2f',
+                backgroundColor: 'rgba(211,47,47,0.13)',
+                fill: false,
+                tension: .35,
+                pointBackgroundColor: '#fff',
+                borderWidth: 2,
+            },
+        ];
+    } else {
+        weekDataSets = [
+            {
+                label: 'Total Appointments',
+                data: weekAppointments,
+                borderColor: '#1a73e8',
+                backgroundColor: 'rgba(26,115,232,0.09)',
                 fill: true,
                 tension: .35,
                 pointBackgroundColor: '#fff',
                 borderWidth: 3,
-            }]
+            },
+            {
+                label: 'Completed',
+                data: weekCompleted.map((_, i) => {
+                    // count completed appointments, not sales
+                    let d = new Date(today);
+                    d.setDate(today.getDate() + i + 1);
+                    let count = 0;
+                    orders.forEach(order=>{
+                        if(!order.date) return;
+                        let od = new Date(order.date);
+                        if(od.getFullYear() === d.getFullYear() && od.getMonth() === d.getMonth() && od.getDate() === d.getDate() && order._tableStatus === 'completed') {
+                            count++;
+                        }
+                    });
+                    return count;
+                }),
+                borderColor: '#2e7d32',
+                backgroundColor: 'rgba(46,125,50,0.08)',
+                fill: false,
+                tension: .35,
+                pointBackgroundColor: '#fff',
+                borderWidth: 2,
+            },
+            {
+                label: 'Cancelled',
+                data: weekCancelled.map((_, i) => {
+                    // count cancelled appointments, not sales
+                    let d = new Date(today);
+                    d.setDate(today.getDate() + i + 1);
+                    let count = 0;
+                    orders.forEach(order=>{
+                        if(!order.date) return;
+                        let od = new Date(order.date);
+                        if(od.getFullYear() === d.getFullYear() && od.getMonth() === d.getMonth() && od.getDate() === d.getDate() && order._tableStatus === 'cancelled') {
+                            count++;
+                        }
+                    });
+                    return count;
+                }),
+                borderColor: '#d32f2f',
+                backgroundColor: 'rgba(211,47,47,0.09)',
+                fill: false,
+                tension: .35,
+                pointBackgroundColor: '#fff',
+                borderWidth: 2,
+            },
+        ];
+    }
+    weekChart = new Chart(weekChartCtx, {
+        type: 'line',
+        data: {
+            labels: weekLabels,
+            datasets: weekDataSets
         },
         options: {
-            plugins: {legend: {display: false}},
+            plugins: {legend: {display: true}},
             scales: {
-                y: {beginAtZero: true, color:'#fff', grid:{color:'#444'}},
-                x: {color:'#fff', grid:{color:'#444'}}
+                y: {
+                    beginAtZero: true, color:'#fff',
+                    grid:{color:'#444', drawBorder: false, drawOnChartArea: false}
+                },
+                x: {
+                    color:'#fff',
+                    grid:{color:'#444', drawBorder: false, drawOnChartArea: false}
+                }
+            }
+        }
+    });
+
+    // --- YEAR CHART HEADER DETAILS ---
+    let year = today.getFullYear();
+    let yearLabels = monthAbbrs;
+    let yearSales = [];
+    let yearCompleted = [];
+    let yearCancelled = [];
+    let yearAppointments = [];
+    let yearTotalSales = 0;
+    let yearTotalAppointments = 0;
+    for(let m=0; m<12; m++) {
+        let total = 0;
+        let completed = 0;
+        let cancelled = 0;
+        let appointments = 0;
+        orders.forEach(order=>{
+            if(!order.date) return;
+            let od = new Date(order.date);
+            if(od.getFullYear() === year && od.getMonth() === m) {
+                appointments++;
+                if(order._tableStatus === 'completed') {
+                    completed += calculateTotal(order.services);
+                }
+                if(order._tableStatus === 'cancelled') {
+                    cancelled += calculateTotal(order.services);
+                }
+                total += calculateTotal(order.services);
+            }
+        });
+        yearSales.push(parseFloat(total.toFixed(2)));
+        yearCompleted.push(parseFloat(completed.toFixed(2)));
+        yearCancelled.push(parseFloat(cancelled.toFixed(2)));
+        yearAppointments.push(appointments);
+        yearTotalSales += total;
+        yearTotalAppointments += appointments;
+    }
+    yearChartHeaderYear.textContent = year;
+    if(yearChartDropdown.value === 'sales') {
+        yearChartHeaderTotal.textContent = `Total Sales: $${yearTotalSales.toFixed(2)}`;
+    } else {
+        yearChartHeaderTotal.textContent = `Total Appointments: ${yearTotalAppointments}`;
+    }
+    if(yearChart) yearChart.destroy();
+    let yearType = yearChartDropdown.value;
+    let yearDataSets = [];
+    if(yearType === 'sales') {
+        yearDataSets = [
+            {
+                label: 'Total Sales',
+                data: yearSales,
+                borderColor: '#1a73e8',
+                backgroundColor: 'rgba(26,115,232,0.09)',
+                fill: true,
+                tension: .35,
+                pointBackgroundColor: '#fff',
+                borderWidth: 3,
+            },
+            {
+                label: 'Completed Sales',
+                data: yearCompleted,
+                borderColor: '#2e7d32',
+                backgroundColor: 'rgba(46,125,50,0.11)',
+                fill: false,
+                tension: .35,
+                pointBackgroundColor: '#fff',
+                borderWidth: 2,
+            },
+            {
+                label: 'Cancelled Sales',
+                data: yearCancelled,
+                borderColor: '#d32f2f',
+                backgroundColor: 'rgba(211,47,47,0.13)',
+                fill: false,
+                tension: .35,
+                pointBackgroundColor: '#fff',
+                borderWidth: 2,
+            },
+        ];
+    } else {
+        yearDataSets = [
+            {
+                label: 'Total Appointments',
+                data: yearAppointments,
+                borderColor: '#1a73e8',
+                backgroundColor: 'rgba(26,115,232,0.09)',
+                fill: true,
+                tension: .35,
+                pointBackgroundColor: '#fff',
+                borderWidth: 3,
+            },
+            {
+                label: 'Completed',
+                data: monthAbbrs.map((_, m) => {
+                    let count = 0;
+                    orders.forEach(order=>{
+                        if(!order.date) return;
+                        let od = new Date(order.date);
+                        if(od.getFullYear() === year && od.getMonth() === m && order._tableStatus === 'completed') count++;
+                    });
+                    return count;
+                }),
+                borderColor: '#2e7d32',
+                backgroundColor: 'rgba(46,125,50,0.08)',
+                fill: false,
+                tension: .35,
+                pointBackgroundColor: '#fff',
+                borderWidth: 2,
+            },
+            {
+                label: 'Cancelled',
+                data: monthAbbrs.map((_, m) => {
+                    let count = 0;
+                    orders.forEach(order=>{
+                        if(!order.date) return;
+                        let od = new Date(order.date);
+                        if(od.getFullYear() === year && od.getMonth() === m && order._tableStatus === 'cancelled') count++;
+                    });
+                    return count;
+                }),
+                borderColor: '#d32f2f',
+                backgroundColor: 'rgba(211,47,47,0.09)',
+                fill: false,
+                tension: .35,
+                pointBackgroundColor: '#fff',
+                borderWidth: 2,
+            },
+        ];
+    }
+    yearChart = new Chart(yearChartCtx, {
+        type: 'line',
+        data: {
+            labels: yearLabels,
+            datasets: yearDataSets
+        },
+        options: {
+            plugins: {legend: {display: true}},
+            scales: {
+                y: {
+                    beginAtZero: true, color:'#fff',
+                    grid:{color:'#444', drawBorder: false, drawOnChartArea: false}
+                },
+                x: {
+                    color:'#fff',
+                    grid:{color:'#444', drawBorder: false, drawOnChartArea: false}
+                }
             }
         }
     });
 }
+
+weekChartDropdown.addEventListener('change', () => renderCharts());
+yearChartDropdown.addEventListener('change', () => renderCharts());
 
 loadOrders();
 </script>
