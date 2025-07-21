@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BDM Salon - Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Chart.js for line charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg: #0d0d0d;
+            --fg: #fff;
+            --card-bg: #181818;
+            --accent: #1a73e8;
+            --border: #333;
+            --pending: #ff9800;
+            --completed: #2e7d32;
+            --cancelled: #d32f2f;
+            --box-padding: 16px;
+        }
+        body {
+            background: var(--bg);
+            color: var(--fg);
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 36px auto 20px;
+            padding: 0 12px;
+        }
+        .summary-row, .filter-row {
+            display: flex;
+            gap: 18px;
+            margin-bottom: 22px;
+            flex-wrap: wrap;
+        }
+        .summary-box, .filter-box {
+            flex: 1;
+            min-width: 120px;
+            background: var(--card-bg);
+            box-shadow: 0 2px 8px #0003;
+            border-radius: 8px;
+            padding: var(--box-padding);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: box-shadow .2s, transform .2s;
+            border: 2px solid transparent;
+            position: relative;
+        }
+        .summary-box.selected, .filter-box.selected {
+            border-color: var(--accent);
+            box-shadow: 0 4px 18px #1a73e81a;
+            transform: translateY(-2px) scale(1.03);
+        }
+        .summary-box .icon {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+        .summary-box.pending { color: var(--pending);}
+        .summary-box.completed { color: var(--completed);}
+        .summary-box.cancelled { color: var(--cancelled);}
+        .summary-box .count {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        .summary-box .label {
+            font-size: 14px;
+            color: #bbb;
+            margin-top: 2px;
+        }
+        .filter-box {
+            font-size: 15px;
+            color: var(--fg);
+            justify-content: center;
+        }
+        .filter-box .count {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        .filter-box.today { border-left: 5px solid var(--accent);}
+        .filter-box.tomorrow { border-left: 5px solid #7e57c2;}
+        .filter-box.week { border-left: 5px solid #1de9b6;}
+        .filter-box.nextweek { border-left: 5px solid #ffb300;}
+        .filter-box.month { border-left: 5px solid #e57373;}
+        .date-selector-row {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .date-selector-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .month-selector, .date-selector {
+            background: var(--card-bg);
+            color: var(--fg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 8px 14px;
+            font-size: 15px;
+            outline: none;
+        }
+        .table-container {
+            background: var(--card-bg);
+            padding: 12px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px #0001;
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: transparent;
+        }
+        th, td {
+            padding: 11px 7px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+        th { color: #90caf9; letter-spacing: 0.5px;}
+        td.status-cell { font-weight: 600;}
+        .badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 13px;
+            display: inline-block;
+            font-weight: 500;
+        }
+        .badge.pending { background: var(--pending);}
+        .badge.completed { background: var(--completed);}
+        .badge.cancelled { background: var(--cancelled);}
+        .view-btn {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 16px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background .2s;
+        }
+        .view-btn:hover {
+            background: #0d47a1;
+        }
+        .status-select {
+            background: #222;
+            color: #fff;
+            border: none;
+            border-radius: 7px;
+            padding: 4px 11px;
+            font-size: 13px;
+            margin-right: 6px;
+        }
+        /* Chart styles */
+        .charts-row {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-top: 45px;
+            margin-bottom: 30px;
+        }
+        .chart-container {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 18px;
+            box-shadow: 0 2px 8px #0002;
+            flex: 1;
+            min-width: 300px;
+            max-width: 530px;
+        }
+        .chart-title {
+            text-align: center;
+            color: #90caf9;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        @media (max-width: 1100px) {
+            .charts-row { flex-direction: column; gap: 20px;}
+            .chart-container { max-width: 100%; }
+        }
+        @media (max-width: 900px) {
+            .container { max-width: 99vw;}
+            .summary-row, .filter-row { gap: 12px;}
+            .summary-box, .filter-box { min-width: 100px; padding: 11px;}
+        }
+        @media (max-width: 650px) {
+            .summary-row, .filter-row, .date-selector-group { flex-direction: column;}
+            .summary-box, .filter-box { min-width: unset; width: 100%; }
+            .table-container { padding: 5px;}
+        }
+        /* Modal styles, similar to orders.html */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px 10px;
+        }
+        .modal-content {
+            background: var(--card-bg);
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 95%;
+            max-width: 500px;
+            position: relative;
+            box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+            border: 1px solid var(--border);
+        }
+        .close-modal {
+            position: absolute;
+            top: 12px; right: 15px;
+            font-size: 22px;
+            cursor: pointer;
+            color: var(--fg);
+            background: none;
+            border: none;
+            width: 30px; height: 30px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%;
+        }
+        .modal-header {
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+        .modal-title {
+            font-size: 18px;
+            color: #90caf9;
+            margin: 0;
+            font-weight: 600;
+        }
+        .detail-row {
+            display: flex;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed var(--border);
+            font-size: 13px;
+        }
+        .detail-label {
+            width: 100px;
+            font-weight: 500;
+            color: #90caf9;
+            flex-shrink: 0;
+        }
+        .detail-value {
+            flex: 1;
+            color: var(--fg);
+            word-break: break-word;
+        }
+        .services-list {
+            margin-top: 5px;
+        }
+        .service-item {
+            background: #1a237e;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 5px;
+            border-left: 3px solid #0d47a1;
+            font-size: 12px;
+        }
+        .service-item .service-name {
+            font-weight: bold;
+            color: white;
+            font-size: 13px;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding-top: 15px;
+            margin-top: 10px;
+            border-top: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 style="text-align:center; margin-bottom:20px;">Appointment Overview</h2>
+    <!-- Summary Boxes -->
+    <div class="summary-row">
+        <div class="summary-box pending selected" data-status="pending">
+            <span class="icon"><i class="fas fa-hourglass-half"></i></span>
+            <span class="count" id="pending-count">0</span>
+            <span class="label">Pending</span>
+        </div>
+        <div class="summary-box completed" data-status="completed">
+            <span class="icon"><i class="fas fa-check-circle"></i></span>
+            <span class="count" id="completed-count">0</span>
+            <span class="label">Completed</span>
+        </div>
+        <div class="summary-box cancelled" data-status="cancelled">
+            <span class="icon"><i class="fas fa-times-circle"></i></span>
+            <span class="count" id="cancelled-count">0</span>
+            <span class="label">Cancelled</span>
+        </div>
+    </div>
+    <!-- Filter Boxes -->
+    <div class="filter-row">
+        <div class="filter-box today" data-filter="today">
+            <span class="count" id="today-count">0</span>
+            Today
+        </div>
+        <div class="filter-box tomorrow" data-filter="tomorrow">
+            <span class="count" id="tomorrow-count">0</span>
+            Tomorrow
+        </div>
+        <div class="filter-box week" data-filter="week">
+            <span class="count" id="week-count">0</span>
+            This Week
+        </div>
+        <div class="filter-box nextweek" data-filter="nextweek">
+            <span class="count" id="nextweek-count">0</span>
+            Next Week
+        </div>
+        <div class="filter-box month" data-filter="month">
+            <span class="count" id="month-count">0</span>
+            This Month
+        </div>
+    </div>
+    <!-- Month/Date Selector -->
+    <div class="date-selector-row">
+        <label for="month-selector"><b>Select Month/Date:</b></label>
+        <div class="date-selector-group">
+            <select id="month-selector" class="month-selector">
+                <option value="">All Months</option>
+                <!-- Populated by JS -->
+            </select>
+            <select id="date-selector" class="date-selector" style="display:none;">
+                <option value="">All Dates</option>
+                <!-- Populated by JS -->
+            </select>
+        </div>
+    </div>
+    <!-- Table -->
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th><th>Date</th><th>Time</th><th>Status</th><th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="appointments-table"></tbody>
+        </table>
+    </div>
+    <!-- Charts -->
+    <div class="charts-row">
+        <div class="chart-container">
+            <div class="chart-title">Sales Report: Next 7 Days</div>
+            <canvas id="weekChart" height="120"></canvas>
+        </div>
+        <div class="chart-container">
+            <div class="chart-title">Sales Report: Jan - Dec</div>
+            <canvas id="yearChart" height="120"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Popup -->
+<div id="orderModal" class="modal">
+    <div class="modal-content">
+        <button class="close-modal"><i class="fas fa-times"></i></button>
+        <div class="modal-header">
+            <h2 class="modal-title">Order Details</h2>
+            <div class="order-number" id="modal-order-number"></div>
+        </div>
+        <div class="modal-body">
+            <div class="detail-row">
+                <div class="detail-label">Customer:</div>
+                <div class="detail-value" id="modal-customer-name"></div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Contact:</div>
+                <div class="detail-value">
+                    <div id="modal-phone"></div>
+                    <div id="modal-email"></div>
+                </div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Date & Time:</div>
+                <div class="detail-value">
+                    <div id="modal-date"></div>
+                    <div id="modal-time"></div>
+                </div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Stylist:</div>
+                <div class="detail-value" id="modal-stylist"></div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Services:</div>
+                <div class="detail-value">
+                    <div class="services-list" id="modal-services"></div>
+                </div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Total Price:</div>
+                <div class="detail-value" id="modal-total-price"></div>
+            </div>
+            <div class="detail-row" style="border-bottom: none; padding-bottom: 0; margin-bottom: 0;">
+                <div class="detail-label">Booking Time:</div>
+                <div class="detail-value" id="modal-booking-time"></div>
+            </div>
+        </div>
+        <div class="modal-footer" id="modal-footer"></div>
+    </div>
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script>
+const firebaseConfig = {
+    apiKey: "AIzaSyAmimDsjW_pF2NGw-w-40QzTsgmf1tdqyI",
+    authDomain: "bdmsalonappointment.firebaseapp.com",
+    databaseURL: "https://bdmsalonappointment-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "bdmsalonappointment",
+    storageBucket: "bdmsalonappointment.firebasestorage.app",
+    messagingSenderId: "123933913893",
+    appId: "1:123933913893:web:c1f57caf4dc2a5440ba0cc",
+    measurementId: "G-Q0FVZRVS64"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+const months = [
+    "January","February","March","April","May","June",
+    "July","August","September","October","November","December"
+];
+function formatTime(timeStr) {
+    if (!timeStr) return 'N/A';
+    let timePart = timeStr.split('-')[0].trim();
+    if (timePart.match(/(AM|PM)$/i)) {
+        let [h, mAP] = timePart.split(':');
+        let [m, ap] = mAP.match(/(\d+)(AM|PM)/i).slice(1, 3);
+        return `${h.padStart(2, '0')}:${m} ${ap.toUpperCase()}`;
+    }
+    const [hours, minutes] = timePart.split(':');
+    if (!hours || !minutes) return timeStr;
+    let h = parseInt(hours, 10);
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const hour12 = h % 12 || 12;
+    return `${hour12.toString().padStart(2, '0')}:${minutes.padStart(2, '0')} ${ampm}`;
+}
+function formatPrice(price) {
+    if (price === undefined || price === null) return 'N/A';
+    return `$${parseFloat(price).toFixed(2)}`;
+}
+function calculateTotal(services) {
+    if (!services || !services.length) return 0;
+    return services.reduce((total, service) => {
+        if (!service.price) return total;
+        const priceStr = String(service.price).replace(/[^0-9.]/g, '');
+        const price = parseFloat(priceStr) || 0;
+        return total + price;
+    }, 0);
+}
+function isToday(dateStr) {
+    let d = new Date(dateStr);
+    let now = new Date();
+    return d.getDate() === now.getDate() &&
+        d.getMonth() === now.getMonth() &&
+        d.getFullYear() === now.getFullYear();
+}
+function isTomorrow(dateStr) {
+    let d = new Date(dateStr);
+    let now = new Date();
+    let tomorrow = new Date(now);
+    tomorrow.setDate(now.getDate()+1);
+    return d.getDate() === tomorrow.getDate() &&
+        d.getMonth() === tomorrow.getMonth() &&
+        d.getFullYear() === tomorrow.getFullYear();
+}
+function isThisWeek(dateStr) {
+    let d = new Date(dateStr);
+    let now = new Date();
+    let first = new Date(now);
+    first.setDate(now.getDate()-now.getDay());
+    let last = new Date(first);
+    last.setDate(first.getDate()+6);
+    return d >= first && d <= last;
+}
+function isNextWeek(dateStr) {
+    let d = new Date(dateStr);
+    let now = new Date();
+    let first = new Date(now);
+    first.setDate(now.getDate()-now.getDay()+7);
+    let last = new Date(first);
+    last.setDate(first.getDate()+6);
+    return d >= first && d <= last;
+}
+function isThisMonth(dateStr) {
+    let d = new Date(dateStr);
+    let now = new Date();
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+}
+
+const summaryBoxes = document.querySelectorAll('.summary-box');
+const filterBoxes = document.querySelectorAll('.filter-box');
+const monthSelector = document.getElementById('month-selector');
+const dateSelector = document.getElementById('date-selector');
+const tableBody = document.getElementById('appointments-table');
+const modal = document.getElementById('orderModal');
+const closeModalBtn = document.querySelector('.close-modal');
+
+const weekChartCtx = document.getElementById('weekChart').getContext('2d');
+const yearChartCtx = document.getElementById('yearChart').getContext('2d');
+let weekChart, yearChart;
+
+// Modal fields
+const modalOrderNumber = document.getElementById('modal-order-number');
+const modalCustomerName = document.getElementById('modal-customer-name');
+const modalPhone = document.getElementById('modal-phone');
+const modalEmail = document.getElementById('modal-email');
+const modalDate = document.getElementById('modal-date');
+const modalTime = document.getElementById('modal-time');
+const modalStylist = document.getElementById('modal-stylist');
+const modalBookingTime = document.getElementById('modal-booking-time');
+const modalServices = document.getElementById('modal-services');
+const modalTotalPrice = document.getElementById('modal-total-price');
+const modalFooter = document.getElementById('modal-footer');
+
+let orders = [];
+let currentView = {type: 'status', value: 'pending'}; // status or filter/date/month
+let monthFilter = ""; // value is month index as string or ""
+let dateFilter = ""; // value is date number 1-31 as string or ""
+
+// Disable click-selected for summary/filter boxes when using month/date selector
+function clearBoxSelection() {
+    summaryBoxes.forEach(b=>b.classList.remove('selected'));
+    filterBoxes.forEach(b=>b.classList.remove('selected'));
+}
+
+function getDaysInMonth(year, monthIdx) {
+    return new Date(year, monthIdx + 1, 0).getDate();
+}
+
+function renderMonthSelector() {
+    monthSelector.innerHTML = `<option value="">All Months</option>`;
+    for(let i=0;i<months.length;i++) {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = months[i];
+        monthSelector.appendChild(opt);
+    }
+}
+function renderDateSelector() {
+    if(monthSelector.value === "") {
+        dateSelector.style.display = "none";
+        dateSelector.innerHTML = `<option value="">All Dates</option>`;
+        return;
+    }
+    dateSelector.style.display = "";
+    dateSelector.innerHTML = `<option value="">All Dates</option>`;
+    let selectedMonthIdx = parseInt(monthSelector.value);
+    let year = new Date().getFullYear();
+    let days = getDaysInMonth(year, selectedMonthIdx);
+    for(let d=1; d<=days; d++) {
+        let opt = document.createElement('option');
+        opt.value = d;
+        opt.textContent = d;
+        dateSelector.appendChild(opt);
+    }
+}
+
+function updateCounts() {
+    let pending=0,completed=0,cancelled=0;
+    orders.forEach(o=>{
+        if(o._tableStatus==='pending') pending++;
+        if(o._tableStatus==='completed') completed++;
+        if(o._tableStatus==='cancelled') cancelled++;
+    });
+    document.getElementById('pending-count').textContent = pending;
+    document.getElementById('completed-count').textContent = completed;
+    document.getElementById('cancelled-count').textContent = cancelled;
+
+    let today=0, tomorrow=0, week=0, nextweek=0, month=0;
+    orders.forEach(o=>{
+        if(isToday(o.date)) today++;
+        if(isTomorrow(o.date)) tomorrow++;
+        if(isThisWeek(o.date)) week++;
+        if(isNextWeek(o.date)) nextweek++;
+        if(isThisMonth(o.date)) month++;
+    });
+    document.getElementById('today-count').textContent = today;
+    document.getElementById('tomorrow-count').textContent = tomorrow;
+    document.getElementById('week-count').textContent = week;
+    document.getElementById('nextweek-count').textContent = nextweek;
+    document.getElementById('month-count').textContent = month;
+}
+
+function getFilteredOrders() {
+    if(monthFilter !== "") {
+        let monthIdx = parseInt(monthFilter);
+        let year = new Date().getFullYear();
+        let filtered = orders.filter(o=>{
+            if(!o.date) return false;
+            let d = new Date(o.date);
+            if(d.getMonth()!==monthIdx || d.getFullYear()!==year) return false;
+            if(dateFilter !== "") {
+                return d.getDate() === parseInt(dateFilter);
+            }
+            return true;
+        });
+        filtered.sort((a,b)=>{
+            let da = new Date(a.date), db = new Date(b.date);
+            return da - db;
+        });
+        return filtered;
+    } else if(dateFilter !== "") {
+        let year = new Date().getFullYear();
+        let filtered = orders.filter(o=>{
+            if(!o.date) return false;
+            let d = new Date(o.date);
+            return d.getDate() === parseInt(dateFilter) && d.getFullYear()===year;
+        });
+        filtered.sort((a,b)=>{
+            let da = new Date(a.date), db = new Date(b.date);
+            return da - db;
+        });
+        return filtered;
+    }
+    if(currentView.type === 'status') {
+        let filtered = orders.filter(o => o._tableStatus === currentView.value);
+        filtered.sort((a,b)=>{
+            let da = new Date(a.date), db = new Date(b.date);
+            return da - db;
+        });
+        return filtered;
+    } else if(currentView.type === 'filter') {
+        let fn = {
+            today: isToday,
+            tomorrow: isTomorrow,
+            week: isThisWeek,
+            nextweek: isNextWeek,
+            month: isThisMonth
+        }[currentView.value];
+        let filtered = orders.filter(o=>fn(o.date));
+        filtered.sort((a,b)=>{
+            let da = new Date(a.date), db = new Date(b.date);
+            return da - db;
+        });
+        return filtered;
+    }
+    let filtered = orders;
+    filtered.sort((a,b)=>{
+        let da = new Date(a.date), db = new Date(b.date);
+        return da - db;
+    });
+    return filtered;
+}
+
+function renderTable() {
+    const filtered = getFilteredOrders();
+    tableBody.innerHTML = '';
+    if(!filtered.length) {
+        tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#bbb;">No appointments found.</td></tr>`;
+        return;
+    }
+    filtered.forEach(order=>{
+        let status = order._tableStatus;
+        let badgeClass = 'badge '+status;
+        let statusSelect = `
+            <select class="status-select" data-id="${order.id}">
+                <option value="pending" ${status==='pending'?'selected':''}>Pending</option>
+                <option value="completed" ${status==='completed'?'selected':''}>Completed</option>
+                <option value="cancelled" ${status==='cancelled'?'selected':''}>Cancelled</option>
+            </select>
+        `;
+        let row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${order.user?.name || 'N/A'}</td>
+            <td>${order.date || 'N/A'}</td>
+            <td>${formatTime(order.time) || 'N/A'}</td>
+            <td class="status-cell">${statusSelect}<span class="${badgeClass}">${status.charAt(0).toUpperCase()+status.slice(1)}</span></td>
+            <td><button class="view-btn" data-id="${order.id}"><i class="fas fa-eye"></i> View</button></td>
+        `;
+        tableBody.appendChild(row);
+    });
+}
+
+function showOrderModal(order) {
+    modalOrderNumber.textContent = order.orderNumber && String(order.orderNumber).length === 8 ? `#${order.orderNumber}` : 'N/A';
+    modalCustomerName.textContent = order.user?.name || 'N/A';
+    modalPhone.textContent = order.user?.phone || 'N/A';
+    modalEmail.textContent = order.user?.email || 'N/A';
+    modalDate.textContent = order.date || 'N/A';
+    modalTime.textContent = formatTime(order.time) || 'N/A';
+    modalStylist.textContent = order.stylist?.name || 'N/A';
+    modalBookingTime.textContent = order.createdAt ? (new Date(order.createdAt)).toLocaleString() : 'N/A';
+    modalServices.innerHTML = '';
+    if (order.services && order.services.length) {
+        order.services.forEach(service => {
+            const serviceEl = document.createElement('div');
+            serviceEl.className = 'service-item';
+            serviceEl.innerHTML = `
+                <div class="service-name">${service.name || 'N/A'}</div>
+                <div>Duration: ${service.duration || service.time || 'N/A'}</div>
+                <div>Price: ${service.price || 'N/A'}</div>
+            `;
+            modalServices.appendChild(serviceEl);
+        });
+    } else {
+        modalServices.innerHTML = '<div class="service-item">No services selected</div>';
+    }
+    modalTotalPrice.textContent = formatPrice(calculateTotal(order.services));
+    modalFooter.innerHTML = '';
+    modal.style.display = 'block';
+}
+
+// Event listeners
+summaryBoxes.forEach(box=>{
+    box.addEventListener('click', ()=>{
+        summaryBoxes.forEach(b=>b.classList.remove('selected'));
+        box.classList.add('selected');
+        filterBoxes.forEach(b=>b.classList.remove('selected'));
+        monthSelector.value = "";
+        dateSelector.value = "";
+        monthFilter = "";
+        dateFilter = "";
+        renderDateSelector();
+        currentView = {type: 'status', value: box.dataset.status};
+        renderTable();
+        renderCharts();
+    });
+});
+filterBoxes.forEach(box=>{
+    box.addEventListener('click', ()=>{
+        filterBoxes.forEach(b=>b.classList.remove('selected'));
+        box.classList.add('selected');
+        summaryBoxes.forEach(b=>b.classList.remove('selected'));
+        monthSelector.value = "";
+        dateSelector.value = "";
+        monthFilter = "";
+        dateFilter = "";
+        renderDateSelector();
+        currentView = {type: 'filter', value: box.dataset.filter};
+        renderTable();
+        renderCharts();
+    });
+});
+monthSelector.addEventListener('change', ()=>{
+    monthFilter = monthSelector.value;
+    dateFilter = "";
+    dateSelector.value = "";
+    renderDateSelector();
+    clearBoxSelection();
+    renderTable();
+    renderCharts();
+});
+dateSelector.addEventListener('change', ()=>{
+    dateFilter = dateSelector.value;
+    clearBoxSelection();
+    renderTable();
+    renderCharts();
+});
+tableBody.addEventListener('change', function(e){
+    if(e.target.classList.contains('status-select')) {
+        let id = e.target.dataset.id;
+        let newStatus = e.target.value;
+        let order = orders.find(o=>o.id===id);
+        if(order) {
+            order._tableStatus = newStatus;
+            db.ref('bookings/'+id).update({
+                status: newStatus === 'pending' ? 'accepted' : newStatus,
+                _tableStatus: newStatus
+            }, function(error){
+                if(!error) {
+                    updateCounts();
+                    renderTable();
+                    renderCharts();
+                }
+            });
+        }
+    }
+});
+tableBody.addEventListener('click',function(e){
+    if(e.target.classList.contains('view-btn') || e.target.closest('.view-btn')) {
+        let btn = e.target.closest('.view-btn');
+        let id = btn.dataset.id;
+        let order = orders.find(o=>o.id===id);
+        if(order) showOrderModal(order);
+    }
+});
+closeModalBtn.addEventListener('click',()=>{modal.style.display='none';});
+window.addEventListener('click',e=>{
+    if(e.target===modal) modal.style.display = 'none';
+});
+
+function loadOrders() {
+    db.ref('bookings').on('value', snapshot => {
+        orders = [];
+        snapshot.forEach(child => {
+            let order = child.val();
+            order.id = child.key;
+            if(order.status === 'accepted' || order.status === 'cancelled' || order.status === 'completed') {
+                order._tableStatus = order.status === 'accepted' ? 'pending' : order.status;
+                orders.push(order);
+            }
+        });
+        renderMonthSelector();
+        renderDateSelector();
+        updateCounts();
+        renderTable();
+        renderCharts();
+    });
+}
+
+function renderCharts() {
+    // Sales report for next 7 days (from tomorrow)
+    let weekLabels = [];
+    let weekSales = [];
+    let today = new Date();
+    for(let i=1; i<=7; i++) {
+        let d = new Date(today);
+        d.setDate(today.getDate() + i);
+        weekLabels.push(`${d.getDate()}/${d.getMonth()+1}`);
+        let total = 0;
+        orders.forEach(order=>{
+            if(!order.date) return;
+            let od = new Date(order.date);
+            if(od.getFullYear() === d.getFullYear() && od.getMonth() === d.getMonth() && od.getDate() === d.getDate()) {
+                total += calculateTotal(order.services);
+            }
+        });
+        weekSales.push(parseFloat(total.toFixed(2)));
+    }
+    if(weekChart) weekChart.destroy();
+    weekChart = new Chart(weekChartCtx, {
+        type: 'line',
+        data: {
+            labels: weekLabels,
+            datasets: [{
+                label: 'Total Sales',
+                data: weekSales,
+                borderColor: '#1a73e8',
+                backgroundColor: 'rgba(26,115,232,0.09)',
+                fill: true,
+                tension: .35,
+                pointBackgroundColor: '#fff',
+                borderWidth: 3,
+            }]
+        },
+        options: {
+            plugins: {legend: {display: false}},
+            scales: {
+                y: {beginAtZero: true, color:'#fff', grid:{color:'#444'}},
+                x: {color:'#fff', grid:{color:'#444'}}
+            }
+        }
+    });
+
+    // Sale report for year (Jan-Dec)
+    let yearLabels = months;
+    let yearSales = [];
+    let year = new Date().getFullYear();
+    for(let m=0; m<12; m++) {
+        let total = 0;
+        orders.forEach(order=>{
+            if(!order.date) return;
+            let od = new Date(order.date);
+            if(od.getFullYear() === year && od.getMonth() === m) {
+                total += calculateTotal(order.services);
+            }
+        });
+        yearSales.push(parseFloat(total.toFixed(2)));
+    }
+    if(yearChart) yearChart.destroy();
+    yearChart = new Chart(yearChartCtx, {
+        type: 'line',
+        data: {
+            labels: yearLabels,
+            datasets: [{
+                label: 'Total Sales',
+                data: yearSales,
+                borderColor: '#2e7d32',
+                backgroundColor: 'rgba(46,125,50,0.11)',
+                fill: true,
+                tension: .35,
+                pointBackgroundColor: '#fff',
+                borderWidth: 3,
+            }]
+        },
+        options: {
+            plugins: {legend: {display: false}},
+            scales: {
+                y: {beginAtZero: true, color:'#fff', grid:{color:'#444'}},
+                x: {color:'#fff', grid:{color:'#444'}}
+            }
+        }
+    });
+}
+
+loadOrders();
+</script>
+</body>
+</html>
