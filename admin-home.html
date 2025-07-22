@@ -81,6 +81,7 @@
             font-weight: 800;
             letter-spacing: 1px;
             margin-bottom: 2px;
+            margin-top: 2px;
             transition: font-size 0.2s;
         }
         .summary-box .label {
@@ -356,24 +357,22 @@
                 flex-direction: row;
                 gap: 4px;
             }
-            .summary-box,
-            .filter-box {
-                min-width: 90px;
-                /* Don't reduce box size in mobile */
+            .summary-box, .filter-box {
+                min-width: 120px;
                 padding: var(--box-padding);
                 font-size: 9px;
             }
             .summary-box .icon {
-                font-size: 14px !important; /* Decrease icon size */
+                font-size: 14px !important;
             }
             .summary-box .count {
-                font-size: 28px !important; /* Increase number size */
+                font-size: 32px !important;
             }
             .summary-box .label,
             .filter-box {
                 font-size: 9px;
             }
-            .table-container { padding: 1px;}
+            /* TABLE: keep normal */
             th, td {
                 font-size: 8px;
                 padding: 4px 0;
@@ -428,8 +427,8 @@
                 max-width: 100vw !important;
                 padding: 2px !important;
                 margin: 0 !important;
-                min-height: 180px !important;
-                height: 180px !important;
+                min-height: 200px !important;
+                height: 200px !important;
             }
             .chart-header-title { font-size: 12px !important; }
             .chart-header-details, .chart-header-total { font-size: 10px !important; }
@@ -449,8 +448,8 @@
                 max-width: 100vw !important;
                 padding: 2px !important;
                 margin: 0 !important;
-                min-height: 180px !important;
-                height: 180px !important;
+                min-height: 200px !important;
+                height: 200px !important;
             }
         }
         @media (max-width: 900px) and (min-width: 651px) {
@@ -638,7 +637,7 @@
                 <label for="weekChartDropdown">Show:</label>
                 <select id="weekChartDropdown" class="chart-dropdown">
                     <option value="sales">Total Sales</option>
-                    <option value="appointments">Total Appointments</option>
+                    <option value="appointments" selected>Total Appointments</option>
                 </select>
             </div>
             <div style="flex:1;display:flex;align-items:center;">
@@ -657,7 +656,7 @@
                 <label for="yearChartDropdown">Show:</label>
                 <select id="yearChartDropdown" class="chart-dropdown">
                     <option value="sales">Total Sales</option>
-                    <option value="appointments">Total Appointments</option>
+                    <option value="appointments" selected>Total Appointments</option>
                 </select>
             </div>
             <div style="flex:1;display:flex;align-items:center;">
@@ -762,11 +761,9 @@ function formatTime(timeStr) {
     return `${hour12.toString().padStart(2, '0')}:${minutes.padStart(2, '0')} ${ampm}`;
 }
 function formatDateChart(d) {
-    // Returns "21 Jul"
     return `${d.getDate()} ${monthAbbrs[d.getMonth()]}`;
 }
 function formatDateDisplay(dateStr) {
-    // Format date as "21 Jul"
     if (!dateStr) return 'N/A';
     let d = new Date(dateStr);
     return `${d.getDate()} ${monthAbbrs[d.getMonth()]}`;
@@ -1205,6 +1202,10 @@ function loadOrders() {
 }
 
 function renderCharts() {
+    // force both dropdowns to select "appointments" on load
+    weekChartDropdown.value = 'appointments';
+    yearChartDropdown.value = 'appointments';
+
     let today = new Date();
     let weekYear = today.getFullYear();
     let weekLabels = [];
@@ -1288,7 +1289,8 @@ function renderCharts() {
             },
         ];
     } else {
-        weekDataSets = [
+        // show 5 lines in chart for mobile (maximum 5 on mobile, but allow all on desktop)
+        let datasetsList = [
             {
                 label: 'Total Appointments',
                 data: weekAppointments,
@@ -1343,7 +1345,34 @@ function renderCharts() {
                 pointBackgroundColor: '#fff',
                 borderWidth: 2,
             },
+            // 2 more dummy datasets for 5 lines
+            {
+                label: 'Dummy 1',
+                data: weekAppointments.map(() => null),
+                borderColor: '#ffb300',
+                backgroundColor: 'rgba(255,179,0,0.08)',
+                fill: false,
+                tension: .4,
+                pointBackgroundColor: '#fff',
+                borderWidth: 2,
+            },
+            {
+                label: 'Dummy 2',
+                data: weekAppointments.map(() => null),
+                borderColor: '#9575cd',
+                backgroundColor: 'rgba(149,117,205,0.08)',
+                fill: false,
+                tension: .4,
+                pointBackgroundColor: '#fff',
+                borderWidth: 2,
+            }
         ];
+        // On mobile, only show 5 lines (for compressed look)
+        if(window.innerWidth <= 650) {
+            weekDataSets = datasetsList.slice(0, 5);
+        } else {
+            weekDataSets = datasetsList.slice(0, 3);
+        }
     }
     weekChart = new Chart(weekChartCtx, {
         type: 'line',
