@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -54,85 +54,415 @@
             background: linear-gradient(90deg, #fbc02d 0%, #ff9800 100%);
             color: #fff;
         }
-        .summary-box.pending { background: linear-gradient(90deg, #fbc02d 0%, #ff9800 100%);}
-        .summary-box.completed { background: linear-gradient(90deg, #43ea7a 0%, #205c26 100%);}
-        .summary-box.cancelled { background: linear-gradient(90deg, #ff3d3d 0%, #992424 100%);}
-        .summary-box:hover { box-shadow: 0 4px 18px #0006; transform: scale(1.04);}
-        .summary-box.selected { border-bottom: 4px solid #fff;}
-        .summary-box .icon { font-size: 22px; margin-bottom: 4px; transition: font-size 0.2s;}
-        .summary-box .count { font-family: 'Montserrat', 'Arial', sans-serif; font-size: 32px; font-weight: 800; letter-spacing: 1px; margin-bottom: 2px; margin-top: 2px; transition: font-size 0.2s;}
-        .summary-box .label { font-size: 15px; color: #fff; margin-top: 2px; font-family: 'Montserrat', 'Arial', sans-serif; letter-spacing: 0.5px;}
+        .summary-box.pending {
+            background: linear-gradient(90deg, #fbc02d 0%, #ff9800 100%);
+        }
+        .summary-box.completed {
+            background: linear-gradient(90deg, #43ea7a 0%, #205c26 100%);
+        }
+        .summary-box.cancelled {
+            background: linear-gradient(90deg, #ff3d3d 0%, #992424 100%);
+        }
+        .summary-box:hover {
+            box-shadow: 0 4px 18px #0006;
+            transform: scale(1.04);
+        }
+        .summary-box.selected {
+            border-bottom: 4px solid #fff;
+        }
+        .summary-box .icon {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+        .summary-box .count {
+            font-family: 'Montserrat', 'Arial', sans-serif;
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+        }
+        .summary-box .label {
+            font-size: 15px;
+            color: #fff;
+            margin-top: 2px;
+            font-family: 'Montserrat', 'Arial', sans-serif;
+            letter-spacing: 0.5px;
+        }
 
-        .filter-box { flex: 1; min-width: 120px; background: linear-gradient(90deg, #233dff 0%, #1a237e 100%); box-shadow: 0 2px 8px #0003; border-radius: 8px; padding: var(--box-padding); display: flex; flex-direction: column; align-items: center; cursor: pointer; font-size: 16px; color: #fff; justify-content: center; transition: box-shadow .2s, transform .2s, border-bottom .2s; border: 2px solid transparent; font-family: 'Montserrat', 'Arial', sans-serif;}
-        .filter-box .count { font-size: 22px; font-weight: 700; margin-bottom: 3px; font-family: 'Montserrat', 'Arial', sans-serif;}
-        .filter-box.selected { border-bottom: 4px solid #fff;}
-        .filter-box:hover { box-shadow: 0 4px 18px #0006; transform: scale(1.04);}
+        /* Filter Boxes */
+        .filter-box {
+            flex: 1;
+            min-width: 120px;
+            background: linear-gradient(90deg, #233dff 0%, #1a237e 100%);
+            box-shadow: 0 2px 8px #0003;
+            border-radius: 8px;
+            padding: var(--box-padding);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            font-size: 16px;
+            color: #fff;
+            justify-content: center;
+            transition: box-shadow .2s, transform .2s, border-bottom .2s;
+            border: 2px solid transparent;
+            font-family: 'Montserrat', 'Arial', sans-serif;
+        }
+        .filter-box .count {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 3px;
+            font-family: 'Montserrat', 'Arial', sans-serif;
+        }
+        .filter-box.selected {
+            border-bottom: 4px solid #fff;
+        }
+        .filter-box:hover {
+            box-shadow: 0 4px 18px #0006;
+            transform: scale(1.04);
+        }
 
-        .date-selector-row { margin-bottom: 12px; display: flex; align-items: center; gap: 10px;}
-        .date-selector-group { display: flex; gap: 8px; align-items: center;}
-        .month-selector, .date-selector { background: var(--card-bg); color: var(--fg); border: 1px solid var(--border); border-radius: 6px; padding: 8px 14px; font-size: 15px; outline: none;}
-        .table-container { background: var(--card-bg); padding: 12px; border-radius: 8px; box-shadow: 0 2px 8px #0001; overflow-x: auto; margin-top: 20px;}
-        .pagination-container { display: flex; justify-content: center; align-items: center; margin: 12px 0 0 0; gap: 8px;}
-        .pagination-btn { background: linear-gradient(90deg, #233dff 0%, #1a237e 100%); color: #fff; border: none; border-radius: 5px; padding: 5px 12px; font-size: 13px; cursor: pointer; transition: background .2s;}
-        .pagination-btn.active { background: var(--accent); font-weight: bold;}
-        .pagination-btn:disabled { background: #444; opacity: 0.5; cursor: not-allowed;}
-        table { width: 100%; border-collapse: separate; border-spacing: 0; background: transparent; margin-top: 12px;}
-        thead tr { background: linear-gradient(90deg, #233dff 0%, #1a237e 100%); border-radius: 10px;}
-        th { color: #fff; letter-spacing: 0.5px; padding: 11px 0px; text-align: left; font-size: 14px; border-bottom: 1px solid var(--border);}
-        th:first-child { border-top-left-radius: 10px; padding-left: 10px;}
-        th:last-child { border-top-right-radius: 10px;}
-        td { padding: 11px 0px; text-align: left; border-bottom: 1px solid var(--border); font-size: 14px;}
-        td:first-child { padding-left: 10px;}
-        td.status-cell { font-weight: 600; position: relative;}
-        .status-select-wrapper { position: relative; display: inline-block; width: 105px; height: 28px;}
-        .status-select { background: #222; color: #fff; border: none; border-radius: 7px; padding: 5px 25px 5px 10px; font-size: 13px; font-weight: 700; width: 105px; height: 28px; outline: none; appearance: none; cursor: pointer;}
+        .date-selector-row {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .date-selector-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .month-selector, .date-selector {
+            background: var(--card-bg);
+            color: var(--fg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 8px 14px;
+            font-size: 15px;
+            outline: none;
+        }
+        .table-container {
+            background: var(--card-bg);
+            padding: 12px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px #0001;
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 12px 0 0 0;
+            gap: 8px;
+        }
+        .pagination-btn {
+            background: linear-gradient(90deg, #233dff 0%, #1a237e 100%);
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 12px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background .2s;
+        }
+        .pagination-btn.active {
+            background: var(--accent);
+            font-weight: bold;
+        }
+        .pagination-btn:disabled {
+            background: #444;
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: transparent;
+            margin-top: 12px;
+        }
+        thead tr {
+            background: linear-gradient(90deg, #233dff 0%, #1a237e 100%);
+            border-radius: 10px;
+        }
+        th {
+            color: #fff;
+            letter-spacing: 0.5px;
+            padding: 11px 0px;
+            text-align: left;
+            font-size: 14px;
+            border-bottom: 1px solid var(--border);
+        }
+        th:first-child {
+            border-top-left-radius: 10px;
+            padding-left: 10px;
+        }
+        th:last-child {
+            border-top-right-radius: 10px;
+        }
+        td {
+            padding: 11px 0px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+        td:first-child {
+            padding-left: 10px;
+        }
+        td.status-cell {
+            font-weight: 600;
+            position: relative;
+        }
+        .status-select-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 105px;
+            height: 28px;
+        }
+        .status-select {
+            background: #222;
+            color: #fff;
+            border: none;
+            border-radius: 7px;
+            padding: 5px 25px 5px 10px;
+            font-size: 13px;
+            font-weight: 700;
+            width: 105px;
+            height: 28px;
+            outline: none;
+            appearance: none;
+            cursor: pointer;
+        }
         .status-select.pending { background: var(--pending);}
         .status-select.completed { background: var(--completed);}
         .status-select.cancelled { background: var(--cancelled);}
         .status-select option.pending { background: var(--pending); color: #fff;}
         .status-select option.completed { background: var(--completed); color: #fff;}
         .status-select option.cancelled { background: var(--cancelled); color: #fff;}
-        .status-select-wrapper .dropdown-icon { position: absolute; right: 9px; top: 50%; transform: translateY(-50%); pointer-events: none; font-size: 13px; color: #fff; opacity: 0.7;}
-        .view-btn { background: var(--accent); color: #fff; border: none; border-radius: 6px; padding: 6px 16px; cursor: pointer; font-size: 13px; transition: background .2s;}
-        .view-btn:hover { background: #0d47a1;}
-        .charts-row { display: flex; gap: 30px; flex-wrap: nowrap; margin-top: 45px; margin-bottom: 30px; justify-content: space-between;}
-        .chart-container { background: var(--card-bg); border-radius: 8px; padding: 18px; box-shadow: 0 2px 8px #0002; flex: 1; min-width: 340px; max-width: 530px; min-height: 320px; height: 320px; display: flex; flex-direction: column;}
-        .chart-header { display: flex; flex-direction: row; align-items: center; justify-content: space-between; background: linear-gradient(90deg, #233dff 0%, #1a237e 100%); color: #fff; border-radius: 6px; padding: 15px 18px 10px 18px; margin-bottom: 12px;}
-        .chart-header-left { display: flex; flex-direction: column; align-items: flex-start; flex: 1;}
-        .chart-header-title { font-size: 18px; font-weight: 800; margin-bottom: 4px; letter-spacing: 0.5px;}
-        .chart-header-details { display: none;}
-        .chart-header-total { font-size: 14px; font-weight: 700; opacity: 1;}
-        .chart-header-year { font-size: 18px; font-weight: 900; margin-left: 16px; opacity: 0.95;}
-        .chart-title { display: none;}
-        .chart-controls { display: flex; justify-content: center; align-items: center; margin-bottom: 12px; gap: 15px;}
-        .chart-dropdown { background: var(--card-bg); color: var(--fg); border: 1px solid var(--border); border-radius: 6px; padding: 6px 12px; font-size: 14px; outline: none;}
+        .status-select-wrapper .dropdown-icon {
+            position: absolute;
+            right: 9px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            font-size: 13px;
+            color: #fff;
+            opacity: 0.7;
+        }
+        .view-btn {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 16px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background .2s;
+        }
+        .view-btn:hover {
+            background: #0d47a1;
+        }
+        /* Chart styles */
+        .charts-row {
+            display: flex;
+            gap: 30px;
+            flex-wrap: nowrap;
+            margin-top: 45px;
+            margin-bottom: 30px;
+            justify-content: space-between;
+        }
+        .chart-container {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 18px;
+            box-shadow: 0 2px 8px #0002;
+            flex: 1;
+            min-width: 340px;
+            max-width: 530px;
+            min-height: 320px;
+            height: 320px;
+            display: flex;
+            flex-direction: column;
+        }
+        .chart-header {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(90deg, #233dff 0%, #1a237e 100%);
+            color: #fff;
+            border-radius: 6px;
+            padding: 15px 18px 10px 18px;
+            margin-bottom: 12px;
+        }
+        .chart-header-left {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            flex: 1;
+        }
+        .chart-header-title {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+        }
+        .chart-header-details {
+            display: none;
+        }
+        .chart-header-total {
+            font-size: 14px;
+            font-weight: 700;
+            opacity: 1;
+        }
+        .chart-header-year {
+            font-size: 18px;
+            font-weight: 900;
+            margin-left: 16px;
+            opacity: 0.95;
+        }
+        .chart-title {
+            display: none;
+        }
+        .chart-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 12px;
+            gap: 15px;
+        }
+        .chart-dropdown {
+            background: var(--card-bg);
+            color: var(--fg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 14px;
+            outline: none;
+        }
+
         @media (max-width: 650px) {
-            .container { max-width: 100vw; padding: 0 2px;}
-            .summary-row, .filter-row, .date-selector-group { flex-direction: row; gap: 4px;}
-            .summary-box, .filter-box { min-width: 120px; padding: var(--box-padding);}
-            .summary-box .icon { font-size: 14px !important;}
-            .summary-box .count { font-size: 32px !important;}
-            .summary-box .label, .filter-box { font-size: 9px;}
-            th, td { font-size: 8px; padding: 4px 0; min-width: 60px !important; max-width: 60px !important; width: 20% !important; box-sizing: border-box; word-break: break-word; text-align: left; vertical-align: middle;}
-            table th, table td { width: 20% !important; min-width: 60px !important; max-width: 60px !important; text-align: left;}
-            th:first-child, td:first-child { padding-left: 2px;}
-            th:first-child, th:last-child { border-radius: 0 !important;}
-            .status-select-wrapper { height: 20px !important; width: 90px !important;}
-            .status-select { font-size: 8px !important; width: 90px !important; height: 20px !important; padding: 1px 18px 1px 4px; min-width: 0; max-width: 100%;}
-            .status-select option { font-size: 8px !important;}
-            .view-btn { font-size: 8px; padding: 3px 8px; min-width: unset;}
-            .charts-row { flex-direction: column !important; gap: 12px !important; margin-top: 8px; margin-bottom: 8px;}
-            .chart-container { min-width: 0 !important; max-width: 100vw !important; padding: 2px !important; margin: 0 !important; min-height: 200px !important; height: 200px !important;}
-            .chart-header-title { font-size: 12px !important;}
-            .chart-header-details, .chart-header-total { font-size: 10px !important;}
-            .chart-header-year { font-size: 12px !important; margin-left: 3px;}
-            .chart-controls label { font-size: 10px !important;}
-            .chart-dropdown { font-size: 10px !important; padding: 2px 4px;}
-            canvas { width: 100% !important; height: 140px !important; max-width: 100vw !important;}
+            .container {
+                max-width: 100vw;
+                padding: 0 2px;
+            }
+            .summary-row,
+            .filter-row,
+            .date-selector-group {
+                flex-direction: row;
+                gap: 4px;
+            }
+            .summary-box,
+            .filter-box {
+                min-width: 40px;
+                padding: 2px;
+                font-size: 9px;
+            }
+            .summary-box .count,
+            .filter-box .count {
+                font-size: 9px;
+            }
+            .summary-box .label,
+            .filter-box {
+                font-size: 9px;
+            }
+            .table-container { padding: 1px;}
+            th, td {
+                font-size: 8px;
+                padding: 4px 0;
+                min-width: 60px !important;
+                max-width: 60px !important;
+                width: 20% !important;
+                box-sizing: border-box;
+                word-break: break-word;
+                text-align: left;
+                vertical-align: middle;
+            }
+            table th, table td {
+                width: 20% !important;
+                min-width: 60px !important;
+                max-width: 60px !important;
+                text-align: left;
+            }
+            th:first-child, td:first-child {
+                padding-left: 2px;
+            }
+            th:first-child, th:last-child {
+                border-radius: 0 !important;
+            }
+            .status-select-wrapper {
+                height: 18px !important;
+                width: 74px !important;
+            }
+            .status-select {
+                font-size: 8px;
+                width: 74px;
+                height: 18px !important;
+                padding: 1px 20px 1px 4px;
+                min-width: 0;
+                max-width: 100%;
+            }
+            .status-select option {
+                font-size: 8px;
+            }
+            .view-btn {
+                font-size: 8px;
+                padding: 3px 8px;
+                min-width: unset;
+            }
+            .charts-row {
+                flex-direction: column;
+                gap: 8px;
+                margin-top: 8px;
+                margin-bottom: 8px;
+            }
+            .chart-container {
+                min-width: 100px !important;
+                max-width: 100vw !important;
+                padding: 2px !important;
+                margin: 0 !important;
+                min-height: 80px !important;
+                height: 150px !important;
+            }
+            .chart-header-title { font-size: 8px; }
+            .chart-header-details, .chart-header-total { font-size: 7px; }
+            .chart-header-year { font-size: 8px; margin-left: 3px; }
+            .chart-controls label { font-size: 7px;}
+            .chart-dropdown { font-size: 7px; padding: 1px 2px;}
+            canvas {
+                width: 100% !important;
+                height: 70px !important;
+                max-width: 100vw !important;
+            }
         }
         @media (max-width: 650px) and (orientation: landscape) {
-            .charts-row { flex-direction: column !important; gap: 12px !important;}
-            .chart-container { min-width: 0 !important; max-width: 100vw !important; padding: 2px !important; margin: 0 !important; min-height: 200px !important; height: 200px !important;}
+            .container { max-width: 1100px; padding: 0 12px; }
+            .summary-row,
+            .filter-row,
+            .date-selector-group {
+                flex-direction: row;
+                gap: 18px;
+            }
+            .summary-box, .filter-box {
+                min-width: 120px;
+                padding: var(--box-padding);
+                font-size: 16px;
+            }
+            .summary-box .count, .filter-box .count { font-size: 22px;}
+            .summary-box .label, .filter-box { font-size: 15px;}
+            .table-container { padding: 12px;}
+            th, td { font-size: 14px; padding: 11px 0px;}
+            th:first-child, td:first-child { padding-left: 10px;}
+            .charts-row { flex-direction: column; gap: 8px; margin-top: 8px; margin-bottom: 8px;}
+            .chart-container { min-width: 100px !important; max-width: 100vw !important; padding: 2px !important; margin: 0 !important; min-height: 80px !important; height: 150px !important;}
+            .chart-header-title { font-size: 8px;}
+            .chart-header-details, .chart-header-total { font-size: 7px;}
+            .chart-header-year { font-size: 8px;}
+            .chart-controls label { font-size: 7px;}
+            .chart-dropdown { font-size: 7px; padding: 1px 2px;}
+            canvas { width: 100% !important; height: 70px !important; max-width: 100vw !important;}
         }
         @media (max-width: 900px) and (min-width: 651px) {
             .container { max-width: 99vw;}
@@ -144,19 +474,96 @@
             .chart-container { max-width: 100%; }
         }
         /* Modal styles, similar to orders.html */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; overflow-y: auto; padding: 20px 10px;}
-        .modal-content { background: var(--card-bg); margin: 20px auto; padding: 20px; border-radius: 8px; width: 95%; max-width: 500px; position: relative; box-shadow: 0 5px 30px rgba(0,0,0,0.5); border: 1px solid var(--border);}
-        .close-modal { position: absolute; top: 12px; right: 15px; font-size: 22px; cursor: pointer; color: var(--fg); background: none; border: none; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 50%;}
-        .close-modal:hover { background: rgba(255,255,255,0.1);}
-        .modal-header { padding-bottom: 12px; margin-bottom: 15px; border-bottom: 1px solid var(--border);}
-        .modal-title { font-size: 18px; color: #90caf9; margin: 0; font-weight: 600;}
-        .detail-row { display: flex; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px dashed var(--border); font-size: 13px;}
-        .detail-label { width: 100px; font-weight: 500; color: #90caf9; flex-shrink: 0;}
-        .detail-value { flex: 1; color: var(--fg); word-break: break-word;}
-        .services-list { margin-top: 5px;}
-        .service-item { background: #1a237e; padding: 10px; margin-bottom: 8px; border-radius: 5px; border-left: 3px solid #0d47a1; font-size: 12px;}
-        .service-item .service-name { font-weight: bold; color: white; font-size: 13px;}
-        .modal-footer { display: flex; justify-content: flex-end; gap: 10px; padding-top: 15px; margin-top: 10px; border-top: 1px solid var(--border); flex-wrap: wrap;}
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px 10px;
+        }
+        .modal-content {
+            background: var(--card-bg);
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 95%;
+            max-width: 500px;
+            position: relative;
+            box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+            border: 1px solid var(--border);
+        }
+        .close-modal {
+            position: absolute;
+            top: 12px; right: 15px;
+            font-size: 22px;
+            cursor: pointer;
+            color: var(--fg);
+            background: none;
+            border: none;
+            width: 30px; height: 30px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%;
+        }
+        .close-modal:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        .modal-header {
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+        .modal-title {
+            font-size: 18px;
+            color: #90caf9;
+            margin: 0;
+            font-weight: 600;
+        }
+        .detail-row {
+            display: flex;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed var(--border);
+            font-size: 13px;
+        }
+        .detail-label {
+            width: 100px;
+            font-weight: 500;
+            color: #90caf9;
+            flex-shrink: 0;
+        }
+        .detail-value {
+            flex: 1;
+            color: var(--fg);
+            word-break: break-word;
+        }
+        .services-list {
+            margin-top: 5px;
+        }
+        .service-item {
+            background: #1a237e;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 5px;
+            border-left: 3px solid #0d47a1;
+            font-size: 12px;
+        }
+        .service-item .service-name {
+            font-weight: bold;
+            color: white;
+            font-size: 13px;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding-top: 15px;
+            margin-top: 10px;
+            border-top: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&display=swap');
     </style>
 </head>
@@ -242,7 +649,7 @@
                 <label for="weekChartDropdown">Show:</label>
                 <select id="weekChartDropdown" class="chart-dropdown">
                     <option value="sales">Total Sales</option>
-                    <option value="appointments" selected>Total Appointments</option>
+                    <option value="appointments">Total Appointments</option>
                 </select>
             </div>
             <div style="flex:1;display:flex;align-items:center;">
@@ -261,7 +668,7 @@
                 <label for="yearChartDropdown">Show:</label>
                 <select id="yearChartDropdown" class="chart-dropdown">
                     <option value="sales">Total Sales</option>
-                    <option value="appointments" selected>Total Appointments</option>
+                    <option value="appointments">Total Appointments</option>
                 </select>
             </div>
             <div style="flex:1;display:flex;align-items:center;">
@@ -366,9 +773,11 @@ function formatTime(timeStr) {
     return `${hour12.toString().padStart(2, '0')}:${minutes.padStart(2, '0')} ${ampm}`;
 }
 function formatDateChart(d) {
+    // Returns "21 Jul"
     return `${d.getDate()} ${monthAbbrs[d.getMonth()]}`;
 }
 function formatDateDisplay(dateStr) {
+    // Format date as "21 Jul"
     if (!dateStr) return 'N/A';
     let d = new Date(dateStr);
     return `${d.getDate()} ${monthAbbrs[d.getMonth()]}`;
@@ -535,7 +944,7 @@ function updateCounts() {
     document.getElementById('month-count').textContent = month;
 }
 
-    function parseTimeForSort(timeStr) {
+function parseTimeForSort(timeStr) {
     // Accepts time in "09:00 AM", "9:00 AM", "13:00", "9:00" etc.
     if (!timeStr) return 0;
     let timePart = timeStr.split('-')[0].trim();
@@ -656,12 +1065,15 @@ function renderPagination(filtered) {
     paginationContainer.appendChild(nextBtn);
 }
 
+// Helper for colored status select
 function getStatusClass(value) {
     if (value === "pending") return "pending";
     if (value === "completed") return "completed";
     if (value === "cancelled") return "cancelled";
     return "";
 }
+
+// Add dropdown icon inside status select
 function renderStatusSelect(order) {
     let status = order._tableStatus;
     let statusSelectClass = "status-select " + getStatusClass(status);
@@ -698,6 +1110,7 @@ function renderTable() {
             <td class="status-cell">${statusSelect}</td>
             <td><button class="view-btn" data-id="${order.id}"><i class="fas fa-eye"></i> View</button></td>
         `;
+        // Add event listener for the view button here to ensure it works even after innerHTML overwrite
         row.querySelector('.view-btn').addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
@@ -738,6 +1151,7 @@ function showOrderModal(order) {
     modal.style.display = 'block';
 }
 
+// Event listeners
 summaryBoxes.forEach(box=>{
     box.addEventListener('click', ()=>{
         summaryBoxes.forEach(b=>b.classList.remove('selected'));
@@ -836,9 +1250,6 @@ function loadOrders() {
 }
 
 function renderCharts() {
-    weekChartDropdown.value = 'appointments';
-    yearChartDropdown.value = 'appointments';
-
     let today = new Date();
     let weekYear = today.getFullYear();
     let weekLabels = [];
@@ -922,7 +1333,7 @@ function renderCharts() {
             },
         ];
     } else {
-        let datasetsList = [
+        weekDataSets = [
             {
                 label: 'Total Appointments',
                 data: weekAppointments,
@@ -977,32 +1388,7 @@ function renderCharts() {
                 pointBackgroundColor: '#fff',
                 borderWidth: 2,
             },
-            {
-                label: 'Dummy 1',
-                data: weekAppointments.map(() => null),
-                borderColor: '#ffb300',
-                backgroundColor: 'rgba(255,179,0,0.08)',
-                fill: false,
-                tension: .4,
-                pointBackgroundColor: '#fff',
-                borderWidth: 2,
-            },
-            {
-                label: 'Dummy 2',
-                data: weekAppointments.map(() => null),
-                borderColor: '#9575cd',
-                backgroundColor: 'rgba(149,117,205,0.08)',
-                fill: false,
-                tension: .4,
-                pointBackgroundColor: '#fff',
-                borderWidth: 2,
-            }
         ];
-        if(window.innerWidth <= 650) {
-            weekDataSets = datasetsList.slice(0, 5);
-        } else {
-            weekDataSets = datasetsList.slice(0, 3);
-        }
     }
     weekChart = new Chart(weekChartCtx, {
         type: 'line',
@@ -1024,10 +1410,6 @@ function renderCharts() {
                     color:'#fff',
                     grid:{color:'#444', drawBorder: false, drawOnChartArea: false}
                 }
-            },
-            elements: {
-                line: { borderWidth: 3 },
-                point: { radius: 3 }
             }
         }
     });
@@ -1179,10 +1561,6 @@ function renderCharts() {
                     color:'#fff',
                     grid:{color:'#444', drawBorder: false, drawOnChartArea: false}
                 }
-            },
-            elements: {
-                line: { borderWidth: 3 },
-                point: { radius: 3 }
             }
         }
     });
