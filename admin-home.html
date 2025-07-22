@@ -535,6 +535,30 @@ function updateCounts() {
     document.getElementById('month-count').textContent = month;
 }
 
+    function parseTimeForSort(timeStr) {
+    // Accepts time in "09:00 AM", "9:00 AM", "13:00", "9:00" etc.
+    if (!timeStr) return 0;
+    let timePart = timeStr.split('-')[0].trim();
+    let h = 0, m = 0;
+    let ampm = null;
+    if (timePart.match(/(AM|PM)$/i)) {
+        // Format: "9:00 AM"
+        let [hm, ap] = timePart.split(/ ?(?=AM|PM)/i);
+        ampm = ap.toUpperCase();
+        let [hh, mm] = hm.split(':');
+        h = parseInt(hh) || 0;
+        m = parseInt(mm) || 0;
+        if (ampm === 'PM' && h !== 12) h += 12;
+        if (ampm === 'AM' && h === 12) h = 0;
+    } else {
+        // Format: "13:00" or "9:00"
+        let [hh, mm] = timePart.split(':');
+        h = parseInt(hh) || 0;
+        m = parseInt(mm) || 0;
+    }
+    return h * 60 + m; // minutes since midnight
+}
+
 function getFilteredOrders() {
     let filtered;
     if(monthFilter !== "") {
@@ -570,31 +594,24 @@ function getFilteredOrders() {
     } else {
         filtered = orders;
     }
-    // Date ascending, then time ascending (both as real values)
+    // --- SORTING LOGIC for Table ---
     filtered.sort((a, b) => {
-        // Date part
-        let aDate = a.date ? new Date(a.date) : new Date(0);
-        let bDate = b.date ? new Date(b.date) : new Date(0);
-        if (aDate.getTime() !== bDate.getTime()) return aDate - bDate;
-        // Time part (assume 24h or 12h, fallback to '00:00')
-        function parseTime(t) {
-            if (!t) return 0;
-            let m = t.match(/(\d+):(\d+)(?: ?(AM|PM))?/i);
-            if (!m) return 0;
-            let h = parseInt(m[1],10), min = parseInt(m[2],10);
-            if (m[3]) {
-                let ap = m[3].toUpperCase();
-                if (ap === 'PM' && h !== 12) h += 12;
-                if (ap === 'AM' && h === 12) h = 0;
-            }
-            return h*60+min;
-        }
-        let aTime = parseTime(a.time);
-        let bTime = parseTime(b.time);
-        return aTime - bTime;
+        let da = a.date ? new Date(a.date) : new Date(0);
+        let db = b.date ? new Date(b.date) : new Date(0);
+        let cmp = da - db;
+        if (cmp !== 0) return cmp;
+        // Same date: compare time
+        let ta = parseTimeForSort(a.time);
+        let tb = parseTimeForSort(b.time);
+        return ta - tb;
     });
+    // For completed/cancelled views, reverse order for newest first
+    if(currentView.type === 'status' && (currentView.value === 'completed' || currentView.value === 'cancelled')) {
+        filtered.reverse();
+    }
     return filtered;
 }
+
 
 // Pagination rendering
 function renderPagination(filtered) {
