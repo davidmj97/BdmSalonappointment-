@@ -570,7 +570,18 @@
     </div>
   </section>
 
+  <div id="serviceSectionContainer"></div>
+
   <script>
+     fetch('servicesection.html')
+    .then(response => response.text())
+    .then(html => {
+      document.getElementById('serviceSectionContainer').innerHTML = html;
+    })
+    .catch(error => {
+      console.error('Error loading service section:', error);
+    });
+    
     // Desktop nav active
     function setActiveNav(links, clicked) {
       links.forEach(l => l.classList.remove('active'));
