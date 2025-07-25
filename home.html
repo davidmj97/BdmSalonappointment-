@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>BDMSALON Home Page</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:600,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-dark: #13131a;
+      --primary-black: #0b0b10;
+      --gray: #22232a;
+      --header-black: #000;
+      --btn-gradient: linear-gradient(90deg, #233dff 0%, #1a237e 100%);
+      --white: #fff;
+      --white-blur: rgba(255,255,255,0.18);
+      --header-blur: blur(14px);
+      --header-height: 76px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Montserrat', Arial, sans-serif;
+    }
+
+    body {
+      background: var(--primary-black);
+      min-height: 100vh;
+      color: var(--white);
+    }
+
+    /* HEADER */
+    header {
+      width: 100vw;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 99;
+      background: rgba(0,0,0,0.94);
+      backdrop-filter: var(--header-blur);
+      display: flex;
+      align-items: center;
+      transition: background 0.35s, backdrop-filter 0.35s;
+      height: var(--header-height);
+      border-bottom: 1px solid #232338;
+      box-shadow: 0 2px 6px rgba(20,20,40,0.18);
+    }
+    header.transparent {
+      background: rgba(19,19,26,0.82);
+      backdrop-filter: var(--header-blur);
+    }
+    .header-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      height: var(--header-height);
+    }
+    /* Hide everything in header for mobile */
+    .header-container > * {
+      min-width: 0;
+    }
+
+    /* Logo */
+    .logo {
+      display: flex;
+      align-items: center;
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: var(--white);
+      user-select: none;
+      gap: 8px;
+      cursor: pointer;
+      transition: transform 0.18s;
+      white-space: nowrap;
+    }
+    .logo img {
+      height: 38px;
+      width: 38px;
+      border-radius: 50%;
+      background: var(--btn-gradient);
+      object-fit: cover;
+      border: 2px solid #233dff;
+    }
+    .logo:hover {
+      transform: scale(1.09);
+    }
+
+    /* Nav */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+      flex: 1;
+      margin-left: 38px;
+      min-width: 0;
+      transition: transform 0.18s;
+      white-space: nowrap;
+    }
+    .nav-link {
+      color: var(--white);
+      text-decoration: none;
+      font-size: 1.05rem;
+      font-weight: 500;
+      background: none;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 6px;
+      transition: background 0.2s, color 0.2s, transform 0.18s;
+      cursor: pointer;
+      position: relative;
+      white-space: nowrap;
+      display: inline-block;
+    }
+    .nav-link:hover, .nav-link.active {
+      background: var(--btn-gradient);
+      color: var(--white);
+      transform: scale(1.07);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-left: 38px;
+      min-width: 0;
+      white-space: nowrap;
+    }
+
+    .bookings-btn {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--btn-gradient);
+      color: var(--white);
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      padding: 9px 18px 9px 14px;
+      font-size: 1.05rem;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, transform 0.18s;
+      outline: none;
+      position: relative;
+      white-space: nowrap;
+    }
+    .bookings-btn:hover {
+      background: #1a237e;
+      color: var(--white);
+      transform: scale(1.07);
+    }
+    .bookings-btn svg {
+      vertical-align: middle;
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+      transition: fill 0.2s;
+    }
+
+    .profile-btn {
+      display: flex;
+      align-items: center;
+      background: var(--gray);
+      border: none;
+      border-radius: 999px;
+      padding: 7px 16px 7px 6px;
+      gap: 10px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.18s;
+      position: relative;
+      white-space: nowrap;
+    }
+    .profile-btn:hover {
+      background: #1a237e;
+      transform: scale(1.07);
+    }
+    .profile-avatar {
+      background: var(--btn-gradient);
+      color: var(--white);
+      font-size: 1.15rem;
+      font-weight: 700;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      border: 2px solid #233dff;
+      margin-right: 4px;
+    }
+    .profile-edit {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      background: var(--primary-dark);
+      border-radius: 50%;
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      border: 1px solid #233dff;
+      transition: background 0.2s, border 0.2s;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .profile-btn:hover .profile-edit {
+      opacity: 1;
+      pointer-events: auto;
+      background: #1a237e;
+      border-color: var(--white);
+    }
+    .profile-edit svg {
+      width: 10px;
+      height: 10px;
+      fill: var(--white);
+    }
+    .profile-name {
+      font-size: 1.01rem;
+      font-weight: 600;
+      color: var(--white);
+      margin-left: 2px;
+      margin-right: 2px;
+      letter-spacing: 0.1px;
+      user-select: none;
+    }
+
+    /* Mobile menu icon */
+    .mobile-menu-icon {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--white);
+      font-size: 2.3rem;
+      cursor: pointer;
+      margin-left: 10px;
+      transition: transform 0.18s;
+      z-index: 200;
+    }
+    .mobile-menu-icon:hover {
+      transform: scale(1.13);
+    }
+
+    /* Mobile nav dropdown */
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(19,19,26,0.98);
+      z-index: 199;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding-top: 40px;
+    }
+    .mobile-nav > * {
+      margin-bottom: 18px;
+      white-space: nowrap;
+    }
+    .mobile-nav .logo {
+      font-size: 2rem;
+      margin-bottom: 30px;
+    }
+    .mobile-nav .header-mobile-btns {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+    .mobile-nav .nav-link {
+      width: 100vw;
+      padding: 16px 32px;
+      font-size: 1.25rem;
+      background: none;
+      text-align: left;
+      margin: 0;
+      border-radius: 0;
+      border-bottom: 1px solid #22253a;
+      display: block;
+    }
+    .mobile-nav .nav-link:last-child {
+      border-bottom: none;
+    }
+    .mobile-nav .bookings-btn,
+    .mobile-nav .profile-btn {
+      width: 90vw;
+      justify-content: flex-start;
+      border-radius: 8px;
+      font-size: 1.14rem;
+    }
+
+    /* HERO SECTION */
+    .hero-section {
+      width: 100vw;
+      height: 100vh;
+      min-height: 100vh;
+      max-height: 100vh;
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 0;
+      overflow: hidden;
+      background: var(--primary-dark);
+      z-index: 1;
+    }
+    .hero-bg {
+      position: absolute;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      z-index: 1;
+      background: var(--primary-dark);
+      pointer-events: none;
+    }
+    .hero-bg img {
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      object-position: center;
+      opacity: 0.58;
+      filter: grayscale(0.2) blur(1px) brightness(0.8);
+      position: absolute;
+      top: 0; left: 0;
+      z-index: 1;
+    }
+    .hero-content {
+      position: relative;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      width: 100vw;
+      height: 100vh;
+      max-height: 100vh;
+      background: none;
+      pointer-events: none;
+    }
+    .hero-btns {
+      display: flex;
+      gap: 28px;
+      margin-bottom: 54px;
+      justify-content: center;
+      pointer-events: auto;
+      flex-direction: row;
+    }
+    .hero-btn {
+      min-width: 235px;
+      min-height: 54px;
+      background: var(--btn-gradient);
+      color: var(--white);
+      border: none;
+      outline: none;
+      border-radius: 10px;
+      font-size: 1.16rem;
+      font-weight: 700;
+      font-family: 'Montserrat', Arial, sans-serif;
+      padding: 0 34px;
+      cursor: pointer;
+      box-shadow: 0 2px 12px 0 #0005;
+      transition: background 0.2s, transform 0.15s, color 0.2s;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+      backdrop-filter: none;
+    }
+    .hero-btn.secondary {
+      background: rgba(255,255,255,0.22);
+      color: var(--white);
+      border: 1.5px solid rgba(30,35,60,0.16);
+      font-weight: 700;
+      box-shadow: 0 2px 12px 0 #0003;
+      backdrop-filter: blur(16px);
+      /* Make text more visible */
+      text-shadow: 0 1px 9px #0002;
+    }
+    .hero-btn.secondary:hover, .hero-btn.secondary:focus {
+      background: rgba(220,220,255,0.28);
+      color: var(--white);
+    }
+    .hero-btn:hover, .hero-btn:focus {
+      background: #1a237e;
+      color: var(--white);
+      transform: translateY(-2px) scale(1.045);
+    }
+    .hero-btn, .hero-btn.secondary {
+      border-radius: 10px;
+      min-width: 235px;
+      min-height: 54px;
+      max-width: 300px;
+      font-size: 1.16rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    /* Hide nav, logo, etc in header for mobile */
+    @media (max-width: 900px) {
+      .header-container {
+        padding: 0 6px;
+      }
+      .logo img {
+        height: 32px;
+        width: 32px;
+      }
+      .logo {
+        font-size: 1.1rem;
+      }
+      .profile-avatar {
+        width: 24px;
+        height: 24px;
+        font-size: 0.95rem;
+      }
+      nav {
+        margin-left: 10px;
+        gap: 8px;
+      }
+      .header-right {
+        margin-left: 10px;
+        gap: 7px;
+      }
+      .hero-btn, .hero-btn.secondary {
+        min-width: 140px;
+        min-height: 38px;
+        font-size: 0.97rem;
+      }
+    }
+    @media (max-width: 800px) {
+      header {
+        height: 56px;
+        min-height: 56px;
+        max-height: 56px;
+      }
+      .header-container {
+        height: 56px;
+        min-height: 56px;
+        max-height: 56px;
+        padding: 0 3vw;
+      }
+      nav, .logo, .header-right {
+        display: none !important;
+      }
+      .mobile-menu-icon {
+        display: block;
+      }
+      .hero-section {
+        height: 100vh;
+        min-height: 100vh;
+        max-height: 100vh;
+      }
+      .hero-bg img {
+        height: 100vh;
+      }
+      .hero-content {
+        height: 100vh;
+        max-height: 100vh;
+        min-height: 100vh;
+        justify-content: flex-end;
+        align-items: center;
+        padding-top: 60px;
+        padding-bottom: 0;
+      }
+      .hero-btns {
+        gap: 15px;
+        flex-direction: column;
+        margin-bottom: 28px;
+        width: 100vw;
+      }
+      .hero-btn, .hero-btn.secondary {
+        min-width: 90vw;
+        min-height: 44px;
+        font-size: 1.01rem;
+        max-width: 96vw;
+        border-radius: 9px;
+      }
+    }
+    @media (max-width: 440px) {
+      .hero-btn, .hero-btn.secondary {
+        min-width: 80vw;
+        font-size: 0.93rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- HEADER -->
+  <header id="mainHeader">
+    <div class="header-container">
+      <!-- Logo -->
+      <div class="logo">
+        <img src="https://cdn-icons-png.flaticon.com/512/2922/2922082.png" alt="Salon Logo">
+        BDMSALON
+      </div>
+      <!-- Nav (Desktop) -->
+      <nav>
+        <button class="nav-link active">Home</button>
+        <button class="nav-link">Services</button>
+        <button class="nav-link">Gallery</button>
+        <button class="nav-link">About</button>
+        <button class="nav-link">Contact</button>
+      </nav>
+      <!-- HEADER RIGHT -->
+      <div class="header-right">
+        <button class="bookings-btn" title="My Bookings">
+          <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v15c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 17H5V8h14v12zm0-14H5V5h14v1z"></path></svg>
+          My Bookings
+        </button>
+        <button class="profile-btn" title="Profile">
+          <span class="profile-avatar">B</span>
+          <span class="profile-name">Profile</span>
+          <span class="profile-edit">
+            <svg viewBox="0 0 20 20"><path d="M17.414 2.586a2 2 0 00-2.828 0l-8.95 8.95a1 1 0 00-.263.464l-1.05 3.515a1 1 0 001.262 1.262l3.516-1.05a1 1 0 00.464-.263l8.949-8.95a2 2 0 000-2.828zm-10.121 10.95l7.071-7.071 1.414 1.414-7.071 7.07-1.414-1.413zm-1.414-1.415l1.415 1.415-1.415 1.413.001-2.828z"></path></svg>
+          </span>
+        </button>
+      </div>
+      <!-- Mobile Menu Icon -->
+      <button class="mobile-menu-icon" id="mobileMenuToggle" aria-label="Open menu">&#9776;</button>
+    </div>
+    <!-- Mobile Nav -->
+    <div class="mobile-nav" id="mobileNav">
+      <div class="logo">
+        <img src="https://cdn-icons-png.flaticon.com/512/2922/2922082.png" alt="Salon Logo">
+        BDMSALON
+      </div>
+      <div class="header-mobile-btns">
+        <button class="bookings-btn" title="My Bookings">
+          <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v15c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 17H5V8h14v12zm0-14H5V5h14v1z"></path></svg>
+          My Bookings
+        </button>
+        <button class="profile-btn" title="Profile">
+          <span class="profile-avatar">B</span>
+          <span class="profile-name">Profile</span>
+          <span class="profile-edit">
+            <svg viewBox="0 0 20 20"><path d="M17.414 2.586a2 2 0 00-2.828 0l-8.95 8.95a1 1 0 00-.263.464l-1.05 3.515a1 1 0 001.262 1.262l3.516-1.05a1 1 0 00.464-.263l8.949-8.95a2 2 0 000-2.828zm-10.121 10.95l7.071-7.071 1.414 1.414-7.071 7.07-1.414-1.413zm-1.414-1.415l1.415 1.415-1.415 1.413.001-2.828z"></path></svg>
+          </span>
+        </button>
+      </div>
+      <button class="nav-link active">Home</button>
+      <button class="nav-link">Services</button>
+      <button class="nav-link">Gallery</button>
+      <button class="nav-link">About</button>
+      <button class="nav-link">Contact</button>
+    </div>
+  </header>
+
+  <!-- HERO SECTION -->
+  <section class="hero-section">
+    <div class="hero-bg">
+      <img src="https://images.pexels.com/photos/1813272/pexels-photo-1813272.jpeg?_gl=1*ztuuom*_ga*MTg1NzQ0ODM3OS4xNzUzMzY4MDky*_ga_8JE65Q40S6*czE3NTMzNjgwOTEkbzEkZzEkdDE3NTMzNjgxMDIkajQ5JGwwJGgw" alt="Salon Hero Image">
+    </div>
+    <div class="hero-content">
+      <div class="hero-btns">
+        <button class="hero-btn" onclick="alert('Book your appointment flow!')">Book Your Appointment</button>
+        <button class="hero-btn secondary" onclick="alert('View our services!')">View Our Services</button>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // Desktop nav active
+    function setActiveNav(links, clicked) {
+      links.forEach(l => l.classList.remove('active'));
+      clicked.classList.add('active');
+    }
+    // Desktop nav links
+    const navLinks = document.querySelectorAll('nav .nav-link');
+    navLinks.forEach(link => {
+      link.addEventListener('click', function(){
+        setActiveNav(navLinks, this);
+      });
+    });
+    // Mobile nav links
+    const mobileNavLinks = document.querySelectorAll('.mobile-nav .nav-link');
+    mobileNavLinks.forEach(link => {
+      link.addEventListener('click', function(){
+        setActiveNav(mobileNavLinks, this);
+        document.getElementById('mobileNav').style.display = 'none';
+      });
+    });
+
+    // Mobile menu toggle
+    const mobileMenuIcon = document.getElementById('mobileMenuToggle');
+    const mobileNav = document.getElementById('mobileNav');
+    mobileMenuIcon.addEventListener('click', function(e) {
+      e.stopPropagation();
+      mobileNav.style.display = (mobileNav.style.display === 'flex') ? 'none' : 'flex';
+    });
+    document.body.addEventListener('click', function(e) {
+      if (window.innerWidth <= 800) mobileNav.style.display = 'none';
+    });
+    mobileNav.addEventListener('click', function(e) {
+      e.stopPropagation();
+    });
+
+    // Profile avatar: set first letter of profile
+    const profileName = "bdmdrums";
+    for (const el of document.querySelectorAll('.profile-avatar')) {
+      el.innerText = profileName.slice(0,1).toUpperCase();
+    }
+
+    // Profile edit button click
+    for (const el of document.querySelectorAll('.profile-edit')) {
+      el.addEventListener('click', function(e) {
+        e.stopPropagation();
+        alert('Edit Profile clicked!');
+      });
+    }
+
+    // Profile button click
+    for (const el of document.querySelectorAll('.profile-btn')) {
+      el.addEventListener('click', function(e) {
+        alert('Profile button clicked!');
+      });
+    }
+
+    // Header background change on scroll (desktop only)
+    const header = document.getElementById('mainHeader');
+    function handleHeaderBg() {
+      if(window.innerWidth <= 800) return;
+      if(window.scrollY > 36) {
+        header.classList.add('transparent');
+      } else {
+        header.classList.remove('transparent');
+      }
+    }
+    window.addEventListener('scroll', handleHeaderBg);
+    window.addEventListener('resize', handleHeaderBg);
+    handleHeaderBg();
+  </script>
+</body>
+</html>
