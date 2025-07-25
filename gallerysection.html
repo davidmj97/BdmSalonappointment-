@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>BDMSALON – Book & Gallery</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #13131a;
+      color: #f1f1f1;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      min-height: 100vh;
+      width: 100vw;
+      overflow-x: hidden;
+    }
+    .section {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 38px 12px 0 12px;
+      box-sizing: border-box;
+      width: 100%;
+    }
+    .heading {
+      font-size: 40px;
+      font-weight: bold;
+      margin: 0 0 14px 0;
+      text-align: center;
+      line-height: 1.06;
+      letter-spacing: -1px;
+      color: #fff;
+      }
+    .desc {
+      text-align: center;
+      font-size: 1.18rem;
+      color: #aaa;
+      margin-bottom: 38px;
+      max-width: 520px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .cta-btn {
+      display: block;
+      margin: 0 auto 60px auto;
+      background: linear-gradient(90deg, #233dff 0%, #1a237e 100%);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.13rem;
+      font-weight: 700;
+      padding: 15px 52px;
+      cursor: pointer;
+      box-shadow: 0 4px 20px 0 #1a237e44;
+      transition: background 0.2s, transform 0.14s;
+      outline: none;
+      letter-spacing: 1px;
+    }
+    .cta-btn:hover,
+    .cta-btn:focus {
+      background: #233dff;
+      transform: scale(1.04);
+    }
+    .gallery-section {
+      margin-top: 70px;
+      margin-bottom: 26px;
+    }
+    .gallery-heading {
+      font-size: 58px;
+      font-weight: bold;
+      margin: 0 0 14px 0;
+      text-align: center;
+      line-height: 1.06;
+      letter-spacing: -1px;
+      color: #fff;
+      }
+    .gallery-desc {
+      text-align: center;
+      font-size: 1.09rem;
+      color: #aaa;
+      margin-bottom: 38px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .social-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 24px;
+      margin-bottom: 54px;
+      flex-wrap: wrap;
+    }
+    .social-row .follow-us {
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: .5px;
+      font-size: 1.08rem;
+      margin-right: 10px;
+    }
+    .social-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #23232c;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 2px;
+      margin-left: 2px;
+      transition: background 0.14s, transform 0.13s;
+      color: #fff;
+      font-size: 1.4rem;
+      cursor: pointer;
+    }
+    .social-icon:hover {
+      background: #233dff;
+      color: #fff;
+      transform: scale(1.15);
+    }
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      width: 100%;
+      margin: 0 auto 64px auto;
+      justify-items: center;
+    }
+    @media (min-width: 700px) {
+      .gallery-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    @media (min-width: 1000px) {
+      .gallery-grid {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+    }
+    .gallery-card {
+      background: #23232c;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px 0 #233dff18, 0 1px 8px #0003;
+      width: 100%;
+      max-width: 380px;
+      overflow: hidden;
+      position: relative;
+      aspect-ratio: 1/1.15;
+      display: flex;
+      flex-direction: column;
+      transition: box-shadow 0.18s, transform 0.18s;
+      cursor: pointer;
+      margin: 0;
+    }
+    .gallery-card:hover {
+      box-shadow: 0 12px 44px 0 #233dff44, 0 4px 48px 0 #000a;
+      transform: scale(1.045);
+      z-index: 2;
+    }
+    .gallery-img-wrap {
+      width: 100%;
+      height: 78%;
+      min-height: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px 10px 0 0;
+      overflow: hidden;
+      background: #18192b;
+    }
+    .gallery-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.2s;
+    }
+    .gallery-card:hover .gallery-img {
+      transform: scale(1.07);
+    }
+  .gallery-info-blur {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  border-radius: 10px; /* Rounded on all 4 corners */
+  padding: 16px 18px 15px 18px;
+  background: rgba(25,27,44,0.68);
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 2;
+}
+
+
+    .gallery-category {
+      font-size: 0.91rem;
+      color: #b4c8ff;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      margin-bottom: 2px;
+      text-shadow: 0 1px 6px #13131a;
+    }
+    .gallery-title {
+      font-size: 1.11rem;
+      color: #fff;
+      font-weight: bold;
+      margin-bottom: 2px;
+      text-shadow: 0 2px 12px #1a237e44;
+      letter-spacing: .2px;
+    }
+    .gallery-details {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.99rem;
+      font-weight: 600;
+      color: #fff;
+      cursor: pointer;
+      transition: color 0.18s;
+      margin-top: 2px;
+      text-decoration: none;
+    }
+    .gallery-details:hover {
+      color: #b0c4ff;
+    }
+    .gallery-details .arrow {
+      font-size: 1.15rem;
+      margin-left: 2px;
+      line-height: 1;
+      display: inline-block;
+      vertical-align: middle;
+      transition: transform 0.18s;
+    }
+    .gallery-details:hover .arrow {
+      transform: translateX(4px) scale(1.17);
+    }
+    @media (max-width: 650px) {
+      .section {
+        padding: 14px 2vw 8px 2vw;
+      }
+      .heading {
+        font-size: 28px;
+      }
+      .desc {
+        font-size: 1rem;
+        margin-bottom: 16px;
+      }
+      .gallery-section {
+        margin-top: 44px;
+      }
+      .gallery-heading {
+        font-size: 39px;
+      }
+      .gallery-desc {
+        font-size: .97rem;
+        margin-bottom: 20px;
+      }
+      .gallery-grid {
+        gap: 30px;
+      }
+      .gallery-card {
+        max-width: 80vw;
+        aspect-ratio: 1/1.1;
+      }
+      .gallery-img-wrap {
+        min-height: 90px;
+      }
+      .gallery-info-blur {
+        padding: 10px 9px 8px 12px;
+      }
+      .cta-btn {
+        padding: 13px 14vw;
+        font-size: 1rem;
+        margin-bottom: 33px;
+      }
+      .social-row {
+        gap: 14px;
+        margin-bottom: 28px;
+      }
+    }
+  </style>
+  <!-- Font Awesome for social icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+</head>
+<body>
+  <!-- Book Appointment Section -->
+  <section class="section">
+    <div class="heading">Ready to Transform Your Look?</div>
+    <div class="desc">
+      Book your appointment today and experience the difference
+    </div>
+    <button class="cta-btn">Schedule Your Visit</button>
+    <!-- Gallery Section -->
+    <div class="gallery-section">
+      <div class="gallery-heading">Our Work Gallery</div>
+      <div class="gallery-desc">
+        Witness the artistry and transformation that defines our work. Each image tells a story of beauty, confidence, and excellence.
+      </div>
+      <div class="social-row">
+        <span class="follow-us">Follow us on:</span>
+        <a class="social-icon" href="https://facebook.com" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+        <a class="social-icon" href="https://instagram.com" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+        <a class="social-icon" href="https://wa.me/1234567890" target="_blank" aria-label="Whatsapp"><i class="fab fa-whatsapp"></i></a>
+      </div>
+      <!-- Gallery Grid -->
+      <div class="gallery-grid">
+        <!-- Card 1 -->
+        <div class="gallery-card">
+          <div class="gallery-img-wrap">
+            <img class="gallery-img" src="https://images.pexels.com/photos/3992879/pexels-photo-3992879.jpeg" alt="Glam Curls">
+          </div>
+          <div class="gallery-info-blur">
+            <div class="gallery-category">Hair Styling</div>
+            <div class="gallery-title">Glam Curls</div>
+            <a class="gallery-details" href="#">
+              View Details <span class="arrow">&#8594;</span>
+            </a>
+          </div>
+        </div>
+        <!-- Card 2 -->
+        <div class="gallery-card">
+          <div class="gallery-img-wrap">
+            <img class="gallery-img" src="https://images.pexels.com/photos/247287/pexels-photo-247287.jpeg" alt="Classic Manicure">
+          </div>
+          <div class="gallery-info-blur">
+            <div class="gallery-category">Nail Care</div>
+            <div class="gallery-title">Classic Manicure</div>
+            <a class="gallery-details" href="#">
+              View Details <span class="arrow">&#8594;</span>
+            </a>
+          </div>
+        </div>
+        <!-- Card 3 -->
+        <div class="gallery-card">
+          <div class="gallery-img-wrap">
+            <img class="gallery-img" src="https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg" alt="Radiant Skin Facial">
+          </div>
+          <div class="gallery-info-blur">
+            <div class="gallery-category">Skin Treatments</div>
+            <div class="gallery-title">Radiant Skin Facial</div>
+            <a class="gallery-details" href="#">
+              View Details <span class="arrow">&#8594;</span>
+            </a>
+          </div>
+        </div>
+        <!-- Card 4 -->
+        <div class="gallery-card">
+          <div class="gallery-img-wrap">
+            <img class="gallery-img" src="https://images.pexels.com/photos/457701/pexels-photo-457701.jpeg" alt="Color Makeover">
+          </div>
+          <div class="gallery-info-blur">
+            <div class="gallery-category">Hair Color</div>
+            <div class="gallery-title">Color Makeover</div>
+            <a class="gallery-details" href="#">
+              View Details <span class="arrow">&#8594;</span>
+            </a>
+          </div>
+        </div>
+        <!-- Card 5 -->
+        <div class="gallery-card">
+          <div class="gallery-img-wrap">
+            <img class="gallery-img" src="https://images.pexels.com/photos/853427/pexels-photo-853427.jpeg" alt="Bridal Beauty">
+          </div>
+          <div class="gallery-info-blur">
+            <div class="gallery-category">Bridal</div>
+            <div class="gallery-title">Bridal Beauty</div>
+            <a class="gallery-details" href="#">
+              View Details <span class="arrow">&#8594;</span>
+            </a>
+          </div>
+        </div>
+        <!-- Card 6 -->
+        <div class="gallery-card">
+          <div class="gallery-img-wrap">
+            <img class="gallery-img" src="https://images.pexels.com/photos/1130626/pexels-photo-1130626.jpeg" alt="Gentlemen’s Cut">
+          </div>
+          <div class="gallery-info-blur">
+            <div class="gallery-category">Men's Grooming</div>
+            <div class="gallery-title">Gentlemen’s Cut</div>
+            <a class="gallery-details" href="#">
+              View Details <span class="arrow">&#8594;</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</body>
+</html>
