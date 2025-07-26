@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Contact Us | BDM SALON</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #13131a;
+      color: #f1f1f1;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      min-height: 100vh;
+      width: 100vw;
+      overflow-x: hidden;
+    }
+    .contact-main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 44px 12px 0 12px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .contact-heading {
+      text-align: center;
+      font-size: 4.5rem;
+      font-weight: bold;
+      color: #fff;
+      margin-bottom: 16px;
+      letter-spacing: -1px;
+      line-height: 1.08;
+    }
+    .contact-desc {
+      font-size: 1.15rem;
+      color: #ccc;
+      line-height: 1.7;
+      margin-bottom: 38px;
+      text-align: center;
+      max-width: 680px;
+    }
+    .contact-info-grid {
+      width: 100%;
+      max-width: 700px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      margin-bottom: 44px;
+    }
+    .contact-info-box {
+      background: #1a1a23;
+      border-radius: 15px;
+      box-shadow: 0 3px 18px #233dff12;
+      padding: 28px 24px 20px 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+    }
+    .contact-info-icon {
+      font-size: 2.2rem;
+      color: #233dff;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .contact-info-content {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .contact-info-title {
+      font-size: 1.23rem;
+      font-weight: bold;
+      color: #b4c8ff;
+      margin-bottom: 4px;
+      letter-spacing: 0.5px;
+    }
+    .contact-info-details,
+    .contact-info-details a {
+      font-size: 1.03rem;
+      color: #fff;
+      line-height: 1.7;
+      text-decoration: none;
+      margin-bottom: 0;
+    }
+    .contact-info-details strong {
+      font-weight: 600;
+    }
+    .contact-info-details .muted {
+      color: #b4c8ff;
+      font-size: 0.98rem;
+    }
+    .contact-info-action {
+      margin-top: 12px;
+    }
+    .call-now-btn {
+      background: linear-gradient(90deg, #233dff 0%, #1a237e 100%);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.08rem;
+      font-weight: 700;
+      padding: 12px 30px;
+      cursor: pointer;
+      box-shadow: 0 4px 20px 0 #1a237e33;
+      transition: background 0.2s, transform 0.14s;
+      outline: none;
+      letter-spacing: 1px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+    .call-now-btn:hover,
+    .call-now-btn:focus {
+      background: #233dff;
+      transform: scale(1.04);
+      color: #fff;
+      text-decoration: none;
+    }
+    @media (max-width: 700px) {
+      .contact-info-box {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 16px 12px 14px 12px;
+        gap: 11px;
+      }
+      .contact-info-icon {
+        font-size: 1.5rem;
+        margin-top: 0;
+      }
+      .contact-info-title {
+        font-size: 1.08rem;
+      }
+      .contact-info-details {
+        font-size: 0.98rem;
+      }
+    }
+    @media (max-width: 500px) {
+      .contact-heading {
+        font-size: 3rem;
+      }
+      .contact-main {
+        padding-top: 16px;
+      }
+      .contact-desc {
+        font-size: 0.80rem;
+      }
+      .contact-info-grid {
+        gap: 13px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="contact-main">
+    <div class="contact-heading">Get In Touch</div>
+    <div class="contact-desc">
+      Ready to book your appointment or have questions? We'd love to hear from you. Reach out and let's make you look and feel amazing.
+    </div>
+    <div class="contact-info-grid">
+
+      <!-- Visit Us -->
+      <div class="contact-info-box">
+        <span class="contact-info-icon"><i class="fa-solid fa-location-dot"></i></span>
+        <div class="contact-info-content">
+          <div class="contact-info-title">Visit Us</div>
+          <div class="contact-info-details">
+            123 Beauty Boulevard<br>
+            Downtown District<br>
+            City, State 12345
+          </div>
+        </div>
+      </div>
+
+      <!-- Call Us -->
+      <div class="contact-info-box">
+        <span class="contact-info-icon"><i class="fa-solid fa-phone-volume"></i></span>
+        <div class="contact-info-content">
+          <div class="contact-info-title">Call Us</div>
+          <div class="contact-info-details">
+            <a href="tel:5551234567">(555) 123-4567</a>
+            <div class="muted">Text us for quick questions</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hours -->
+      <div class="contact-info-box">
+        <span class="contact-info-icon"><i class="fa-regular fa-clock"></i></span>
+        <div class="contact-info-content">
+          <div class="contact-info-title">Hours</div>
+          <div class="contact-info-details">
+            <strong>Mon-Fri:</strong> 9AM - 8PM<br>
+            <strong>Saturday:</strong> 8AM - 6PM<br>
+            <strong>Sunday:</strong> 10AM - 5PM
+          </div>
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div class="contact-info-box">
+        <span class="contact-info-icon"><i class="fa-regular fa-envelope"></i></span>
+        <div class="contact-info-content">
+          <div class="contact-info-title">Email</div>
+          <div class="contact-info-details">
+            <a href="mailto:hello@bdmsalon.com">hello@bdmsalon.com</a><br>
+            <a href="mailto:bookings@bdmsalon.com">bookings@bdmsalon.com</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Same-Day Appointment -->
+      <div class="contact-info-box">
+        <span class="contact-info-icon"><i class="fa-solid fa-calendar-day"></i></span>
+        <div class="contact-info-content">
+          <div class="contact-info-title">Need Same-Day Appointment?</div>
+          <div class="contact-info-details">
+            Call us directly for last-minute bookings and cancellations
+          </div>
+        </div>
+      </div>
+
+      <!-- Cancellation Policy -->
+      <div class="contact-info-box">
+        <span class="contact-info-icon"><i class="fa-solid fa-ban"></i></span>
+        <div class="contact-info-content">
+          <div class="contact-info-title">Cancellation Policy</div>
+          <div class="contact-info-details">
+            Please provide 24 hours notice for cancellations
+          </div>
+          <div class="contact-info-action">
+            <a class="call-now-btn" href="tel:5551234567">
+              <i class="fa-solid fa-phone"></i>
+              Call Now: (555) 123-4567
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</body>
+</html>
