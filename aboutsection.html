@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>About BDM SALON</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #13131a;
+      color: #f1f1f1;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      min-height: 100vh;
+      width: 100vw;
+      overflow-x: hidden;
+    }
+    .about-main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 44px 12px 0 12px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .about-heading {
+      text-align: center;
+      font-size: 3rem;
+      font-weight: bold;
+      color: #fff;
+      margin-bottom: 18px;
+      letter-spacing: -1px;
+      line-height: 1.08;
+    }
+    @media (min-width: 900px) {
+      .about-heading {
+        font-size: 4.2rem;
+      }
+    }
+    .about-content-row {
+      display: flex;
+      flex-direction: column;
+      gap: 36px;
+      width: 100%;
+      max-width: 1200px;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 54px;
+    }
+    @media (min-width: 900px) {
+      .about-content-row {
+        flex-direction: row;
+        gap: 56px;
+        margin-bottom: 68px;
+        align-items: flex-start;
+      }
+    }
+    .about-left {
+      flex: 1 1 350px;
+      min-width: 280px;
+      max-width: 570px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 0;
+    }
+    .about-desc {
+      font-size: 1.15rem;
+      color: #ccc;
+      line-height: 1.7;
+      margin-bottom: 0px;
+      white-space: pre-line;
+      font-family: 'Montserrat', Arial, sans-serif;
+    }
+    .about-right {
+      flex: 1 1 320px;
+      min-width: 230px;
+      max-width: 470px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .about-photo {
+      width: 100%;
+      max-width: 420px;
+      border-radius: 18px;
+      box-shadow: 0 8px 32px #233dff30, 0 2px 16px #0004;
+      object-fit: cover;
+      aspect-ratio: 4/5;
+      min-height: 320px;
+      background: #22232a;
+    }
+    @media (max-width: 900px) {
+      .about-left,
+      .about-right {
+        max-width: 99vw;
+      }
+      .about-photo {
+        min-height: 180px;
+        max-width: 99vw;
+      }
+      .about-desc {
+        font-size: 1.05rem;
+      }
+    }
+    /* Stats boxes row */
+    .about-box-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 22px;
+      width: 100%;
+      justify-content: center;
+      align-items: stretch;
+      margin-top: 54px;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 900px) {
+      .about-box-row {
+        gap: 14px;
+        margin-top: 40px;
+        margin-bottom: 20px;
+      }
+    }
+    @media (max-width: 600px) {
+      .about-box-row {
+        gap: 10px;
+        margin-top: 28px;
+      }
+    }
+    .about-box {
+      background: #23232c;
+      border-radius: 12px;
+      box-shadow: 0 3px 18px #233dff14;
+      min-width: 120px;
+      flex: 1 1 120px;
+      max-width: 220px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 22px 10px 18px 10px;
+      text-align: center;
+      position: relative;
+      font-family: 'Montserrat', Arial, sans-serif;
+      transition: box-shadow 0.18s, transform 0.13s;
+    }
+    .about-box:hover {
+      box-shadow: 0 6px 28px #233dff44;
+      transform: scale(1.04);
+    }
+    .about-icon {
+      font-size: 2.12rem;
+      color: #233dff;
+      margin-bottom: 3px;
+    }
+    .about-box-title {
+      font-size: 1.45rem;
+      font-weight: bold;
+      color: #fff;
+      margin-bottom: 2px;
+      letter-spacing: 1px;
+      font-family: 'Montserrat', Arial, sans-serif;
+    }
+    .about-box-desc {
+      font-size: 1.02rem;
+      color: #b4c8ff;
+      font-weight: 500;
+      letter-spacing: 1px;
+      font-family: 'Montserrat', Arial, sans-serif;
+    }
+    .see-more-btn {
+      margin: 0 auto 38px auto;
+      display: block;
+      background: linear-gradient(90deg, #233dff 0%, #1a237e 100%);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.13rem;
+      font-weight: 700;
+      padding: 14px 38px;
+      cursor: pointer;
+      box-shadow: 0 4px 20px 0 #1a237e33;
+      transition: background 0.2s, transform 0.14s;
+      outline: none;
+      letter-spacing: 1px;
+    }
+    .see-more-btn:hover,
+    .see-more-btn:focus {
+      background: #233dff;
+      transform: scale(1.04);
+    }
+    @media (max-width: 600px) {
+      .about-heading {
+        font-size: 2rem;
+      }
+      .about-box {
+        min-width: 90px;
+        max-width: 99vw;
+        padding: 13px 3px 10px 3px;
+      }
+      .about-box-title {
+        font-size: 1.12rem;
+      }
+      .about-box-desc {
+        font-size: 0.89rem;
+      }
+      .see-more-btn {
+        font-size: 0.96rem;
+        padding: 10px 22px;
+      }
+    }
+  </style>
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+</head>
+<body>
+  <section class="about-main">
+    <div class="about-heading">About BDM SALON</div>
+    <div class="about-content-row">
+      <div class="about-left">
+        <div class="about-desc">
+For over 15 years, Bella Salon has been the premier destination for beauty and style in our community. Our passion lies in helping each client discover their unique beauty through personalized service and expert craftsmanship.
+
+Our team of skilled professionals stays current with the latest trends and techniques, ensuring you receive the highest quality service in a luxurious, welcoming environment.
+
+We believe that beauty is personal, and every visit should be a transformative experience that leaves you feeling confident, refreshed, and absolutely radiant.
+        </div>
+      </div>
+      <div class="about-right">
+        <img class="about-photo" src="https://images.pexels.com/photos/1813272/pexels-photo-1813272.jpeg" alt="BDM Salon Team">
+      </div>
+    </div>
+    <!-- Stats boxes row at bottom, in one line -->
+    <div class="about-box-row">
+      <div class="about-box">
+        <span class="about-icon"><i class="fas fa-award"></i></span>
+        <div class="about-box-title">15+</div>
+        <div class="about-box-desc">Years Experience</div>
+      </div>
+      <div class="about-box">
+        <span class="about-icon"><i class="fas fa-users"></i></span>
+        <div class="about-box-title">5000+</div>
+        <div class="about-box-desc">Happy Clients</div>
+      </div>
+      <div class="about-box">
+        <span class="about-icon"><i class="fas fa-calendar-week"></i></span>
+        <div class="about-box-title">6</div>
+        <div class="about-box-desc">Days a Week</div>
+      </div>
+      <div class="about-box">
+        <span class="about-icon"><i class="fas fa-star"></i></span>
+        <div class="about-box-title">100%</div>
+        <div class="about-box-desc">Satisfaction</div>
+      </div>
+    </div>
+    <button class="see-more-btn">See More</button>
+  </section>
+</body>
+</html>
