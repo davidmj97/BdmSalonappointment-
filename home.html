@@ -616,6 +616,9 @@
 </div>
 
   <div id="contact-section-container"></div>
+
+  <div id="footer-container"></div>
+
   <script>
 
      fetch('aboutsection.html')
@@ -630,6 +633,17 @@
         console.error('Error loading About Section:', error);
       });
 
+
+    fetch('footer.html')
+  .then(res => {
+    if (!res.ok) throw new Error('Failed to load Footer');
+    return res.text();
+  })
+  .then(html => {
+    document.getElementById('footer-container').innerHTML = html;
+  })
+  .catch(error => console.error('Footer loading error:', error));
+    
      fetch('contactsection.html')
     .then(res => {
       if (!res.ok) throw new Error('Failed to load Contact Section');
