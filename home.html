@@ -606,7 +606,7 @@
   </svg>
 </div>
   
-  <div id="review-section-container"></div>
+<div id="review-section-container"></div>
   <script>
 
      fetch('aboutsection.html')
@@ -621,29 +621,36 @@
         console.error('Error loading About Section:', error);
       });
 
-     // Corrected fetch block
-  fetch('reviewsection.html')
-    .then(res => {
-      if (!res.ok) throw new Error('Failed to load Review Section');
-      return res.text();
-    })
-    .then(html => {
-      // Inject the HTML into the container
-      document.getElementById('review-section-container').innerHTML = html;
+   fetch('reviewsection.html')
+  .then(res => {
+    if (!res.ok) throw new Error('Failed to load Review Section');
+    return res.text();
+  })
+  .then(html => {
+    // Inject the HTML into the container
+    document.getElementById('review-section-container').innerHTML = html;
 
-      // Initialize Swiper after content is loaded
-      new Swiper('.mySwiper', {
-        loop: true,
-        pagination: {
-          el: '.swiper-pagination',
-        },
-        navigation: {
-          nextEl: '.swiper-button-next',
-          prevEl: '.swiper-button-prev',
-        },
-      });
-    })
-    .catch(error => console.error('Review Section error:', error));
+    // Initialize Swiper after content is loaded (class names must match your section)
+    new Swiper('.swiper', {
+      slidesPerView: 1,
+      spaceBetween: 14,
+      loop: true,
+      breakpoints: {
+        500: { slidesPerView: 1, spaceBetween: 10 },
+        700: { slidesPerView: 2, spaceBetween: 12 },
+        1000: { slidesPerView: 3, spaceBetween: 14 }
+      },
+      navigation: {
+        nextEl: '.swiper-nav-btn.next',
+        prevEl: '.swiper-nav-btn.prev',
+      }
+    });
+
+    // If you have a setEqualReviewCardHeights() function, call it here too:
+    // setEqualReviewCardHeights();
+  })
+  .catch(error => console.error('Review Section error:', error));
+    
     
      fetch('gallerysection.html')
     .then(response => response.text())
