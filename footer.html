@@ -1,0 +1,77 @@
+<footer style="background: #181824; color: #f1f1f1; padding: 45px 0 18px 0; font-family: system-ui, Arial, sans-serif;">
+  <div style="max-width:1200px; margin:0 auto; display:flex; flex-wrap:wrap; gap:40px; justify-content:space-between; align-items:flex-start; padding:0 14px;">
+    <!-- Brand & Description -->
+    <div style="flex:1 1 230px; min-width:210px; margin-bottom:30px;">
+      <div style="font-size:1.7rem; font-weight:bold; letter-spacing:1px; color:#ffffff; margin-bottom:10px;">BDMSALON</div>
+      <div style="color:#b4c8ff; font-size:1.02rem; line-height:1.7; margin-bottom:14px;">
+        Transform your look with our professional beauty services. Experience luxury styling in a modern, comfortable environment.
+      </div>
+    </div>
+    <!-- Quick Links -->
+    <div style="flex:1 1 170px; min-width:160px; margin-bottom:30px;">
+      <div style="font-weight:bold; font-size:1.09rem; margin-bottom:10px; color:#b4c8ff;">Quick Links</div>
+      <ul class="footer-quicklinks" style="list-style:none; padding:0; margin:0;">
+        <li style="margin-bottom:7px;"><a href="index.html">Home</a></li>
+        <li style="margin-bottom:7px;"><a href="services.html">Services</a></li>
+        <li style="margin-bottom:7px;"><a href="book.html">Book Appointment</a></li>
+        <li style="margin-bottom:7px;"><a href="gallery.html">Gallery</a></li>
+        <li style="margin-bottom:7px;"><a href="about.html">About Us</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </div>
+    <!-- Contact Info -->
+    <div style="flex:1 1 230px; min-width:210px; margin-bottom:30px;">
+      <div style="font-weight:bold; font-size:1.09rem; margin-bottom:10px; color:#b4c8ff;">Contact Info</div>
+      <div style="font-size:1.01rem; margin-bottom:7px;">
+        123 Beauty Street<br>
+        Downtown, NY 10001
+      </div>
+      <div style="font-size:1.01rem; margin-bottom:7px;">
+        <a href="tel:5551234567" style="color:#f1f1f1; text-decoration:none;">(555) 123-4567</a>
+      </div>
+      <div style="font-size:1.01rem; margin-bottom:7px;">
+        <a href="mailto:info@bdmsalon.com" style="color:#f1f1f1; text-decoration:none;">info@bdmsalon.com</a>
+      </div>
+      <div style="font-size:1.01rem; margin-bottom:3px;">
+        Mon-Sat: 9:00 AM - 6:00 PM
+      </div>
+      <div style="font-size:1.01rem;">
+        Sun: 10:00 AM - 5:00 PM
+      </div>
+    </div>
+  </div>
+  <div style="border-top:1px solid #233dff22; margin-top:16px; padding:14px 0 0 0; text-align:center; color:#b4c8ff; font-size:0.96rem;">
+    &copy; 2025 bdmsalon. All rights reserved.
+  </div>
+  <style>
+    .footer-quicklinks a {
+      color: #f1f1f1;
+      text-decoration: none;
+      transition: color 0.18s;
+      outline: none;
+      display: inline-block;
+      padding: 0;
+      border-radius: 0;
+      background: none;
+    }
+    .footer-quicklinks a:hover,
+    .footer-quicklinks a:focus,
+    .footer-quicklinks a.active {
+      color: #233dff;
+      background: none !important;
+    }
+  </style>
+  <script>
+    // Optional: Add 'active' class if you want to highlight the current page
+    // Usage: add 'active' class to the link that matches location.pathname
+    (function(){
+      var links = document.querySelectorAll('.footer-quicklinks a');
+      var path = window.location.pathname.split('/').pop();
+      links.forEach(function(link) {
+        if(link.getAttribute('href') === path) {
+          link.classList.add('active');
+        }
+      });
+    })();
+  </script>
+</footer>
