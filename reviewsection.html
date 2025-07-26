@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>What Our Clients Say | BDM SALON</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Swiper CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #13131a;
+      color: #f1f1f1;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      min-height: 100vh;
+      width: 100vw;
+      overflow-x: hidden;
+    }
+    .reviews-main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 8px 0 8px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .reviews-heading {
+      text-align: center;
+      font-size: 5rem;
+      font-weight: bold;
+      color: #fff;
+      margin-bottom: 12px;
+      letter-spacing: -1px;
+      line-height: 1.08;
+    }
+    .reviews-desc {
+      font-size: 1rem;
+      color: #ccc;
+      line-height: 1.5;
+      margin-bottom: 16px;
+      text-align: center;
+      max-width: 540px;
+    }
+    .reviews-swiper-container {
+      position: relative;
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 28px;
+      box-sizing: border-box;
+      gap: 8px;
+    }
+    .swiper {
+      width: 100%;
+      padding-bottom: 0;
+      padding-top: 4px;
+      z-index: 1;
+    }
+    .swiper-wrapper {
+      align-items: stretch;
+    }
+    .swiper-slide {
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+      height: auto;
+    }
+    .review-card {
+      background: #191922;
+      border-radius: 14px;
+      min-width: 210px;
+      max-width: 235px;
+      width: 100%;
+      min-height: 180px; /* Increased height */
+      max-height: 320px;  /* Increased max height */
+      box-shadow:
+        0 3px 12px #233dff0a,
+        0 2px 7px #0004,
+        0 0 0 1px #233dff17;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 8px;
+      padding: 20px 13px 16px 13px;
+      text-align: center;
+      position: relative;
+      font-family: 'Montserrat', Arial, sans-serif;
+      overflow: hidden;
+      z-index: 1;
+      font-size: 0.97rem;
+      margin-right: 14px; /* Space between cards */
+      box-sizing: border-box;
+    }
+    .swiper-slide:last-child .review-card {
+      margin-right: 0;
+    }
+    .review-card:before {
+      content: "\f10d";
+      font-family: "Font Awesome 6 Free";
+      font-weight: 900;
+      color: #233dff;
+      font-size: 1.2rem;
+      position: absolute;
+      top: 10px;
+      left: 13px;
+      opacity: 0.14;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .review-stars {
+      color: #ffd700;
+      font-size: 1rem;
+      letter-spacing: 1px;
+      margin-bottom: 2px;
+      z-index: 1;
+      margin-top: 2px;
+    }
+    .review-text {
+      font-size: 0.93rem;
+      color: #fff;
+      margin-bottom: 3px;
+      font-style: italic;
+      line-height: 1.4;
+      z-index: 1;
+      flex: 1;
+      word-break: break-word;
+      /* Removed max-height and overflow-y so no scroll bar */
+    }
+    .review-client {
+      font-size: 0.98rem;
+      color: #fff;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-top: 2px;
+      z-index: 1;
+    }
+    .swiper-nav-btn {
+      background: #23232c;
+      border: 2px solid #233dff;
+      color: #233dff;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      position: relative;
+      cursor: pointer;
+      z-index: 20;
+      transition: background 0.18s, color 0.18s, border 0.18s, transform 0.15s;
+      box-shadow: 0 2px 10px 0 #1a237e33;
+      outline: none;
+      margin: 0 2px;
+      flex-shrink: 0;
+    }
+    .swiper-nav-btn:hover,
+    .swiper-nav-btn:focus {
+      background: #233dff;
+      color: #fff;
+      border: 2px solid #fff;
+      transform: scale(1.08);
+    }
+    @media (max-width: 900px) {
+      .reviews-heading {
+        font-size: 1.3rem;
+      }
+      .review-card {
+        min-width: 150px;
+        max-width: 88vw;
+        min-height: 140px;
+        max-height: 240px;
+        padding: 10px 4px 8px 4px;
+        font-size: 0.92rem;
+        margin-right: 10px;
+      }
+      .review-text {
+        font-size: 0.90rem;
+        /* No max-height or overflow-y */
+      }
+      .reviews-desc {
+        font-size: 0.97rem;
+        padding: 0 3px;
+      }
+      .swiper-nav-btn {
+        width: 24px;
+        height: 24px;
+        font-size: 0.95rem;
+      }
+    }
+    @media (max-width: 600px) {
+      .reviews-main {
+        padding-top: 12px;
+      }
+      .reviews-heading {
+        font-size: 2rem;
+      }
+      .reviews-desc {
+      font-size: 0.8rem;
+      .review-card {
+        min-width: 80vw;
+        max-width: 80vw;
+        padding: 8px 2px 7px 2px;
+        min-height: 110px;
+        max-height: 200px;
+        font-size: 0.89rem;
+        margin-right: 7px;
+      }
+      .review-text {
+        font-size: 0.56rem;
+        /* No max-height or overflow-y */
+      }
+      .reviews-swiper-container {
+        max-width: 99vw;
+        padding: 0 4px;
+        gap: 3px;
+      }
+      .swiper-nav-btn {
+        width: 21px;
+        height: 21px;
+        font-size: 0.85rem;
+      }
+    }
+    .see-more-btn {
+      margin: 0 auto 20px auto;
+      display: block;
+      background: linear-gradient(90deg, #233dff 0%, #1a237e 100%);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.93rem;
+      font-weight: 700;
+      padding: 10px 22px;
+      cursor: pointer;
+      box-shadow: 0 4px 20px 0 #1a237e33;
+      transition: background 0.2s, transform 0.14s;
+      outline: none;
+      letter-spacing: 1px;
+    }
+    .see-more-btn:hover,
+    .see-more-btn:focus {
+      background: #233dff;
+      transform: scale(1.04);
+    }
+    .swiper-button-prev, .swiper-button-next {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <section class="reviews-main">
+    <div class="reviews-heading">What Our Clients Say</div>
+    <div class="reviews-desc">
+      Don't just take our word for it. Here's what our valued clients have to say about their BDM Salon experience.
+    </div>
+    <div class="reviews-swiper-container">
+      <div class="swiper-nav-btn prev" tabindex="0" aria-label="Previous review">
+        <i class="fa-solid fa-chevron-left"></i>
+      </div>
+      <div class="swiper">
+        <div class="swiper-wrapper">
+          <div class="swiper-slide">
+            <div class="review-card">
+              <div class="review-stars">
+                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+              </div>
+              <div class="review-text">
+                "BDM Salon exceeded my expectations! The staff was so welcoming, and my haircut turned out perfect. I'll definitely be back."
+              </div>
+              <div class="review-client">— Priya S.</div>
+            </div>
+          </div>
+          <div class="swiper-slide">
+            <div class="review-card">
+              <div class="review-stars">
+                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+              </div>
+              <div class="review-text">
+                "Wonderful ambiance and super professional service. My skin has never looked better. Highly recommend BDM!"
+              </div>
+              <div class="review-client">— Rahul M.</div>
+            </div>
+          </div>
+          <div class="swiper-slide">
+            <div class="review-card">
+              <div class="review-stars">
+                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+              </div>
+              <div class="review-text">
+                "I always get compliments after my visits. The stylists are talented and really listen to what you want. Five stars!"
+              </div>
+              <div class="review-client">— Anjali K.</div>
+            </div>
+          </div>
+          <div class="swiper-slide">
+            <div class="review-card">
+              <div class="review-stars">
+                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+              </div>
+              <div class="review-text">
+                "Best salon in town! Clean, modern, and the results are always fantastic. My go-to place for any occasion."
+              </div>
+              <div class="review-client">— Sunita D.</div>
+            </div>
+          </div>
+          <div class="swiper-slide">
+            <div class="review-card">
+              <div class="review-stars">
+                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+              </div>
+              <div class="review-text">
+                "Their attention to detail is unmatched. Every visit feels special. Thank you, BDM Salon!"
+              </div>
+              <div class="review-client">— Meera T.</div>
+            </div>
+          </div>
+          <div class="swiper-slide">
+            <div class="review-card">
+              <div class="review-stars">
+                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+              </div>
+              <div class="review-text">
+                "From appointments to aftercare, the team is amazing. I always leave BDM feeling confident and refreshed."
+              </div>
+              <div class="review-client">— Karan J.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="swiper-nav-btn next" tabindex="0" aria-label="Next review">
+        <i class="fa-solid fa-chevron-right"></i>
+      </div>
+    </div>
+    <button class="see-more-btn">See More</button>
+  </section>
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <script>
+    function setEqualReviewCardHeights() {
+      document.querySelectorAll('.review-card').forEach(card => {
+        card.style.height = "";
+        card.style.maxWidth = "";
+      });
+      if(window.innerWidth > 600) {
+        let maxH = 0;
+        document.querySelectorAll('.review-card').forEach(card => {
+          maxH = Math.max(maxH, card.offsetHeight);
+        });
+        document.querySelectorAll('.review-card').forEach(card => card.style.height = maxH + 'px');
+      } else {
+        document.querySelectorAll('.review-card').forEach(card => {
+          card.style.maxWidth = "80vw";
+        });
+      }
+    }
+    const swiper = new Swiper('.swiper', {
+      slidesPerView: 1,
+      spaceBetween: 14,
+      loop: true,
+      breakpoints: {
+        500: {
+          slidesPerView: 1,
+          spaceBetween: 10
+        },
+        700: {
+          slidesPerView: 2,
+          spaceBetween: 12
+        },
+        1000: {
+          slidesPerView: 3,
+          spaceBetween: 14
+        }
+      },
+      navigation: {
+        nextEl: '.swiper-nav-btn.next',
+        prevEl: '.swiper-nav-btn.prev',
+      },
+      on: {
+        init: function() {
+          setTimeout(setEqualReviewCardHeights, 80);
+        },
+        resize: function() {
+          setTimeout(setEqualReviewCardHeights, 100);
+        }
+      }
+    });
+    window.addEventListener('resize', () => setTimeout(setEqualReviewCardHeights, 110));
+    setTimeout(setEqualReviewCardHeights, 150);
+  </script>
+</body>
+</html>
