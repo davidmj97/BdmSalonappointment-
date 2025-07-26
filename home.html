@@ -617,15 +617,29 @@
         console.error('Error loading About Section:', error);
       });
 
-     fetch('reviewsection.html')
-      .then(res => {
-        if (!res.ok) throw new Error('Failed to load Review Section');
-        return res.text();
-      })
-      .then(html => {
-        document.getElementById('review-section-container').innerHTML = html;
-      })
-      .catch(error => console.error('Review Section error:', error));
+     // Corrected fetch block
+  fetch('reviewsection.html')
+    .then(res => {
+      if (!res.ok) throw new Error('Failed to load Review Section');
+      return res.text();
+    })
+    .then(html => {
+      // Inject the HTML into the container
+      document.getElementById('review-section-container').innerHTML = html;
+
+      // Initialize Swiper after content is loaded
+      new Swiper('.mySwiper', {
+        loop: true,
+        pagination: {
+          el: '.swiper-pagination',
+        },
+        navigation: {
+          nextEl: '.swiper-button-next',
+          prevEl: '.swiper-button-prev',
+        },
+      });
+    })
+    .catch(error => console.error('Review Section error:', error));
     
      fetch('gallerysection.html')
     .then(response => response.text())
