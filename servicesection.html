@@ -4,7 +4,16 @@
   <meta charset="UTF-8">
   <title>BDMSALON – Our Premium Services</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Add ITC Motter Corpus Bold font-face (you must host the font file or link from a trusted CDN if available) -->
   <style>
+    /* Example: Use your own font file path or a reliable font CDN */
+    @font-face {
+      font-family: 'ITC Motter Corpus';
+      src: url('fonts/ITC-Motter-Corpus-Bold.ttf') format('truetype');
+      font-weight: bold;
+      font-style: normal;
+      font-display: swap;
+    }
     html, body {
       margin: 0;
       padding: 0;
@@ -29,6 +38,10 @@
       line-height: 1.06;
       letter-spacing: -1px;
       color: #fff;
+      /* Apply ITC Motter Corpus font */
+      font-family: 'ITC Motter Corpus', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      font-style: normal;
+      font-weight: bold;
     }
     @media (min-width: 1024px) {
       .heading {
