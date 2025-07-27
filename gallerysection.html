@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <title>BDMSALON – Book & Gallery</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Google Fonts for Montserrat Extra Bold -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap" rel="stylesheet">
+  <!-- Font Awesome for social icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
   <style>
     html, body {
       margin: 0;
@@ -28,9 +32,8 @@
       margin: 0 0 14px 0;
       text-align: center;
       line-height: 1.06;
-      letter-spacing: -1px;
       color: #fff;
-      }
+    }
     .desc {
       text-align: center;
       font-size: 1.18rem;
@@ -65,15 +68,17 @@
       margin-top: 70px;
       margin-bottom: 26px;
     }
-    .gallery-heading {
-      font-size: 58px;
-      font-weight: bold;
-      margin: 0 0 14px 0;
+    .heading-btt {
+      font-family: 'Montserrat',sans-serif;
+      font-weight: 900;
+      font-size: 72px;
+      text-transform: uppercase;
+      color: #fff;
       text-align: center;
       line-height: 1.06;
-      letter-spacing: -1px;
-      color: #fff;
-      }
+      text-shadow: 1px 2px 2px #000c,0 2px 6px #233dff22;
+      margin: 0 0 14px 0;
+    }
     .gallery-desc {
       text-align: center;
       font-size: 1.09rem;
@@ -177,22 +182,28 @@
     .gallery-card:hover .gallery-img {
       transform: scale(1.07);
     }
-  .gallery-info-blur {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  border-radius: 10px; /* Rounded on all 4 corners */
-  padding: 16px 18px 15px 18px;
-  background: rgba(25,27,44,0.68);
-  backdrop-filter: blur(8px);
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  z-index: 2;
-}
-
-
+    .gallery-info-blur {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      border-radius: 10px;
+      padding: 16px 18px 15px 18px;
+      background: rgba(25,27,44,0.68);
+      backdrop-filter: blur(8px);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      z-index: 2;
+    }
+    .white-line {
+      width: 350px;
+      height: 3px;
+      background-color: white;
+      margin: 40px auto;
+      border: none;
+      border-radius: 2px;
+    }
     .gallery-category {
       font-size: 0.91rem;
       color: #b4c8ff;
@@ -240,27 +251,24 @@
         padding: 14px 2vw 8px 2vw;
       }
       .heading {
-        font-size: 28px;
+        font-size: 33px;
       }
-
-        @media (max-width: 650px) {
-  .section-wrapper .heading {
-    font-size: 40px !important;
-  }
-}
+      .heading-btt {
+        font-size: 48px !important;
+      }
       .desc {
-        font-size: 0.7rem;
+        font-size: 1rem;
         margin-bottom: 16px;
       }
       .gallery-section {
         margin-top: 44px;
       }
-      .gallery-heading {
-        font-size: 39px;
-      }
       .gallery-desc {
         font-size: 0.7rem;
         margin-bottom:20px;
+      }
+      .gallery-heading {
+        font-size: 39px;
       }
       .gallery-grid {
         gap: 30px;
@@ -280,14 +288,20 @@
         font-size: 1rem;
         margin-bottom: 33px;
       }
+      .white-line {
+        width: 80px;
+        height: 3px;
+        background-color: white;
+        margin: 40px auto;
+        border: none;
+        border-radius: 2px;
+      }
       .social-row {
         gap: 14px;
         margin-bottom: 28px;
       }
     }
   </style>
-  <!-- Font Awesome for social icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
 </head>
 <body>
   <!-- Book Appointment Section -->
@@ -298,18 +312,19 @@
     </div>
     <button class="cta-btn">Schedule Your Visit</button>
     <!-- After one section -->
-<div style="height: 60px;"></div>
+    <div style="height: 60px;"></div>
 
     <!-- Gallery Section -->
     <div class="gallery-section">
-<div class="heading"
-     style="font-family:'Montserrat',sans-serif;font-weight:900;font-size:72px;letter-spacing:-2px;text-transform:uppercase;color:#fff;text-align:center;line-height:1.06;text-shadow:1px 2px 2px #000c,0 2px 6px #233dff22;margin:0 0 14px 0;">
-  OUR WORK GALLERY
-</div>       <div class="gallery-desc">
+      <div class="heading-btt">
+        OUR WORK GALLERY
+      </div>
+      <hr class="white-line">
+      <div class="gallery-desc">
         Witness the artistry and transformation that defines our work. Each image tells a story of beauty, confidence, and excellence.
       </div>
       <!-- After one section -->
-<div style="height: 30px;"></div>
+      <div style="height: 30px;"></div>
 
       <div class="social-row">
         <span class="follow-us">Follow us on:</span>
