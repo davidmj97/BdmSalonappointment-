@@ -6,9 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css?family=Montserrat:600,400&display=swap" rel="stylesheet">
   <!-- Swiper CSS -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
-<!-- Swiper JS (BEFORE your closing </body>) -->
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
   <style>
     :root {
       --primary-dark: #13131a;
@@ -30,7 +29,6 @@
       min-height: 100vh;
       color: var(--white);
     }
-
     /* HEADER */
     header {
       width: 100vw;
@@ -61,12 +59,7 @@
       padding: 0 32px;
       height: var(--header-height);
     }
-    /* Hide everything in header for mobile */
-    .header-container > * {
-      min-width: 0;
-    }
-
-    /* Logo */
+    .header-container > * { min-width: 0; }
     .logo {
       display: flex;
       align-items: center;
@@ -88,11 +81,7 @@
       object-fit: cover;
       border: 2px solid #233dff;
     }
-    .logo:hover {
-      transform: scale(1.09);
-    }
-
-    /* Nav */
+    .logo:hover { transform: scale(1.09); }
     nav {
       display: flex;
       align-items: center;
@@ -124,7 +113,6 @@
       color: var(--white);
       transform: scale(1.07);
     }
-
     .header-right {
       display: flex;
       align-items: center;
@@ -133,7 +121,6 @@
       min-width: 0;
       white-space: nowrap;
     }
-
     .bookings-btn {
       display: flex;
       align-items: center;
@@ -163,7 +150,6 @@
       fill: currentColor;
       transition: fill 0.2s;
     }
-
     .profile-btn {
       display: flex;
       align-items: center;
@@ -234,8 +220,6 @@
       letter-spacing: 0.1px;
       user-select: none;
     }
-
-    /* Mobile menu icon */
     .mobile-menu-icon {
       display: none;
       background: none;
@@ -247,11 +231,7 @@
       transition: transform 0.18s;
       z-index: 200;
     }
-    .mobile-menu-icon:hover {
-      transform: scale(1.13);
-    }
-
-    /* Mobile nav dropdown */
+    .mobile-menu-icon:hover { transform: scale(1.13); }
     .mobile-nav {
       display: none;
       position: fixed;
@@ -266,14 +246,8 @@
       justify-content: flex-start;
       padding-top: 40px;
     }
-    .mobile-nav > * {
-      margin-bottom: 18px;
-      white-space: nowrap;
-    }
-    .mobile-nav .logo {
-      font-size: 2rem;
-      margin-bottom: 30px;
-    }
+    .mobile-nav > * { margin-bottom: 18px; white-space: nowrap; }
+    .mobile-nav .logo { font-size: 2rem; margin-bottom: 30px; }
     .mobile-nav .header-mobile-btns {
       display: flex;
       flex-direction: column;
@@ -292,17 +266,13 @@
       border-bottom: 1px solid #22253a;
       display: block;
     }
-    .mobile-nav .nav-link:last-child {
-      border-bottom: none;
-    }
-    .mobile-nav .bookings-btn,
-    .mobile-nav .profile-btn {
+    .mobile-nav .nav-link:last-child { border-bottom: none; }
+    .mobile-nav .bookings-btn, .mobile-nav .profile-btn {
       width: 90vw;
       justify-content: flex-start;
       border-radius: 8px;
       font-size: 1.14rem;
     }
-
     /* HERO SECTION */
     .hero-section {
       width: 100vw;
@@ -325,7 +295,8 @@
       background: var(--primary-dark);
       pointer-events: none;
     }
-    .hero-bg img {
+    .hero-bg-desktop {
+      display: block;
       width: 100vw;
       height: 100vh;
       object-fit: cover;
@@ -333,6 +304,9 @@
       position: absolute;
       top: 0; left: 0;
       z-index: 1;
+    }
+    .hero-bg-mobile {
+      display: none;
     }
     .hero-content {
       position: relative;
@@ -384,7 +358,6 @@
       font-weight: 700;
       box-shadow: 0 2px 12px 0 #0003;
       backdrop-filter: blur(16px);
-      /* Make text more visible */
       text-shadow: 0 1px 9px #0002;
     }
     .hero-btn.secondary:hover, .hero-btn.secondary:focus {
@@ -405,32 +378,13 @@
       font-weight: 700;
       white-space: nowrap;
     }
-
-    /* Hide nav, logo, etc in header for mobile */
     @media (max-width: 900px) {
-      .header-container {
-        padding: 0 6px;
-      }
-      .logo img {
-        height: 32px;
-        width: 32px;
-      }
-      .logo {
-        font-size: 1.1rem;
-      }
-      .profile-avatar {
-        width: 24px;
-        height: 24px;
-        font-size: 0.95rem;
-      }
-      nav {
-        margin-left: 10px;
-        gap: 8px;
-      }
-      .header-right {
-        margin-left: 10px;
-        gap: 7px;
-      }
+      .header-container { padding: 0 6px; }
+      .logo img { height: 32px; width: 32px; }
+      .logo { font-size: 1.1rem; }
+      .profile-avatar { width: 24px; height: 24px; font-size: 0.95rem; }
+      nav { margin-left: 10px; gap: 8px; }
+      .header-right { margin-left: 10px; gap: 7px; }
       .hero-btn, .hero-btn.secondary {
         min-width: 140px;
         min-height: 38px;
@@ -449,19 +403,23 @@
         max-height: 56px;
         padding: 0 3vw;
       }
-      nav, .logo, .header-right {
-        display: none !important;
-      }
-      .mobile-menu-icon {
-        display: block;
-      }
+      nav, .logo, .header-right { display: none !important; }
+      .mobile-menu-icon { display: block; }
       .hero-section {
         height: 100vh;
         min-height: 100vh;
         max-height: 100vh;
       }
-      .hero-bg img {
+      .hero-bg-desktop { display: none !important; }
+      .hero-bg-mobile {
+        display: block !important;
+        width: 100vw;
         height: 100vh;
+        object-fit: cover;
+        object-position: center;
+        position: absolute;
+        top: 0; left: 0;
+        z-index: 1;
       }
       .hero-content {
         height: 100vh;
@@ -473,23 +431,26 @@
         padding-bottom: 0;
       }
       .hero-btns {
-        gap: 15px;
+        gap: 13px;
         flex-direction: column;
-        margin-bottom: 28px;
-        width: 100vw;
+        margin-bottom: 26px;
       }
       .hero-btn, .hero-btn.secondary {
-        min-width: 90vw;
-        min-height: 44px;
+        min-width: 60vw !important;
+        max-width: 92vw;
+        width: 80vw;
         font-size: 1.01rem;
-        max-width: 96vw;
-        border-radius: 9px;
+        padding: 0 10px;
+        min-height: 38px;
       }
     }
     @media (max-width: 440px) {
       .hero-btn, .hero-btn.secondary {
-        min-width: 80vw;
-        font-size: 0.93rem;
+        min-width: 60vw !important;
+        max-width: 60vw;
+        width: 60vw;
+        font-size: 0.80rem;
+        padding: 0 7px;
       }
     }
   </style>
@@ -498,12 +459,10 @@
   <!-- HEADER -->
   <header id="mainHeader">
     <div class="header-container">
-      <!-- Logo -->
       <div class="logo">
         <img src="https://cdn-icons-png.flaticon.com/512/2922/2922082.png" alt="Salon Logo">
         BDMSALON
       </div>
-      <!-- Nav (Desktop) -->
       <nav>
         <button class="nav-link active">Home</button>
         <button class="nav-link">Services</button>
@@ -511,7 +470,6 @@
         <button class="nav-link">About</button>
         <button class="nav-link">Contact</button>
       </nav>
-      <!-- HEADER RIGHT -->
       <div class="header-right">
         <button class="bookings-btn" title="My Bookings">
           <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v15c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 17H5V8h14v12zm0-14H5V5h14v1z"></path></svg>
@@ -525,10 +483,8 @@
           </span>
         </button>
       </div>
-      <!-- Mobile Menu Icon -->
       <button class="mobile-menu-icon" id="mobileMenuToggle" aria-label="Open menu">&#9776;</button>
     </div>
-    <!-- Mobile Nav -->
     <div class="mobile-nav" id="mobileNav">
       <div class="logo">
         <img src="https://cdn-icons-png.flaticon.com/512/2922/2922082.png" alt="Salon Logo">
@@ -558,68 +514,57 @@
   <!-- HERO SECTION -->
   <section class="hero-section">
     <div class="hero-bg">
-      <img src="https://raw.githubusercontent.com/davidmj97/BdmSalonappointment-/refs/heads/main/Experience%20Precision%20(1).png" alt="Salon Hero Image">
+      <!-- Desktop Hero Image -->
+      <img class="hero-bg-desktop" src="https://raw.githubusercontent.com/davidmj97/BdmSalonappointment-/refs/heads/main/Experience%20Precision%20(1).png" alt="Salon Hero Image">
+      <!-- Mobile Hero Image -->
+      <img class="hero-bg-mobile" src="https://raw.githubusercontent.com/davidmj97/BdmSalonappointment-/refs/heads/main/Experience%20Precision.png" alt="Salon Hero Image Mobile">
     </div>
     <div class="hero-content">
       <div class="hero-btns">
         <button class="hero-btn" onclick="alert('Book your appointment flow!')">Book Your Appointment</button>
         <button class="hero-btn secondary" onclick="alert('View our services!')">View Our Services</button>
       </div>
-     <!-- Triangle Shape Divider (Up Arrow) -->
-<div style="position: relative; width: 100%; overflow: hidden; line-height: 0;">
-  <svg viewBox="0 0 100 100" preserveAspectRatio="none"
-       style="display: block; width: 100%; height: 50px;">
-    <polygon points="0,100 50,0 100,100" style="fill: #13131a;"></polygon>
-  </svg>
-</div>
- </div>
+      <div style="position: relative; width: 100%; overflow: hidden; line-height: 0;">
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none"
+             style="display: block; width: 100%; height: 50px;">
+          <polygon points="0,100 50,0 100,100" style="fill: #13131a;"></polygon>
+        </svg>
+      </div>
+    </div>
   </section>
 
   <div id="serviceSectionContainer"></div>
-       <!-- Triangle Shape Divider (Up Arrow) -->
-<div style="position: relative; width: 100%; overflow: hidden; line-height: 0;">
-  <svg viewBox="0 0 100 100" preserveAspectRatio="none"
-       style="display: block; width: 100%; height: 50px;">
-    <polygon points="0,100 50,0 100,100" style="fill: #13131a;"></polygon>
-  </svg>
-</div>
- </div>
-  </section>
-
+  <div style="position: relative; width: 100%; overflow: hidden; line-height: 0;">
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none"
+         style="display: block; width: 100%; height: 50px;">
+      <polygon points="0,100 50,0 100,100" style="fill: #13131a;"></polygon>
+    </svg>
+  </div>
   <div id="gallery-section-placeholder"></div>
-    <!-- Triangle Shape Divider (Up Arrow) -->
-<div style="position: relative; width: 100%; overflow: hidden; line-height: 0;">
-  <svg viewBox="0 0 100 100" preserveAspectRatio="none"
-       style="display: block; width: 100%; height: 50px;">
-    <polygon points="0,100 50,0 100,100" style="fill: #13131a;"></polygon>
-  </svg>
-</div>
+  <div style="position: relative; width: 100%; overflow: hidden; line-height: 0;">
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none"
+         style="display: block; width: 100%; height: 50px;">
+      <polygon points="0,100 50,0 100,100" style="fill: #13131a;"></polygon>
+    </svg>
+  </div>
   <div id="about-section-container"></div>
-
-  <!-- Triangle Shape Divider (Up Arrow) -->
-<div style="position: relative; width: 100%; overflow: hidden; line-height: 0;">
-  <svg viewBox="0 0 100 100" preserveAspectRatio="none"
-       style="display: block; width: 100%; height: 50px;">
-    <polygon points="0,100 50,0 100,100" style="fill: #13131a;"></polygon>
-  </svg>
-</div>
-  
-<div id="review-section-container"></div>
-  <!-- Triangle Shape Divider (Up Arrow) -->
-<div style="position: relative; width: 100%; overflow: hidden; line-height: 0;">
-  <svg viewBox="0 0 100 100" preserveAspectRatio="none"
-       style="display: block; width: 100%; height: 50px;">
-    <polygon points="0,100 50,0 100,100" style="fill: #13131a;"></polygon>
-  </svg>
-</div>
-
+  <div style="position: relative; width: 100%; overflow: hidden; line-height: 0;">
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none"
+         style="display: block; width: 100%; height: 50px;">
+      <polygon points="0,100 50,0 100,100" style="fill: #13131a;"></polygon>
+    </svg>
+  </div>
+  <div id="review-section-container"></div>
+  <div style="position: relative; width: 100%; overflow: hidden; line-height: 0;">
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none"
+         style="display: block; width: 100%; height: 50px;">
+      <polygon points="0,100 50,0 100,100" style="fill: #13131a;"></polygon>
+    </svg>
+  </div>
   <div id="contact-section-container"></div>
-
   <div id="footer-container"></div>
-
   <script>
-
-     fetch('aboutsection.html')
+    fetch('aboutsection.html')
       .then(response => {
         if (!response.ok) throw new Error('Failed to load About Section');
         return response.text();
@@ -630,89 +575,70 @@
       .catch(error => {
         console.error('Error loading About Section:', error);
       });
-
-
     fetch('footer.html')
-  .then(res => {
-    if (!res.ok) throw new Error('Failed to load Footer');
-    return res.text();
-  })
-  .then(html => {
-    document.getElementById('footer-container').innerHTML = html;
-  })
-  .catch(error => console.error('Footer loading error:', error));
-    
-     fetch('contactsection.html')
-    .then(res => {
-      if (!res.ok) throw new Error('Failed to load Contact Section');
-      return res.text();
-    })
-    .then(html => {
-      document.getElementById('contact-section-container').innerHTML = html;
-
-      // Optional: initialize JS for form, animation, map, etc., if needed here
-    })
-    .catch(error => console.error('Contact Section error:', error));
-    
-   fetch('reviewsection.html')
-  .then(res => {
-    if (!res.ok) throw new Error('Failed to load Review Section');
-    return res.text();
-  })
-  .then(html => {
-    // Inject the HTML into the container
-    document.getElementById('review-section-container').innerHTML = html;
-
-    // Initialize Swiper after content is loaded (class names must match your section)
-    new Swiper('.swiper', {
-      slidesPerView: 1,
-      spaceBetween: 14,
-      loop: true,
-      breakpoints: {
-        500: { slidesPerView: 1, spaceBetween: 10 },
-        700: { slidesPerView: 2, spaceBetween: 12 },
-        1000: { slidesPerView: 3, spaceBetween: 14 }
-      },
-      navigation: {
-        nextEl: '.swiper-nav-btn.next',
-        prevEl: '.swiper-nav-btn.prev',
-      }
-    });
-
-    // If you have a setEqualReviewCardHeights() function, call it here too:
-    // setEqualReviewCardHeights();
-  })
-  .catch(error => console.error('Review Section error:', error));
-    
-    
-     fetch('gallerysection.html')
-    .then(response => response.text())
-    .then(data => {
-      document.getElementById('gallery-section-placeholder').innerHTML = data;
-    });
-    
-     fetch('servicesection.html')
-    .then(response => response.text())
-    .then(html => {
-      document.getElementById('serviceSectionContainer').innerHTML = html;
-    })
-    .catch(error => {
-      console.error('Error loading service section:', error);
-    });
-    
-    // Desktop nav active
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to load Footer');
+        return res.text();
+      })
+      .then(html => {
+        document.getElementById('footer-container').innerHTML = html;
+      })
+      .catch(error => console.error('Footer loading error:', error));
+    fetch('contactsection.html')
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to load Contact Section');
+        return res.text();
+      })
+      .then(html => {
+        document.getElementById('contact-section-container').innerHTML = html;
+      })
+      .catch(error => console.error('Contact Section error:', error));
+    fetch('reviewsection.html')
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to load Review Section');
+        return res.text();
+      })
+      .then(html => {
+        document.getElementById('review-section-container').innerHTML = html;
+        new Swiper('.swiper', {
+          slidesPerView: 1,
+          spaceBetween: 14,
+          loop: true,
+          breakpoints: {
+            500: { slidesPerView: 1, spaceBetween: 10 },
+            700: { slidesPerView: 2, spaceBetween: 12 },
+            1000: { slidesPerView: 3, spaceBetween: 14 }
+          },
+          navigation: {
+            nextEl: '.swiper-nav-btn.next',
+            prevEl: '.swiper-nav-btn.prev',
+          }
+        });
+      })
+      .catch(error => console.error('Review Section error:', error));
+    fetch('gallerysection.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('gallery-section-placeholder').innerHTML = data;
+      });
+    fetch('servicesection.html')
+      .then(response => response.text())
+      .then(html => {
+        document.getElementById('serviceSectionContainer').innerHTML = html;
+      })
+      .catch(error => {
+        console.error('Error loading service section:', error);
+      });
     function setActiveNav(links, clicked) {
       links.forEach(l => l.classList.remove('active'));
       clicked.classList.add('active');
     }
-    // Desktop nav links
     const navLinks = document.querySelectorAll('nav .nav-link');
     navLinks.forEach(link => {
       link.addEventListener('click', function(){
         setActiveNav(navLinks, this);
       });
     });
-    // Mobile nav links
     const mobileNavLinks = document.querySelectorAll('.mobile-nav .nav-link');
     mobileNavLinks.forEach(link => {
       link.addEventListener('click', function(){
@@ -720,8 +646,6 @@
         document.getElementById('mobileNav').style.display = 'none';
       });
     });
-
-    // Mobile menu toggle
     const mobileMenuIcon = document.getElementById('mobileMenuToggle');
     const mobileNav = document.getElementById('mobileNav');
     mobileMenuIcon.addEventListener('click', function(e) {
@@ -734,29 +658,21 @@
     mobileNav.addEventListener('click', function(e) {
       e.stopPropagation();
     });
-
-    // Profile avatar: set first letter of profile
     const profileName = "bdmdrums";
     for (const el of document.querySelectorAll('.profile-avatar')) {
       el.innerText = profileName.slice(0,1).toUpperCase();
     }
-
-    // Profile edit button click
     for (const el of document.querySelectorAll('.profile-edit')) {
       el.addEventListener('click', function(e) {
         e.stopPropagation();
         alert('Edit Profile clicked!');
       });
     }
-
-    // Profile button click
     for (const el of document.querySelectorAll('.profile-btn')) {
       el.addEventListener('click', function(e) {
         alert('Profile button clicked!');
       });
     }
-
-    // Header background change on scroll (desktop only)
     const header = document.getElementById('mainHeader');
     function handleHeaderBg() {
       if(window.innerWidth <= 800) return;
