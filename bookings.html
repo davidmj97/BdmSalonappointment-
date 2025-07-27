@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Bookings – BDMSALON</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Montserrat 400, 600, 900 -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: #0b0b10;
+      color: #fff;
+      font-family: 'Montserrat', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+    header {
+      width: 100vw;
+      background: rgba(0,0,0,0.82);
+      padding: 0;
+      border-bottom: 1px solid #232338;
+      box-shadow: 0 2px 6px rgba(20,20,40,0.15);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .header-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 12px 18px;
+    }
+    .logo {
+      font-weight: 700;
+      font-size: 1.2rem;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #fff;
+      text-decoration: none;
+    }
+    .logo img {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: linear-gradient(90deg, #233dff 0%, #1a237e 100%);
+      object-fit: cover;
+      border: 2px solid #233dff;
+    }
+    .back-btn {
+      color: #fff;
+      background: none;
+      border: none;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: color 0.2s;
+    }
+    .back-btn:hover { color: #aab3ff; }
+    main {
+      max-width: 700px;
+      margin: 34px auto 0;
+      padding: 0 12px 56px;
+    }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+      font-weight: 900;
+      color: #fff;
+    }
+    .section-desc {
+      color: #b8bbd9;
+      font-size: 1.03rem;
+      margin-bottom: 22px;
+      font-weight: 500;
+    }
+    .booking-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .booking-card {
+      background: #171728;
+      border-radius: 12px;
+      padding: 18px 20px 14px 20px;
+      margin-bottom: 22px;
+      box-shadow: 0 2px 15px #0005;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      border: 1.5px solid #232338;
+      position: relative;
+      transition: border 0.2s, box-shadow 0.2s;
+    }
+    .booking-card.upcoming {
+      border-color: #2e82ff;
+      box-shadow: 0 4px 18px #1a237e33;
+    }
+    .booking-card .svc-name {
+      font-size: 1.18rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 2px;
+    }
+    .booking-card .svc-date {
+      font-size: 1rem;
+      color: #aab3ff;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    .booking-card .svc-status {
+      font-size: 0.98rem;
+      font-weight: 600;
+      color: #2e82ff;
+      margin-bottom: 2px;
+      display: inline-block;
+    }
+    .booking-card .svc-detail {
+      color: #b8bbd9;
+      font-size: 0.99rem;
+      margin-bottom: 2px;
+    }
+    .booking-card .svc-points {
+      font-size: 0.87rem;
+      color: #b8bbd9;
+      font-style: italic;
+      margin-bottom: 2px;
+    }
+    .booking-card .svc-price {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 2px;
+    }
+    .booking-card .order-id {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #777;
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      background: #1114;
+      padding: 2px 8px;
+      border-radius: 7px;
+      letter-spacing: 1px;
+    }
+    .empty-bookings {
+      text-align: center;
+      margin-top: 55px;
+      color: #b8bbd9;
+      font-size: 1.1rem;
+    }
+    @media (max-width: 600px) {
+      main { padding: 0 4vw 56px; }
+      h1 { font-size: 1.3rem; }
+      .header-container { padding: 8px 5vw; }
+      .booking-card { padding: 14px 10px 12px 10px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <button class="back-btn" onclick="window.location.href='index.html'">
+        <span style="font-size:1.4em;">&#8592;</span> Home
+      </button>
+      <a class="logo" href="index.html">
+        <img src="https://cdn-icons-png.flaticon.com/512/2922/2922082.png" alt="Salon Logo">
+        BDMSALON
+      </a>
+      <div style="width:42px;"></div>
+    </div>
+  </header>
+  <main>
+    <h1>My Bookings</h1>
+    <div class="section-desc">View your upcoming and past salon appointments.</div>
+    <ul class="booking-list" id="bookingList"></ul>
+    <div id="noBookings" class="empty-bookings" style="display:none;">
+      You have no bookings yet.<br>
+      <a href="booknow.html" style="color:#2e82ff;text-decoration:underline;">Book your first appointment &rarr;</a>
+    </div>
+  </main>
+  <!-- Firebase scripts -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script>
+    // Initialize Firebase
+    firebase.initializeApp({
+      apiKey: "AIzaSyAmimDsjW_pF2NGw-w-40QzTsgmf1tdqyI",
+      authDomain: "bdmsalonappointment.firebaseapp.com",
+      projectId: "bdmsalonappointment"
+    });
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    const bookingList = document.getElementById('bookingList');
+    const noBookings = document.getElementById('noBookings');
+
+    function formatDate(ts) {
+      if (!ts) return '';
+      let d = (ts instanceof Date) ? ts : ts.toDate ? ts.toDate() : new Date(ts);
+      return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) + 
+             ' ' + d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function bookingCard(b) {
+      return `
+        <li class="booking-card ${b.status === 'Upcoming' ? 'upcoming' : ''}">
+          <span class="order-id">#${b.orderId || b.id || ''}</span>
+          <div class="svc-name">${b.service || 'Service'}</div>
+          <div class="svc-date">${formatDate(b.date)}</div>
+          <div class="svc-status">${b.status || 'Status'}</div>
+          <div class="svc-detail">${b.details || ''}</div>
+          <div class="svc-points">${b.points ? (b.points+' points') : ''}</div>
+          <div class="svc-price">${b.price ? ('₹'+b.price) : ''}</div>
+        </li>
+      `;
+    }
+
+    function renderBookings(bookings) {
+      bookingList.innerHTML = '';
+      if (!bookings.length) {
+        bookingList.style.display = 'none';
+        noBookings.style.display = '';
+        return;
+      }
+      bookingList.style.display = '';
+      noBookings.style.display = 'none';
+      // Show upcoming first, then past
+      bookings.sort((a, b) => (b.date && a.date) ? (b.date.seconds - a.date.seconds) : 0);
+      bookings.forEach(b => bookingList.insertAdjacentHTML('beforeend', bookingCard(b)));
+    }
+
+    auth.onAuthStateChanged(async user => {
+      if (!user) {
+        window.location.href = "index.html";
+        return;
+      }
+      // Fetch bookings from Firestore (collection: 'bookings', userId field)
+      try {
+        let query = db.collection('bookings').where('userId', '==', user.uid).orderBy('date', 'desc');
+        let snap = await query.get();
+        let bookings = [];
+        snap.forEach(doc => {
+          let data = doc.data();
+          bookings.push({
+            id: doc.id,
+            ...data
+          });
+        });
+        renderBookings(bookings);
+      } catch (e) {
+        bookingList.innerHTML = '';
+        noBookings.style.display = '';
+        noBookings.innerHTML = 'Error loading bookings.<br><small style="color:#b86">Please try again later.</small>';
+      }
+    });
+  </script>
+</body>
+</html>
