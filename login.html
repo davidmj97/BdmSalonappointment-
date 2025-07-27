@@ -123,7 +123,7 @@
       try {
         const { user } = await auth.signInWithEmailAndPassword(email, password);
         if (user.emailVerified) {
-          location.href = 'customer-dashboard.html';
+          location.href = 'home.html';
         } else {
           infoText.innerHTML = 'Please verify your e-mail before logging in.<br>Check your inbox.';
           await auth.signOut();
