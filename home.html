@@ -18,6 +18,9 @@
       --header-blur: blur(14px);
       --header-height: 76px;
     }
+    html {
+      scroll-behavior: smooth;
+    }
     * {
       box-sizing: border-box;
       margin: 0;
@@ -248,12 +251,9 @@
     }
     .mobile-nav > * { margin-bottom: 18px; white-space: nowrap; }
     .mobile-nav .logo { font-size: 2rem; margin-bottom: 30px; }
+    /* Remove bookings/profile from inside mobile-nav */
     .mobile-nav .header-mobile-btns {
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-      align-items: center;
-      margin-bottom: 30px;
+      display: none !important;
     }
     .mobile-nav .nav-link {
       width: 100vw;
@@ -267,12 +267,6 @@
       display: block;
     }
     .mobile-nav .nav-link:last-child { border-bottom: none; }
-    .mobile-nav .bookings-btn, .mobile-nav .profile-btn {
-      width: 90vw;
-      justify-content: flex-start;
-      border-radius: 8px;
-      font-size: 1.14rem;
-    }
     /* HERO SECTION */
     .hero-section {
       width: 100vw;
@@ -443,6 +437,48 @@
         padding: 0 10px;
         min-height: 38px;
       }
+      /* Fixed profile/bookings on mobile */
+      .mobile-fixed-profile {
+        display: flex !important;
+        position: fixed;
+        top: 12px;
+        right: 18px;
+        z-index: 300;
+        flex-direction: row;
+        gap: 0;
+      }
+      .mobile-fixed-profile .profile-btn {
+        padding: 4px 8px 4px 5px;
+        font-size: 0.9rem;
+        background: var(--gray);
+        min-width: unset;
+        min-height: unset;
+        height: 38px;
+      }
+      .mobile-fixed-profile .profile-avatar {
+        width: 22px;
+        height: 22px;
+        font-size: 0.77rem;
+      }
+      .mobile-fixed-bookings {
+        display: flex !important;
+        position: fixed;
+        bottom: 18px;
+        right: 16px;
+        z-index: 300;
+      }
+      .mobile-fixed-bookings .bookings-btn {
+        padding: 7px 14px 7px 10px;
+        font-size: 0.91rem;
+        min-width: unset;
+        min-height: unset;
+        border-radius: 20px;
+        height: 38px;
+      }
+      .mobile-fixed-profile,
+      .mobile-fixed-bookings {
+        pointer-events: auto;
+      }
     }
     @media (max-width: 440px) {
       .hero-btn, .hero-btn.secondary {
@@ -452,10 +488,29 @@
         font-size: 0.80rem;
         padding: 0 7px;
       }
+      .mobile-fixed-profile .profile-btn {
+        font-size: 0.81rem;
+        height: 32px;
+      }
+      .mobile-fixed-profile .profile-avatar {
+        width: 18px;
+        height: 18px;
+        font-size: 0.61rem;
+      }
+      .mobile-fixed-bookings .bookings-btn {
+        font-size: 0.78rem;
+        height: 32px;
+      }
+    }
+    /* Hide fixed buttons on desktop */
+    .mobile-fixed-profile,
+    .mobile-fixed-bookings {
+      display: none;
     }
   </style>
 </head>
 <body>
+  <div id="homepage"></div>
   <!-- HEADER -->
   <header id="mainHeader">
     <div class="header-container">
@@ -464,11 +519,11 @@
         BDMSALON
       </div>
       <nav>
-        <button class="nav-link active">Home</button>
-        <button class="nav-link">Services</button>
-        <button class="nav-link">Gallery</button>
-        <button class="nav-link">About</button>
-        <button class="nav-link">Contact</button>
+        <button class="nav-link active" data-scroll="homepage">Home</button>
+        <button class="nav-link" data-scroll="serviceSectionContainer">Services</button>
+        <button class="nav-link" data-scroll="gallery-section-placeholder">Gallery</button>
+        <button class="nav-link" data-scroll="about-section-container">About</button>
+        <button class="nav-link" data-scroll="contact-section-container">Contact</button>
       </nav>
       <div class="header-right">
         <button class="bookings-btn" title="My Bookings">
@@ -490,26 +545,32 @@
         <img src="https://cdn-icons-png.flaticon.com/512/2922/2922082.png" alt="Salon Logo">
         BDMSALON
       </div>
-      <div class="header-mobile-btns">
-        <button class="bookings-btn" title="My Bookings">
-          <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v15c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 17H5V8h14v12zm0-14H5V5h14v1z"></path></svg>
-          My Bookings
-        </button>
-        <button class="profile-btn" title="Profile">
-          <span class="profile-avatar">B</span>
-          <span class="profile-name">Profile</span>
-          <span class="profile-edit">
-            <svg viewBox="0 0 20 20"><path d="M17.414 2.586a2 2 0 00-2.828 0l-8.95 8.95a1 1 0 00-.263.464l-1.05 3.515a1 1 0 001.262 1.262l3.516-1.05a1 1 0 00.464-.263l8.949-8.95a2 2 0 000-2.828zm-10.121 10.95l7.071-7.071 1.414 1.414-7.071 7.07-1.414-1.413zm-1.414-1.415l1.415 1.415-1.415 1.413.001-2.828z"></path></svg>
-          </span>
-        </button>
-      </div>
-      <button class="nav-link active">Home</button>
-      <button class="nav-link">Services</button>
-      <button class="nav-link">Gallery</button>
-      <button class="nav-link">About</button>
-      <button class="nav-link">Contact</button>
+      <!-- header-mobile-btns removed from here -->
+      <button class="nav-link active" data-scroll="homepage">Home</button>
+      <button class="nav-link" data-scroll="serviceSectionContainer">Services</button>
+      <button class="nav-link" data-scroll="gallery-section-placeholder">Gallery</button>
+      <button class="nav-link" data-scroll="about-section-container">About</button>
+      <button class="nav-link" data-scroll="contact-section-container">Contact</button>
     </div>
   </header>
+
+  <!-- Fixed Profile Button (Mobile Only) -->
+  <div class="mobile-fixed-profile">
+    <button class="profile-btn" title="Profile">
+      <span class="profile-avatar">B</span>
+      <span class="profile-name">Profile</span>
+      <span class="profile-edit">
+        <svg viewBox="0 0 20 20"><path d="M17.414 2.586a2 2 0 00-2.828 0l-8.95 8.95a1 1 0 00-.263.464l-1.05 3.515a1 1 0 001.262 1.262l3.516-1.05a1 1 0 00.464-.263l8.949-8.95a2 2 0 000-2.828zm-10.121 10.95l7.071-7.071 1.414 1.414-7.071 7.07-1.414-1.413zm-1.414-1.415l1.415 1.415-1.415 1.413.001-2.828z"></path></svg>
+      </span>
+    </button>
+  </div>
+  <!-- Fixed Bookings Button (Mobile Only) -->
+  <div class="mobile-fixed-bookings">
+    <button class="bookings-btn" title="My Bookings">
+      <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v15c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 17H5V8h14v12zm0-14H5V5h14v1z"></path></svg>
+      My Bookings
+    </button>
+  </div>
 
   <!-- HERO SECTION -->
   <section class="hero-section">
@@ -564,6 +625,7 @@
   <div id="contact-section-container"></div>
   <div id="footer-container"></div>
   <script>
+    // Dynamic section loads (same as before)
     fetch('aboutsection.html')
       .then(response => {
         if (!response.ok) throw new Error('Failed to load About Section');
@@ -629,23 +691,53 @@
       .catch(error => {
         console.error('Error loading service section:', error);
       });
+
+    // Navigation scroll behavior
+    function scrollToSection(id) {
+      const el = document.getElementById(id);
+      if (el) {
+        // Offset by header height if desktop nav visible
+        const header = document.getElementById('mainHeader');
+        let offset = 0;
+        if (window.innerWidth > 800 && header) {
+          offset = header.offsetHeight;
+        }
+        const rect = el.getBoundingClientRect();
+        const scrollTop = window.scrollY || window.pageYOffset;
+        const top = rect.top + scrollTop - offset;
+        window.scrollTo({ top: top, behavior: 'smooth' });
+      }
+    }
+
     function setActiveNav(links, clicked) {
       links.forEach(l => l.classList.remove('active'));
       clicked.classList.add('active');
     }
+
+    // Desktop nav
     const navLinks = document.querySelectorAll('nav .nav-link');
     navLinks.forEach(link => {
-      link.addEventListener('click', function(){
+      link.addEventListener('click', function(e){
+        e.preventDefault();
         setActiveNav(navLinks, this);
+        const section = this.getAttribute('data-scroll');
+        if (section) scrollToSection(section);
       });
     });
+
+    // Mobile nav
     const mobileNavLinks = document.querySelectorAll('.mobile-nav .nav-link');
     mobileNavLinks.forEach(link => {
-      link.addEventListener('click', function(){
+      link.addEventListener('click', function(e){
+        e.preventDefault();
         setActiveNav(mobileNavLinks, this);
         document.getElementById('mobileNav').style.display = 'none';
+        const section = this.getAttribute('data-scroll');
+        if (section) scrollToSection(section);
       });
     });
+
+    // Mobile menu open/close
     const mobileMenuIcon = document.getElementById('mobileMenuToggle');
     const mobileNav = document.getElementById('mobileNav');
     mobileMenuIcon.addEventListener('click', function(e) {
@@ -658,6 +750,8 @@
     mobileNav.addEventListener('click', function(e) {
       e.stopPropagation();
     });
+
+    // Profile avatar initial
     const profileName = "bdmdrums";
     for (const el of document.querySelectorAll('.profile-avatar')) {
       el.innerText = profileName.slice(0,1).toUpperCase();
@@ -673,6 +767,14 @@
         alert('Profile button clicked!');
       });
     }
+    // For bookings button
+    for (const el of document.querySelectorAll('.bookings-btn')) {
+      el.addEventListener('click', function(e) {
+        alert('Bookings button clicked!');
+      });
+    }
+
+    // Header transparency
     const header = document.getElementById('mainHeader');
     function handleHeaderBg() {
       if(window.innerWidth <= 800) return;
