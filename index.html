@@ -88,7 +88,7 @@
             localStorage.setItem('displayName', result.user.displayName || '');
             localStorage.setItem('email',       result.user.email       || '');
             // Navigate to dashboard
-            location.href = 'customer-dashboard.html';
+            location.href = 'home.html';
           })
           .catch(err => {
             console.error(err);
@@ -99,7 +99,7 @@
     // --- Auto-redirect if already signed-in (landing page only) ---
     auth.onAuthStateChanged(user => {
       const onLanding = location.pathname.endsWith('index.html') || location.pathname === '/' || location.pathname === '';
-      if (user && onLanding) location.replace('customer-dashboard.html');
+      if (user && onLanding) location.replace('home.html');
     });
   </script>
 </body>
