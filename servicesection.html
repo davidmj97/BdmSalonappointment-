@@ -4,9 +4,8 @@
   <meta charset="UTF-8">
   <title>BDMSALON – Our Premium Services</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Add ITC Motter Corpus Bold font-face (you must host the font file or link from a trusted CDN if available) -->
+  <!-- Add ITC Motter Corpus Bold font-face (ensure font is hosted properly) -->
   <style>
-    /* Example: Use your own font file path or a reliable font CDN */
     @font-face {
       font-family: 'ITC Motter Corpus';
       src: url('fonts/ITC-Motter-Corpus-Bold.ttf') format('truetype');
@@ -32,16 +31,18 @@
     }
     .heading {
       font-size: 48px;
-      font-weight: bold;
+      /* Extra bold and capitalized */
+      font-weight: 900;
       margin: 0 0 14px 0;
       text-align: center;
       line-height: 1.06;
       letter-spacing: -1px;
       color: #fff;
-      /* Apply ITC Motter Corpus font */
       font-family: 'ITC Motter Corpus', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
       font-style: normal;
-      font-weight: bold;
+      text-transform: uppercase;
+      /* Add text-shadow for extra bold effect */
+      text-shadow: 1px 1px 0 #fff, 2px 2px 0 #233dff88, 0 2px 8px #233dff33;
     }
     @media (min-width: 1024px) {
       .heading {
@@ -57,7 +58,6 @@
       margin-left: auto;
       margin-right: auto;
     }
-
     .services-grid {
       display: grid;
       grid-template-columns: 1fr;
@@ -81,7 +81,6 @@
         padding: 0 10px;
       }
     }
-
     .service-card {
       background: #21212a;
       border-radius: 16px;
@@ -108,7 +107,6 @@
       transform: scale(1.035);
       z-index: 2;
     }
-
     .service-img-wrap {
       width: 100%;
       height: 46%;
@@ -132,7 +130,6 @@
     .service-card:hover .service-img {
       transform: scale(1.04);
     }
-
     .service-content {
       flex: 1;
       display: flex;
@@ -180,7 +177,6 @@
       background: #233dff;
       transform: scale(1.07);
     }
-
     @media (max-width: 900px) {
       .service-card {
         max-width: 98vw;
@@ -201,7 +197,7 @@
         font-size: 36px;
       }
       .desc {
-        font-size: 0.7rem;
+        font-size: 0.95rem;
         margin-bottom: 16px;
       }
       .services-grid {
@@ -239,7 +235,7 @@
 <div style="height: 60px;"></div>
 
   <section class="section-wrapper">
-    <div class="heading">Our Premium Services</div>
+    <div class="heading">OUR PREMIUM SERVICES</div>
     <div class="desc">
       Discover our comprehensive range of beauty services, each designed to enhance your natural elegance
     </div>
@@ -252,7 +248,7 @@
         <div class="service-content">
           <div class="service-title">Hair Styling &amp; Color</div>
           <div class="service-desc">Expert cuts, colors, and styling to bring out your natural beauty with the latest trends and techniques.</div>
-          <button class="learn-btn">Learn More</button>
+          <button class="learn-btn">View More</button>
         </div>
       </div>
       <!-- Service 2 -->
@@ -263,7 +259,7 @@
         <div class="service-content">
           <div class="service-title">Skin Treatments</div>
           <div class="service-desc">Revitalize your skin with our advanced facials and skincare solutions for a radiant, healthy glow.</div>
-          <button class="learn-btn">Learn More</button>
+          <button class="learn-btn">View More</button>
         </div>
       </div>
       <!-- Service 3 -->
@@ -274,7 +270,7 @@
         <div class="service-content">
           <div class="service-title">Nail Care</div>
           <div class="service-desc">Manicures and pedicures that combine precision and pampering, leaving your nails flawless and beautiful.</div>
-          <button class="learn-btn">Learn More</button>
+          <button class="learn-btn">View More</button>
         </div>
       </div>
       <!-- Service 4 -->
@@ -285,7 +281,7 @@
         <div class="service-content">
           <div class="service-title">Spa &amp; Relaxation</div>
           <div class="service-desc">Unwind with our luxurious massages and spa experiences, curated for deep relaxation and rejuvenation.</div>
-          <button class="learn-btn">Learn More</button>
+          <button class="learn-btn">View More</button>
         </div>
       </div>
     </div>
