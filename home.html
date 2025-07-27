@@ -33,7 +33,6 @@
       min-height: 100vh;
       color: var(--white);
     }
-    /* HEADER */
     header {
       width: 100vw;
       position: fixed;
@@ -252,7 +251,6 @@
     }
     .mobile-nav > * { margin-bottom: 18px; white-space: nowrap; }
     .mobile-nav .logo { font-size: 2rem; margin-bottom: 30px; }
-    /* Remove bookings/profile from inside mobile-nav */
     .mobile-nav .header-mobile-btns {
       display: none !important;
     }
@@ -268,7 +266,7 @@
       display: block;
     }
     .mobile-nav .nav-link:last-child { border-bottom: none; }
-    /* HERO SECTION */
+
     .hero-section {
       width: 100vw;
       height: 100vh;
@@ -438,7 +436,6 @@
         padding: 0 10px;
         min-height: 38px;
       }
-      /* Fixed profile/bookings on mobile */
       .mobile-fixed-profile {
         display: flex !important;
         position: fixed;
@@ -503,10 +500,86 @@
         height: 32px;
       }
     }
-    /* Hide fixed buttons on desktop */
     .mobile-fixed-profile,
     .mobile-fixed-bookings {
       display: none;
+    }
+    /* Account Sheet Modal Styles */
+    .sheet {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: -100%;
+      background: #fff;
+      color: #000;
+      border-top-left-radius: 18px;
+      border-top-right-radius: 18px;
+      box-shadow: 0 -4px 20px #0005;
+      max-height: 92vh;
+      overflow-y: auto;
+      transition: bottom .35s;
+      z-index: 3000;
+      padding: 24px 22px;
+      font-size: 15px;
+    }
+    .sheet.open {
+      bottom: 0;
+    }
+    .close-x {
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      font-size: 20px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .sheet input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 12px;
+      font-size: 15px;
+      border: 1.2px solid #ccc;
+      border-radius: 6px;
+    }
+    .save-btn {
+      display: block;
+      margin: 18px auto 0;
+      padding: 12px 28px;
+      border: none;
+      border-radius: 8px;
+      background: #13131a;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .signout-btn {
+      width: 100%;
+      margin-top: 20px;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background: #22232a;
+      color: #fff;
+      font-size: 15px;
+      cursor: pointer;
+    }
+    .reset-link {
+      font-size: 13px;
+      text-align: center;
+      margin-top: 2px;
+    }
+    .reset-link a {
+      font-weight: 700;
+      color: #13131a;
+      text-decoration: none;
+    }
+    @media (max-width: 800px) {
+      .sheet {
+        max-height: 98vh;
+        padding: 14px 8px;
+        font-size: 14px;
+      }
     }
   </style>
 </head>
@@ -531,9 +604,9 @@
           <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v15c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 17H5V8h14v12zm0-14H5V5h14v1z"></path></svg>
           My Bookings
         </button>
-        <button class="profile-btn" title="Profile">
-          <span class="profile-avatar">B</span>
-          <span class="profile-name">Profile</span>
+        <button class="profile-btn" title="Profile" id="profileBtnHeader">
+          <span class="profile-avatar" id="profileAvatarHeader">B</span>
+          <span class="profile-name" id="profileNameHeader">Profile</span>
           <span class="profile-edit">
             <svg viewBox="0 0 20 20"><path d="M17.414 2.586a2 2 0 00-2.828 0l-8.95 8.95a1 1 0 00-.263.464l-1.05 3.515a1 1 0 001.262 1.262l3.516-1.05a1 1 0 00.464-.263l8.949-8.95a2 2 0 000-2.828zm-10.121 10.95l7.071-7.071 1.414 1.414-7.071 7.07-1.414-1.413zm-1.414-1.415l1.415 1.415-1.415 1.413.001-2.828z"></path></svg>
           </span>
@@ -546,7 +619,6 @@
         <img src="https://cdn-icons-png.flaticon.com/512/2922/2922082.png" alt="Salon Logo">
         BDMSALON
       </div>
-      <!-- header-mobile-btns removed from here -->
       <button class="nav-link active" data-scroll="homepage">Home</button>
       <button class="nav-link" data-scroll="serviceSectionContainer">Services</button>
       <button class="nav-link" data-scroll="gallery-section-placeholder">Gallery</button>
@@ -557,34 +629,47 @@
 
   <!-- Fixed Profile Button (Mobile Only) -->
   <div class="mobile-fixed-profile">
-    <button class="profile-btn" title="Profile">
-      <span class="profile-avatar">B</span>
-      <span class="profile-name">Profile</span>
+    <button class="profile-btn" title="Profile" id="profileBtnMobile">
+      <span class="profile-avatar" id="profileAvatarMobile">B</span>
+      <span class="profile-name" id="profileNameMobile">Profile</span>
       <span class="profile-edit">
         <svg viewBox="0 0 20 20"><path d="M17.414 2.586a2 2 0 00-2.828 0l-8.95 8.95a1 1 0 00-.263.464l-1.05 3.515a1 1 0 001.262 1.262l3.516-1.05a1 1 0 00.464-.263l8.949-8.95a2 2 0 000-2.828zm-10.121 10.95l7.071-7.071 1.414 1.414-7.071 7.07-1.414-1.413zm-1.414-1.415l1.415 1.415-1.415 1.413.001-2.828z"></path></svg>
       </span>
     </button>
   </div>
-  <!-- Fixed Bookings Button (Mobile Only) -->
   <div class="mobile-fixed-bookings">
-    <button class="bookings-btn" title="My Bookings">
+    <button class="bookings-btn" title="My Bookings" id="bookingsBtnMobile">
       <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v15c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 17H5V8h14v12zm0-14H5V5h14v1z"></path></svg>
       My Bookings
     </button>
   </div>
 
+  <!-- Account Sheet Modal -->
+  <aside class="sheet" id="accountSheet">
+    <span class="close-x" id="closeSheetX">&times;</span>
+    <h3>Account</h3>
+    <input id="displayName" placeholder="Full name">
+    <input id="phone" placeholder="Phone number">
+    <input id="email" placeholder="Email">
+    <div class="reset-link">Forgot password? <a href="#" id="resetPwdLink">Reset</a></div>
+    <div id="resetBox" style="display:none;margin-top:10px;">
+      <input id="resetEmail" placeholder="Enter your email">
+      <button class="save-btn" id="sendResetBtn" style="margin-top:10px;width:100%;max-width:160px;">Send</button>
+    </div>
+    <button class="save-btn" id="saveBtn">Save Changes</button>
+    <button class="signout-btn" id="signoutBtn">Sign Out</button>
+  </aside>
+
   <!-- HERO SECTION -->
   <section class="hero-section">
     <div class="hero-bg">
-      <!-- Desktop Hero Image -->
       <img class="hero-bg-desktop" src="https://raw.githubusercontent.com/davidmj97/BdmSalonappointment-/refs/heads/main/Experience%20Precision%20(1).png" alt="Salon Hero Image">
-      <!-- Mobile Hero Image -->
       <img class="hero-bg-mobile" src="https://raw.githubusercontent.com/davidmj97/BdmSalonappointment-/refs/heads/main/Experience%20Precision.png" alt="Salon Hero Image Mobile">
     </div>
     <div class="hero-content">
       <div class="hero-btns">
-        <button class="hero-btn" onclick="alert('Book your appointment flow!')">Book Your Appointment</button>
-        <button class="hero-btn secondary" onclick="alert('View our services!')">View Our Services</button>
+        <button class="hero-btn" id="bookNowBtn">Book Your Appointment</button>
+        <button class="hero-btn secondary" id="viewServicesBtn">View Our Services</button>
       </div>
       <div style="position: relative; width: 100%; overflow: hidden; line-height: 0;">
         <svg viewBox="0 0 100 100" preserveAspectRatio="none"
@@ -625,8 +710,111 @@
   </div>
   <div id="contact-section-container"></div>
   <div id="footer-container"></div>
+
+  <!-- Firebase scripts -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   <script>
-    // Dynamic section loads (same as before)
+    firebase.initializeApp({
+      apiKey: "AIzaSyAmimDsjW_pF2NGw-w-40QzTsgmf1tdqyI",
+      authDomain: "bdmsalonappointment.firebaseapp.com",
+      projectId: "bdmsalonappointment"
+    });
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    const profileBtnHeader = document.getElementById('profileBtnHeader');
+    const profileBtnMobile = document.getElementById('profileBtnMobile');
+    const accountSheet = document.getElementById('accountSheet');
+    const closeSheetX = document.getElementById('closeSheetX');
+    const displayNameIn = document.getElementById('displayName');
+    const phoneIn = document.getElementById('phone');
+    const emailIn = document.getElementById('email');
+    const resetPwdLink = document.getElementById('resetPwdLink');
+    const resetBox = document.getElementById('resetBox');
+    const resetEmailIn = document.getElementById('resetEmail');
+    const sendResetBtn = document.getElementById('sendResetBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const signoutBtn = document.getElementById('signoutBtn');
+    const profileAvatarHeader = document.getElementById('profileAvatarHeader');
+    const profileAvatarMobile = document.getElementById('profileAvatarMobile');
+    const profileNameHeader = document.getElementById('profileNameHeader');
+    const profileNameMobile = document.getElementById('profileNameMobile');
+
+    function openAccountSheet() {
+      accountSheet.classList.add('open');
+    }
+    function closeAccountSheet() {
+      accountSheet.classList.remove('open');
+      resetBox.style.display = 'none';
+    }
+    profileBtnHeader.addEventListener('click', openAccountSheet);
+    profileBtnMobile.addEventListener('click', openAccountSheet);
+    closeSheetX.addEventListener('click', closeAccountSheet);
+
+    auth.onAuthStateChanged(u => {
+      if (!u) { window.location.href = 'index.html'; return; }
+      let initial = (u.displayName || 'U')[0].toUpperCase();
+      profileAvatarHeader.textContent = initial;
+      profileAvatarMobile.textContent = initial;
+      profileNameHeader.textContent = u.displayName || 'Profile';
+      profileNameMobile.textContent = u.displayName || 'Profile';
+      displayNameIn.value = u.displayName || '';
+      emailIn.value = u.email || '';
+      phoneIn.value = localStorage.getItem('phone_' + u.uid) || '';
+    });
+
+    saveBtn.onclick = async () => {
+      const u = auth.currentUser; if (!u) return;
+      try {
+        if (displayNameIn.value !== u.displayName)
+          await u.updateProfile({ displayName: displayNameIn.value });
+        if (emailIn.value !== u.email)
+          await u.updateEmail(emailIn.value);
+        localStorage.setItem('phone_' + u.uid, phoneIn.value);
+        alert('Saved!');
+        closeAccountSheet();
+        profileAvatarHeader.textContent = (displayNameIn.value || 'U')[0].toUpperCase();
+        profileAvatarMobile.textContent = (displayNameIn.value || 'U')[0].toUpperCase();
+        profileNameHeader.textContent = displayNameIn.value || 'Profile';
+        profileNameMobile.textContent = displayNameIn.value || 'Profile';
+      } catch (e) { alert(e.message); }
+    };
+
+    resetPwdLink.onclick = e => {
+      e.preventDefault();
+      resetBox.style.display = 'block';
+      resetEmailIn.value = emailIn.value;
+    };
+    sendResetBtn.onclick = async () => {
+      try {
+        await auth.sendPasswordResetEmail(resetEmailIn.value.trim());
+        alert('Reset e-mail sent!');
+        resetBox.style.display = 'none';
+      } catch (e) { alert(e.message); }
+    };
+
+    signoutBtn.onclick = () => {
+      auth.signOut().then(() => {
+        window.location.href = 'index.html';
+      });
+    };
+
+    function openBookings() {
+      window.location.href = 'bookings.html';
+    }
+    document.querySelectorAll('.bookings-btn').forEach(el =>
+      el.addEventListener('click', openBookings)
+    );
+
+    document.getElementById('bookNowBtn').onclick = () => {
+      window.location.href = 'booknow.html';
+    };
+    document.getElementById('viewServicesBtn').onclick = () => {
+      window.location.href = 'ourservices.html';
+    };
+
     fetch('aboutsection.html')
       .then(response => {
         if (!response.ok) throw new Error('Failed to load About Section');
@@ -693,11 +881,9 @@
         console.error('Error loading service section:', error);
       });
 
-    // Navigation scroll behavior
     function scrollToSection(id) {
       const el = document.getElementById(id);
       if (el) {
-        // Offset by header height if desktop nav visible
         const header = document.getElementById('mainHeader');
         let offset = 0;
         if (window.innerWidth > 800 && header) {
@@ -709,13 +895,10 @@
         window.scrollTo({ top: top, behavior: 'smooth' });
       }
     }
-
     function setActiveNav(links, clicked) {
       links.forEach(l => l.classList.remove('active'));
       clicked.classList.add('active');
     }
-
-    // Desktop nav
     const navLinks = document.querySelectorAll('nav .nav-link');
     navLinks.forEach(link => {
       link.addEventListener('click', function(e){
@@ -725,8 +908,6 @@
         if (section) scrollToSection(section);
       });
     });
-
-    // Mobile nav
     const mobileNavLinks = document.querySelectorAll('.mobile-nav .nav-link');
     mobileNavLinks.forEach(link => {
       link.addEventListener('click', function(e){
@@ -737,8 +918,6 @@
         if (section) scrollToSection(section);
       });
     });
-
-    // Mobile menu open/close
     const mobileMenuIcon = document.getElementById('mobileMenuToggle');
     const mobileNav = document.getElementById('mobileNav');
     mobileMenuIcon.addEventListener('click', function(e) {
@@ -752,30 +931,6 @@
       e.stopPropagation();
     });
 
-    // Profile avatar initial
-    const profileName = "bdmdrums";
-    for (const el of document.querySelectorAll('.profile-avatar')) {
-      el.innerText = profileName.slice(0,1).toUpperCase();
-    }
-    for (const el of document.querySelectorAll('.profile-edit')) {
-      el.addEventListener('click', function(e) {
-        e.stopPropagation();
-        alert('Edit Profile clicked!');
-      });
-    }
-    for (const el of document.querySelectorAll('.profile-btn')) {
-      el.addEventListener('click', function(e) {
-        alert('Profile button clicked!');
-      });
-    }
-    // For bookings button
-    for (const el of document.querySelectorAll('.bookings-btn')) {
-      el.addEventListener('click', function(e) {
-        alert('Bookings button clicked!');
-      });
-    }
-
-    // Header transparency
     const header = document.getElementById('mainHeader');
     function handleHeaderBg() {
       if(window.innerWidth <= 800) return;
