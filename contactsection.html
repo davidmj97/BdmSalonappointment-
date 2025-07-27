@@ -26,6 +26,15 @@
       flex-direction: column;
       align-items: center;
     }
+      .white-line {
+  width: 350px;
+  height: 3px;
+  background-color: white;
+  margin: 40px auto;
+  border: none;
+  border-radius: 2px;
+}
+    
     .contact-heading {
       text-align: center;
       font-size: 5.5rem;
@@ -224,14 +233,29 @@
         gap: 13px;
       }
     }
+      @media (max-width: 650px) {
+ .white-line {
+  width: 80px;
+  height: 3px;
+  background-color: white;
+  margin: 40px auto;
+  border: none;
+  border-radius: 2px;
+} @media (max-width: 650px) {
+  .heading-btb {
+    font-size: 45px !important;
+  }
+}
   </style>
 </head>
 <body>
   <section class="contact-main">
-<div class="heading"
+<div class="heading-btb"
      style="font-family:'Montserrat',sans-serif;font-weight:900;font-size:72px;letter-spacing:-2px;text-transform:uppercase;color:#fff;text-align:center;line-height:1.06;text-shadow:1px 2px 2px #000c,0 2px 6px #233dff22;margin:0 0 14px 0;">
   GET IN TOUCH
-</div>     <div class="contact-desc">
+</div>   
+<hr class="white-line">
+<div class="contact-desc">
       Ready to book your appointment or have questions? We'd love to hear from you. Reach out and let's make you look and feel amazing.
     </div>
 
