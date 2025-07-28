@@ -59,7 +59,17 @@
       color: white;
       letter-spacing: 1px;
     }
-    .tabs { display: flex; margin-top: 65px; border-bottom: 1px solid var(--border-color);}
+    .container {
+      max-width: 900px;
+      margin: 75px auto 0 auto;
+      padding: 0 24px;
+    }
+    .tabs { 
+      display: flex; 
+      margin-top: 0;
+      padding-top: 12px;
+      border-bottom: 1px solid var(--border-color);
+    }
     .tab {
       padding: 10px 32px;
       cursor: pointer;
@@ -77,8 +87,8 @@
     .tab-content.active { display: block;}
     .bookings-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 14px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
       margin-top: 18px;
     }
     .booking-card {
@@ -130,11 +140,15 @@
       border: 1px dashed var(--border-color);
       grid-column: 1 / -1;
     }
-    @media (max-width: 768px) {
-      .header-container {padding: 6px 0;}
-      .tabs {margin-top: 53px;}
-      .bookings-grid {grid-template-columns: 1fr;}
-      .booking-card {padding: 11px;}
+    @media (max-width: 900px) {
+      .container {
+        max-width: 100vw;
+        padding: 0 12px;
+      }
+      .bookings-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
     }
     @media (max-width: 480px) {
       .header-content {justify-content: flex-start;}
@@ -151,7 +165,7 @@
       <div class="bookings-heading">My Bookings</div>
     </div>
   </div>
-  <div class="container" style="max-width: 900px; margin: 0 auto; padding: 0 10px;">
+  <div class="container">
     <div class="tabs">
       <div class="tab active" data-tab="upcoming">Upcoming Bookings</div>
       <div class="tab" data-tab="past">Past Bookings</div>
