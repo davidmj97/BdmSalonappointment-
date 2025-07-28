@@ -192,6 +192,8 @@
     }
     .booking-actions {
       display: flex;
+      justify-content: space-between;
+      align-items: center;
       gap: 8px;
       margin-top: 8px;
       padding-top: 8px;
@@ -200,39 +202,37 @@
       position: relative; z-index: 1;
     }
     .btn {
-      padding: 6px 10px;
+      padding: 6px 14px;
       border: none;
-      border-radius: 4px;
+      border-radius: 50px;
       cursor: pointer;
       font-weight: 600;
-      font-size: 12px;
-      transition: all 0.2s;
+      font-size: 13px;
+      transition: all 0.18s;
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      gap: 5px;
+      gap: 8px;
       background: var(--primary-blue);
       color: #fff;
-      min-width: 60px;
+      min-width: 70px;
+      justify-content: center;
     }
-    .btn i { font-size: 12px;}
+    .btn i { font-size: 13px;}
     .btn:active { opacity: 0.9; }
     .btn-call {
-      background: #2ecc40;
+      background: var(--primary-blue);
       color: #fff;
       font-weight: 700;
       border-radius: 50px;
-      padding: 7px 16px;
       font-size: 13px;
-      transition: background 0.18s;
       border: none;
-      margin-right: 8px;
+      margin-left: 8px;
       display: inline-flex;
       align-items: center;
       gap: 7px;
     }
     .btn-call:hover {
-      background: #189c1c;
+      background: #191948;
       color: #fff;
       transform: scale(1.08);
     }
@@ -252,81 +252,53 @@
       .page-title {font-size: 1.01rem;}
       .tab {padding: 9px 11px; font-size: 12px;}
     }
-    /* MODAL styles */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      left: 0; top: 0; width: 100vw; height: 100vh;
-      background: rgba(0,0,0,0.75);
-      align-items: center;
-      justify-content: center;
-      overflow-y: auto;
-      padding: 32px 0;
-    }
-    .modal-content {
-      background: var(--card-bg);
-      color: var(--fg);
-      border-radius: 10px;
-      padding: 28px 24px 22px 24px;
-      max-width: 420px;
-      width: 96vw;
-      box-shadow: 0 6px 32px rgba(0,0,0,0.5);
-      position: relative;
-      border: 1px solid var(--border-color);
-      animation: fadeIn 0.17s;
-    }
-    .close-modal {
-      position: absolute; top: 12px; right: 14px;
-      font-size: 23px; color: #fff; background: none; border: none; cursor: pointer;
-      transition: color 0.2s;
-    }
-    .close-modal:hover { color: #90caf9; }
-    .modal-header {margin-bottom: 6px;}
-    .modal-title {font-size: 18px; color: #90caf9; font-weight: 600;}
-    .modal-body .detail-row {
-      display: flex; margin-bottom: 10px; font-size: 13px;
-      border-bottom: 1px dashed var(--border-color); padding-bottom: 7px;
-    }
-    .modal-body .detail-label {
-      width: 110px;
-      font-weight: 500;
-      color: #90caf9;
-      flex-shrink: 0;
-    }
-    .modal-body .detail-value {
-      flex: 1;
-      color: var(--fg);
-      word-break: break-word;
-    }
-    .modal-body .services-list {margin-top: 2px;}
-    .modal-body .service-item {
-      background: #1a237e;
-      padding: 8px;
-      margin-bottom: 6px;
-      border-radius: 4px;
-      border-left: 3px solid #0d47a1;
-      font-size: 12px;
-      color: #fff;
-    }
-    .modal-body .service-item .service-name {
-      font-weight: bold;
-      color: white;
-      font-size: 13px;
-      margin-bottom: 2px;
-    }
-    .modal-body .service-item div {margin: 1px 0;}
-    .modal-footer {
+    /* Pagination */
+    .pagination {
       display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      padding-top: 14px;
-      margin-top: 10px;
-      border-top: 1px solid var(--border-color);
-      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      margin: 30px 0 5px 0;
+      font-family: inherit;
+      user-select: none;
     }
-    .modal-footer .btn {background: var(--primary-blue);}
-    @keyframes fadeIn {from {opacity: 0; transform: translateY(24px);} to {opacity: 1; transform: none;}}
+    .pagination button,
+    .pagination span {
+      background: #161a2f;
+      color: #90caf9;
+      border: none;
+      border-radius: 6px;
+      min-width: 35px;
+      height: 36px;
+      font-size: 15px;
+      margin: 0 2px;
+      padding: 6px 0;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+      transition: background 0.15s, color 0.15s, transform 0.13s;
+      outline: none;
+    }
+    .pagination button.active,
+    .pagination span.active {
+      background: var(--primary-blue);
+      color: #fff;
+      transform: scale(1.13);
+      pointer-events: none;
+    }
+    .pagination button:disabled {
+      opacity: 0.45;
+      pointer-events: none;
+    }
+    .pagination span.gap {
+      pointer-events: none;
+      background: none;
+      color: #bbb;
+      font-size: 19px;
+      min-width: 10px;
+      width: 20px;
+      cursor: initial;
+    }
   </style>
 </head>
 <body>
@@ -348,9 +320,11 @@
     </div>
     <div id="upcoming-content" class="tab-content active">
       <div class="bookings-grid" id="upcoming-grid"></div>
+      <div class="pagination" id="upcoming-pagination"></div>
     </div>
     <div id="past-content" class="tab-content">
       <div class="bookings-grid" id="past-grid"></div>
+      <div class="pagination" id="past-pagination"></div>
     </div>
   </div>
   <!-- Order Details Modal -->
@@ -484,6 +458,41 @@
       date.setHours(h || 0, m || 0, 0, 0);
       return date.getTime() < Date.now();
     }
+
+    // PAGINATION: show 10 per page
+    const BOOKINGS_PER_PAGE = 10;
+    let upcomingPage = 1, pastPage = 1, upcomingList = [], pastList = [];
+
+    function renderPagination(total, currentPage, containerId, onPage) {
+      const pageCount = Math.ceil(total / BOOKINGS_PER_PAGE);
+      const container = document.getElementById(containerId);
+      if (pageCount <= 1) { container.innerHTML = ''; return; }
+      let html = '';
+      html += `<button ${currentPage === 1 ? 'disabled' : ''} data-page="${currentPage-1}">&laquo;</button>`;
+      // Show first, gaps, 2 before/after current, last
+      for (let i = 1; i <= pageCount; i++) {
+        if (
+          i === 1 || i === pageCount ||
+          (i >= currentPage - 1 && i <= currentPage + 1)
+        ) {
+          html += `<button class="${i === currentPage ? 'active' : ''}" data-page="${i}">${i}</button>`;
+        } else if (
+          i === 2 && currentPage > 3
+        ) {
+          html += `<span class="gap">…</span>`;
+        } else if (
+          i === pageCount - 1 && currentPage < pageCount - 2
+        ) {
+          html += `<span class="gap">…</span>`;
+        }
+      }
+      html += `<button ${currentPage === pageCount ? 'disabled' : ''} data-page="${currentPage+1}">&raquo;</button>`;
+      container.innerHTML = html;
+      Array.from(container.querySelectorAll('button[data-page]')).forEach(btn => {
+        btn.onclick = () => onPage(Number(btn.getAttribute('data-page')));
+      });
+    }
+
     function createBookingCard(booking) {
       const status = booking.status || 'pending';
       const totalPrice = calculateTotal(booking.services);
@@ -520,22 +529,46 @@
             }</span>
           </div>
           <div class="booking-actions">
-            ${phoneNumber ? `<a class="btn-call" href="tel:${phoneNumber}" title="Call ${phoneNumber}"><i class="fas fa-phone"></i> ${phoneNumber}</a>` : ''}
             <button class="btn btn-view" data-id="${booking.id}">
               <i class="fas fa-eye"></i> View
             </button>
+            ${phoneNumber ? `<a class="btn btn-call" href="tel:${phoneNumber}" title="Call"><i class="fas fa-phone"></i> Call</a>` : ''}
           </div>
         </div>
       `;
     }
+    function renderBookings(gridId, paginationId, list, page) {
+      const start = (page - 1) * BOOKINGS_PER_PAGE;
+      const bookingsToShow = list.slice(start, start + BOOKINGS_PER_PAGE);
+      document.getElementById(gridId).innerHTML =
+        bookingsToShow.length ?
+        bookingsToShow.map(createBookingCard).join('') :
+        '<div class="no-bookings">No bookings found.</div>';
+      renderPagination(list.length, page, paginationId, newPage => {
+        if (gridId === 'upcoming-grid') {
+          upcomingPage = newPage; renderBookings('upcoming-grid', 'upcoming-pagination', upcomingList, upcomingPage);
+        } else {
+          pastPage = newPage; renderBookings('past-grid', 'past-pagination', pastList, pastPage);
+        }
+        setTimeout(attachViewBtns, 100);
+      });
+      setTimeout(attachViewBtns, 100);
+    }
+    function attachViewBtns() {
+      document.querySelectorAll('.btn-view').forEach(btn => {
+        btn.onclick = function(e) {
+          e.stopPropagation();
+          const id = btn.getAttribute('data-id');
+          const allBookings = [...upcomingList, ...pastList];
+          const booking = allBookings.find(b => b.id === id);
+          if (booking) openOrderModal(booking);
+        };
+      });
+    }
     function showUserBookings(user) {
       const userEmail = user.email;
-      const upcomingGrid = document.getElementById('upcoming-grid');
-      const pastGrid = document.getElementById('past-grid');
       const upCount = document.getElementById('upcoming-count');
       const pastCount = document.getElementById('past-count');
-      upcomingGrid.innerHTML = '<div style="color:#bbb;padding:24px 0;text-align:center;">Loading...</div>';
-      pastGrid.innerHTML = '';
       database.ref('bookings').on('value', snapshot => {
         const bookings = [];
         snapshot.forEach(child => {
@@ -545,42 +578,25 @@
             bookings.push(b);
           }
         });
-        const upcoming = [];
-        const past = [];
+        upcomingList = [];
+        pastList = [];
         bookings.sort((a, b) => {
           const dA = new Date(a.date || 0); const dB = new Date(b.date || 0);
           return dB - dA;
         });
         bookings.forEach(b => {
           if (isPastBooking(b.date, b.time, b.status)) {
-            past.push(b);
+            pastList.push(b);
           } else {
-            upcoming.push(b);
+            upcomingList.push(b);
           }
         });
-        upCount.textContent = upcoming.length;
-        pastCount.textContent = past.length;
-        upcomingGrid.innerHTML = upcoming.length
-          ? upcoming.map(createBookingCard).join('')
-          : '<div class="no-bookings">No upcoming bookings found.</div>';
-        pastGrid.innerHTML = past.length
-          ? past.map(createBookingCard).join('')
-          : '<div class="no-bookings">No past bookings found.</div>';
-
-        setTimeout(() => {
-          document.querySelectorAll('.btn-view').forEach(btn => {
-            btn.onclick = function(e) {
-              e.stopPropagation();
-              const id = btn.getAttribute('data-id');
-              const allBookings = [...upcoming, ...past];
-              const booking = allBookings.find(b => b.id === id);
-              if (booking) openOrderModal(booking);
-            };
-          });
-        }, 100);
+        upCount.textContent = upcomingList.length;
+        pastCount.textContent = pastList.length;
+        renderBookings('upcoming-grid', 'upcoming-pagination', upcomingList, upcomingPage = 1);
+        renderBookings('past-grid', 'past-pagination', pastList, pastPage = 1);
       });
     }
-
     function openOrderModal(order) {
       document.getElementById('orderModal').style.display = 'flex';
       document.getElementById('modal-order-number').textContent = "#" + (order.orderNumber || "N/A");
