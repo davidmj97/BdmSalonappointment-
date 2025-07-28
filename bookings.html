@@ -201,22 +201,22 @@
       justify-content: flex-end;
     }
     .btn {
-      padding: 6px 16px;
+      padding: 6px 10px;
       border: none;
-      border-radius: 10px;
+      border-radius: 4px;
       cursor: pointer;
       font-weight: 600;
-      font-size: 13px;
-      transition: all 0.18s;
+      font-size: 12px;
+      transition: all 0.2s;
       display: inline-flex;
       align-items: center;
-      gap: 7px;
+      justify-content: center;
+      gap: 5px;
       background: var(--primary-blue);
       color: #fff;
-      min-width: 70px;
-      justify-content: center;
+      min-width: 60px;
     }
-    .btn i { font-size: 13px;}
+    .btn i { font-size: 12px;}
     .btn:active { opacity: 0.9; }
     .btn-call {
       background: var(--primary-blue);
@@ -497,7 +497,6 @@
       const serviceCount = booking.services?.length || 0;
       const extraClass = status === "completed" ? "completed" : "";
       const phoneNumber = booking.user?.phone || "";
-      // Only text "Call" with icon, curve 10px, right side, triggers popup
       return `
         <div class="booking-card ${status} ${extraClass}">
           <div class="booking-header">
