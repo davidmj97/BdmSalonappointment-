@@ -12,11 +12,7 @@
       --border-color: #444;
       --card-bg: #111;
     }
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Helvetica Neue', Arial, sans-serif;
       background: var(--bg);
@@ -28,9 +24,7 @@
     }
     .header-container {
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
+      top: 0; left: 0; right: 0;
       background: #000;
       z-index: 100;
       padding: 15px 0;
@@ -88,22 +82,19 @@
       overflow: hidden;
       box-shadow: 0 2px 24px rgba(0,0,0,0.25);
     }
-   .section-header {
-  padding: 14px 20px;
-  background: #1a237e;  /* Changed from semi-transparent to solid dark blue */
-  border-bottom: 1px solid #333;
-}
-
-.section-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: #fff;  /* Changed from light blue (#90caf9) to white */
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-    .section-content {
-      padding: 16px;
+    .section-header {
+      padding: 14px 20px;
+      background: #1a237e;
+      border-bottom: 1px solid #333;
     }
+    .section-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .section-content { padding: 16px; }
     .service-item {
       background: #1a237e;
       color: #fff;
@@ -133,48 +124,20 @@
       padding: 10px 0;
       border-bottom: 1px solid #333;
     }
-    .detail-row:last-child {
-      border-bottom: none;
-    }
-    .detail-label {
-      color: #bbb;
-      font-size: 13px;
-    }
-    .detail-value {
-      color: #fff;
-      font-weight: 500;
-    }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-label { color: #bbb; font-size: 13px; }
+    .detail-value { color: #fff; font-weight: 500; }
 
-    /* MOBILE STYLES */
     @media (max-width: 600px) {
-      .container {
-        padding: 10px;
-      }
-      .step-heading {
-        font-size: 18px;
-      }
-      .btn-container {
-        gap: 12px;
-        margin: 0 10px;
-      }
-      .btn-prev, .confirm-btn {
-        padding: 10px;
-        font-size: 13px;
-      }
-      .section-header {
-        padding: 12px 16px;
-      }
-      .section-content {
-        padding: 12px;
-      }
-      .service-item {
-        padding: 12px;
-      }
+      .container { padding: 10px; }
+      .step-heading { font-size: 18px; }
+      .btn-container { gap: 12px; margin: 0 10px; }
+      .btn-prev, .confirm-btn { padding: 10px; font-size: 13px; }
+      .section-header { padding: 12px 16px; }
+      .section-content { padding: 12px; }
+      .service-item { padding: 12px; }
     }
-
-    ::-webkit-scrollbar {
-      display: none;
-    }
+    ::-webkit-scrollbar { display: none; }
   </style>
 </head>
 <body>
@@ -195,7 +158,6 @@
         <!-- Services will be inserted here by JavaScript -->
       </div>
     </div>
-
     <!-- Stylist Section -->
     <div class="booking-card">
       <div class="section-header">
@@ -212,7 +174,6 @@
         </div>
       </div>
     </div>
-
     <!-- Date & Time Section -->
     <div class="booking-card">
       <div class="section-header">
@@ -233,7 +194,6 @@
         </div>
       </div>
     </div>
-
     <!-- Personal Details Section -->
     <div class="booking-card">
       <div class="section-header">
@@ -255,9 +215,9 @@
       </div>
     </div>
   </div>
-
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   <script>
     const firebaseConfig = {
@@ -271,9 +231,9 @@
       measurementId: "G-Q0FVZRVS64"
     };
     firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
     const database = firebase.database();
-
-    // Function to format time
+    // Format time display
     function formatTimeOnlyStart(timeStr) {
       if (!timeStr) return 'Not selected';
       let timePart = timeStr.split('-')[0].trim();
@@ -290,18 +250,14 @@
       const hour12 = h % 12 || 12;
       return `${hour12.toString().padStart(2, '0')}:${minutes.padStart(2, '0')} ${ampm}`;
     }
-
-    // Load booking details
+    // Load booking details into the page
     const loadBookingDetails = () => {
-      // Load services
       const servicesData = localStorage.getItem('selectedServices');
       const servicesContainer = document.getElementById('servicesContainer');
-      
       if (servicesData) {
         try {
           const services = JSON.parse(servicesData);
           servicesContainer.innerHTML = '';
-          
           services.forEach(service => {
             const serviceItem = document.createElement('div');
             serviceItem.className = 'service-item';
@@ -322,8 +278,7 @@
       } else {
         servicesContainer.innerHTML = '<div class="service-item">No services selected</div>';
       }
-
-      // Load stylist
+      // Stylist
       const stylistData = localStorage.getItem('selectedStylist');
       if (stylistData) {
         try {
@@ -334,19 +289,16 @@
           console.error("Error parsing stylist:", e);
         }
       }
-
-      // Load date and time
+      // Date and time
       const formattedDate = localStorage.getItem('formattedDate');
       if (formattedDate) {
         document.getElementById('dateValue').textContent = formattedDate;
       }
-
       const selectedTime = localStorage.getItem('selectedTime');
       if (selectedTime) {
         document.getElementById('timeValue').textContent = formatTimeOnlyStart(selectedTime);
       }
-
-      // Load user details
+      // User details
       const userDetails = localStorage.getItem('userDetails');
       if (userDetails) {
         try {
@@ -359,50 +311,44 @@
         }
       }
     };
-
-    // Confirm booking function
+    // Confirm booking function, always use logged-in user's email and name
     const confirmBooking = async () => {
       const confirmBtn = document.getElementById('confirmBtn');
       const originalText = confirmBtn.textContent;
       confirmBtn.disabled = true;
       confirmBtn.textContent = 'Processing...';
-
       try {
+        const authUser = firebase.auth().currentUser;
         const userDetails = JSON.parse(localStorage.getItem('userDetails') || '{}');
         const services = JSON.parse(localStorage.getItem('selectedServices') || '[]');
         const stylist = JSON.parse(localStorage.getItem('selectedStylist') || '{}');
         const selectedDate = localStorage.getItem('selectedDate');
         const selectedTime = localStorage.getItem('selectedTime');
         const formattedDate = localStorage.getItem('formattedDate') || "";
-
         if (!services.length) throw new Error("No services selected");
-
-        // Create booking object
+        // Always use Firebase Auth user for email (and name if available)
         const bookingDetails = {
           services: services,
           stylist: stylist,
           date: formattedDate,
           time: selectedTime,
           user: {
-            name: userDetails.name || "Guest",
-            email: userDetails.email || "",
+            name: userDetails.name || (authUser ? authUser.displayName : "Guest"),
+            email: (authUser ? authUser.email : userDetails.email || ""),
             phone: userDetails.phone || ""
           },
           status: "pending",
           createdAt: firebase.database.ServerValue.TIMESTAMP
         };
-
         // Save booking to Firebase
         const newBookingRef = await database.ref('bookings').push(bookingDetails);
         localStorage.setItem('currentBookingId', newBookingRef.key);
-
         // Clear booking data from localStorage
         localStorage.removeItem('selectedServices');
         localStorage.removeItem('selectedStylist');
         localStorage.removeItem('formattedDate');
         localStorage.removeItem('selectedTime');
         localStorage.removeItem('selectedDate');
-
         // Redirect to confirmation page
         window.location.href = 'booking-confirmation.html';
       } catch (error) {
@@ -412,11 +358,14 @@
         confirmBtn.textContent = originalText;
       }
     };
-
-    // Initialize the page
+    // Init
     document.addEventListener('DOMContentLoaded', () => {
       loadBookingDetails();
       document.getElementById('confirmBtn').addEventListener('click', confirmBooking);
+      // Optionally, redirect to login if not logged in
+      auth.onAuthStateChanged(user => {
+        if (!user) window.location.href = "index.html";
+      });
     });
   </script>
 </body>
