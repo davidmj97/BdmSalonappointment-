@@ -1,267 +1,335 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>My Bookings – BDMSALON</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Montserrat 400, 600, 900 -->
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;900&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>My Bookings – BDM Salon</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
-    body {
-      background: #0b0b10;
-      color: #fff;
-      font-family: 'Montserrat', Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      min-height: 100vh;
+    :root {
+      --bg: #000;
+      --fg: #fff;
+      --card-bg: #111;
+      --accent: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+      --border-color: #333;
+      --text-muted: #bbb;
+      --success: #2e7d32;
+      --danger: #c62828;
+      --warning: #ff9800;
+      --primary-blue: #1a73e8;
+      --delete-red: #d32f2f;
     }
-    header {
-      width: 100vw;
-      background: rgba(0,0,0,0.82);
-      padding: 0;
-      border-bottom: 1px solid #232338;
-      box-shadow: 0 2px 6px rgba(20,20,40,0.15);
-      position: sticky;
-      top: 0;
-      z-index: 10;
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      min-height: 100vh;
+      font-size: 14px;
     }
     .header-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: #000;
+      z-index: 100;
+      padding: 12px 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.5);
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 12px 18px;
     }
-    .logo {
-      font-weight: 700;
-      font-size: 1.2rem;
-      letter-spacing: 1px;
+    .header-content {
+      width: 100%;
       display: flex;
       align-items: center;
-      gap: 8px;
-      color: #fff;
-      text-decoration: none;
+      justify-content: center;
     }
-    .logo img {
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      background: linear-gradient(90deg, #233dff 0%, #1a237e 100%);
-      object-fit: cover;
-      border: 2px solid #233dff;
-    }
-    .back-btn {
-      color: #fff;
-      background: none;
-      border: none;
-      font-size: 1.1rem;
+    .back-icon {
+      color: #90caf9;
+      font-size: 24px;
+      margin-left: 12px;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      transition: color 0.2s;
+      margin-right: 12px;
     }
-    .back-btn:hover { color: #aab3ff; }
-    main {
-      max-width: 700px;
-      margin: 34px auto 0;
-      padding: 0 12px 56px;
-    }
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 10px;
+    .bookings-heading {
+      flex: 1;
+      text-align: center;
+      font-size: 18px;
+      font-weight: 700;
+      color: white;
       letter-spacing: 1px;
-      font-weight: 900;
-      color: #fff;
     }
-    .section-desc {
-      color: #b8bbd9;
-      font-size: 1.03rem;
-      margin-bottom: 22px;
+    .tabs { display: flex; margin-top: 65px; border-bottom: 1px solid var(--border-color);}
+    .tab {
+      padding: 10px 32px;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
       font-weight: 500;
+      color: var(--text-muted);
+      transition: all 0.2s;
+      font-size: 13px;
+      white-space: nowrap;
     }
-    .booking-list {
-      margin: 0;
-      padding: 0;
-      list-style: none;
+    .tab.active {
+      color: #90caf9; border-bottom: 3px solid var(--primary-blue);
+    }
+    .tab-content { display: none;}
+    .tab-content.active { display: block;}
+    .bookings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 14px;
+      margin-top: 18px;
     }
     .booking-card {
-      background: #171728;
-      border-radius: 12px;
-      padding: 18px 20px 14px 20px;
-      margin-bottom: 22px;
-      box-shadow: 0 2px 15px #0005;
+      background: var(--card-bg);
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      border-left: 4px solid var(--primary-blue);
       display: flex;
       flex-direction: column;
-      gap: 7px;
-      border: 1.5px solid #232338;
+      gap: 10px;
       position: relative;
-      transition: border 0.2s, box-shadow 0.2s;
     }
-    .booking-card.upcoming {
-      border-color: #2e82ff;
-      box-shadow: 0 4px 18px #1a237e33;
+    .booking-card.pending  { border-left-color: var(--warning);}
+    .booking-card.accepted { border-left-color: var(--success);}
+    .booking-card.cancelled{ border-left-color: var(--danger);}
+    .booking-header {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;
     }
-    .booking-card .svc-name {
-      font-size: 1.18rem;
-      font-weight: 700;
-      color: #fff;
-      margin-bottom: 2px;
-    }
-    .booking-card .svc-date {
-      font-size: 1rem;
-      color: #aab3ff;
+    .booking-status {
+      font-size: 11px;
+      padding: 2px 8px 2px 4px;
+      border-radius: 10px;
+      color: white;
       font-weight: 600;
-      margin-bottom: 2px;
+      text-transform: capitalize;
+      display: flex; align-items: center; gap: 4px;
     }
-    .booking-card .svc-status {
-      font-size: 0.98rem;
-      font-weight: 600;
-      color: #2e82ff;
-      margin-bottom: 2px;
-      display: inline-block;
+    .status-pending { background-color: var(--warning);}
+    .status-accepted { background-color: var(--success);}
+    .status-cancelled{ background-color: var(--danger);}
+    .booking-detail {
+      font-size: 13px;
+      color: var(--text-muted);
+      display: flex;
+      gap: 5px;
     }
-    .booking-card .svc-detail {
-      color: #b8bbd9;
-      font-size: 0.99rem;
-      margin-bottom: 2px;
+    .booking-detail span {
+      color: var(--fg);
+      font-weight: 500;
     }
-    .booking-card .svc-points {
-      font-size: 0.87rem;
-      color: #b8bbd9;
-      font-style: italic;
-      margin-bottom: 2px;
-    }
-    .booking-card .svc-price {
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: #fff;
-      margin-bottom: 2px;
-    }
-    .booking-card .order-id {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: #777;
-      position: absolute;
-      top: 15px;
-      right: 20px;
-      background: #1114;
-      padding: 2px 8px;
-      border-radius: 7px;
-      letter-spacing: 1px;
-    }
-    .empty-bookings {
+    .no-bookings {
       text-align: center;
-      margin-top: 55px;
-      color: #b8bbd9;
-      font-size: 1.1rem;
+      padding: 36px 10px;
+      color: var(--text-muted);
+      font-size: 14px;
+      background: var(--card-bg);
+      border-radius: 8px;
+      border: 1px dashed var(--border-color);
+      grid-column: 1 / -1;
     }
-    @media (max-width: 600px) {
-      main { padding: 0 4vw 56px; }
-      h1 { font-size: 1.3rem; }
-      .header-container { padding: 8px 5vw; }
-      .booking-card { padding: 14px 10px 12px 10px; }
+    @media (max-width: 768px) {
+      .header-container {padding: 6px 0;}
+      .tabs {margin-top: 53px;}
+      .bookings-grid {grid-template-columns: 1fr;}
+      .booking-card {padding: 11px;}
+    }
+    @media (max-width: 480px) {
+      .header-content {justify-content: flex-start;}
+      .bookings-heading {font-size: 15px;}
+      .tabs {margin-top: 41px;}
+      .back-icon {font-size: 22px;}
     }
   </style>
 </head>
 <body>
-  <header>
-    <div class="header-container">
-      <button class="back-btn" onclick="window.location.href='home.html'">
-        <span style="font-size:1.4em;">&#8592;</span> Home
-      </button>
-      <a class="logo" href="home.html">
-        <img src="https://cdn-icons-png.flaticon.com/512/2922/2922082.png" alt="Salon Logo">
-        BDMSALON
-      </a>
-      <div style="width:42px;"></div>
+  <div class="header-container">
+    <i class="fas fa-arrow-left back-icon" onclick="window.history.back()" title="Back"></i>
+    <div class="header-content">
+      <div class="bookings-heading">My Bookings</div>
     </div>
-  </header>
-  <main>
-    <h1>My Bookings</h1>
-    <div class="section-desc">View your upcoming and past salon appointments.</div>
-    <ul class="booking-list" id="bookingList"></ul>
-    <div id="noBookings" class="empty-bookings" style="display:none;">
-      You have no bookings yet.<br>
-      <a href="booknow.html" style="color:#2e82ff;text-decoration:underline;">Book your first appointment &rarr;</a>
+  </div>
+  <div class="container" style="max-width: 900px; margin: 0 auto; padding: 0 10px;">
+    <div class="tabs">
+      <div class="tab active" data-tab="upcoming">Upcoming Bookings</div>
+      <div class="tab" data-tab="past">Past Bookings</div>
     </div>
-  </main>
-  <!-- Firebase scripts -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <div id="upcoming-content" class="tab-content active">
+      <div class="bookings-grid" id="upcoming-grid"></div>
+    </div>
+    <div id="past-content" class="tab-content">
+      <div class="bookings-grid" id="past-grid"></div>
+    </div>
+  </div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   <script>
-    // Initialize Firebase
-    firebase.initializeApp({
+    // Firebase config
+    const firebaseConfig = {
       apiKey: "AIzaSyAmimDsjW_pF2NGw-w-40QzTsgmf1tdqyI",
       authDomain: "bdmsalonappointment.firebaseapp.com",
-      projectId: "bdmsalonappointment"
-    });
+      databaseURL: "https://bdmsalonappointment-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "bdmsalonappointment",
+      storageBucket: "bdmsalonappointment.firebasestorage.app",
+      messagingSenderId: "123933913893",
+      appId: "1:123933913893:web:c1f57caf4dc2a5440ba0cc",
+      measurementId: "G-Q0FVZRVS64"
+    };
+    firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
-    const db = firebase.firestore();
+    const database = firebase.database();
 
-    const bookingList = document.getElementById('bookingList');
-    const noBookings = document.getElementById('noBookings');
-
-    function formatDate(ts) {
-      if (!ts) return '';
-      let d = (ts instanceof Date) ? ts : ts.toDate ? ts.toDate() : new Date(ts);
-      return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) + 
-             ' ' + d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+    function formatTime(timeStr) {
+      if (!timeStr) return 'N/A';
+      let timePart = timeStr.split('-')[0].trim();
+      if (timePart.match(/(AM|PM)$/i)) {
+        let [h, mAP] = timePart.split(':');
+        let m = mAP ? mAP.match(/\d+/)?.[0] || "00" : "00";
+        let ap = mAP ? mAP.match(/(AM|PM)/i)?.[0].toUpperCase() : "";
+        return `${h.padStart(2, '0')}:${m.padStart(2, '0')} ${ap}`;
+      }
+      const [hours, minutes] = timePart.split(':');
+      if (!hours || !minutes) return timePart;
+      let h = parseInt(hours, 10);
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      const hour12 = h % 12 || 12;
+      return `${hour12.toString().padStart(2, '0')}:${minutes.padStart(2, '0')} ${ampm}`;
     }
-
-    function bookingCard(b) {
+    function formatPrice(price) {
+      if (price === undefined || price === null) return 'N/A';
+      return `$${parseFloat(price).toFixed(2)}`;
+    }
+    function calculateTotal(services) {
+      if (!services || !services.length) return 0;
+      return services.reduce((total, s) => {
+        if (!s.price) return total;
+        const priceStr = String(s.price).replace(/[^0-9.]/g, '');
+        const price = parseFloat(priceStr) || 0;
+        return total + price;
+      }, 0);
+    }
+    function getStatusSymbol(status) {
+      // Pending: ⏳, Accepted: ✅, Cancelled: ❌
+      if (status === 'pending') return '<span title="Pending" style="font-size:16px;">⏳</span>';
+      if (status === 'accepted') return '<span title="Accepted" style="font-size:16px;">✅</span>';
+      if (status === 'cancelled') return '<span title="Cancelled" style="font-size:16px;">❌</span>';
+      return '';
+    }
+    function isPastBooking(dateStr, timeStr, status) {
+      // Consider as past if date+time < now or status is cancelled
+      if (status === 'cancelled') return true;
+      if (!dateStr || !timeStr) return false;
+      const date = new Date(dateStr);
+      // Try to parse time
+      let [h, m] = [0, 0];
+      let t = timeStr.split('-')[0].trim();
+      if (t.match(/AM|PM/i)) {
+        let [hh, mmAP] = t.split(':');
+        let mm = mmAP.match(/\d+/)?.[0] || "00";
+        let ap = mmAP.match(/(AM|PM)/i)?.[0].toUpperCase();
+        h = parseInt(hh, 10);
+        m = parseInt(mm, 10);
+        if (ap === 'PM' && h !== 12) h += 12;
+        if (ap === 'AM' && h === 12) h = 0;
+      } else {
+        [h, m] = t.split(':').map(Number);
+      }
+      date.setHours(h || 0, m || 0, 0, 0);
+      return date.getTime() < Date.now();
+    }
+    function createBookingCard(booking) {
+      const status = booking.status || 'pending';
+      const totalPrice = calculateTotal(booking.services);
+      const firstService = booking.services?.[0]?.name || 'No Service';
+      const serviceCount = booking.services?.length || 0;
       return `
-        <li class="booking-card ${b.status === 'Upcoming' ? 'upcoming' : ''}">
-          <span class="order-id">#${b.orderId || b.id || ''}</span>
-          <div class="svc-name">${b.service || 'Service'}</div>
-          <div class="svc-date">${formatDate(b.date)}</div>
-          <div class="svc-status">${b.status || 'Status'}</div>
-          <div class="svc-detail">${b.details || ''}</div>
-          <div class="svc-points">${b.points ? (b.points+' points') : ''}</div>
-          <div class="svc-price">${b.price ? ('₹'+b.price) : ''}</div>
-        </li>
+        <div class="booking-card ${status}">
+          <div class="booking-header">
+            <div class="booking-status status-${status}">
+              ${getStatusSymbol(status)}
+              ${status === 'pending' ? "Pending" : status.charAt(0).toUpperCase() + status.slice(1)}
+            </div>
+            <div style="font-size:13px;font-family:monospace;color:#90caf9;">#${booking.orderNumber || 'N/A'}</div>
+          </div>
+          <div class="booking-detail"><span>Date:</span> ${booking.date || "N/A"}</div>
+          <div class="booking-detail"><span>Time:</span> ${formatTime(booking.time) || "N/A"}</div>
+          <div class="booking-detail"><span>Service:</span> ${firstService}${serviceCount > 1 ? ` +${serviceCount-1} more` : ''}</div>
+          <div class="booking-detail"><span>Stylist:</span> ${booking.stylist?.name || 'N/A'}</div>
+          <div class="booking-detail"><span>Amount:</span> ${formatPrice(totalPrice)}</div>
+          <div class="booking-detail"><span>Status:</span>
+            <span>${getStatusSymbol(status)}</span>
+            <span style="margin-left:3px;">${
+              status === 'pending'
+                ? 'Please wait for confirmation'
+                : (status === 'accepted'
+                  ? 'Accepted'
+                  : status === 'cancelled'
+                    ? 'Cancelled'
+                    : '')
+            }</span>
+          </div>
+        </div>
       `;
     }
-
-    function renderBookings(bookings) {
-      bookingList.innerHTML = '';
-      if (!bookings.length) {
-        bookingList.style.display = 'none';
-        noBookings.style.display = '';
-        return;
-      }
-      bookingList.style.display = '';
-      noBookings.style.display = 'none';
-      // Show upcoming first, then past
-      bookings.sort((a, b) => (b.date && a.date) ? (b.date.seconds - a.date.seconds) : 0);
-      bookings.forEach(b => bookingList.insertAdjacentHTML('beforeend', bookingCard(b)));
-    }
-
-    auth.onAuthStateChanged(async user => {
-      if (!user) {
-        window.location.href = "home.html";
-        return;
-      }
-      // Fetch bookings from Firestore (collection: 'bookings', userId field)
-      try {
-        let query = db.collection('bookings').where('userId', '==', user.uid).orderBy('date', 'desc');
-        let snap = await query.get();
-        let bookings = [];
-        snap.forEach(doc => {
-          let data = doc.data();
-          bookings.push({
-            id: doc.id,
-            ...data
-          });
+    function showUserBookings(user) {
+      const userEmail = user.email;
+      const upcomingGrid = document.getElementById('upcoming-grid');
+      const pastGrid = document.getElementById('past-grid');
+      upcomingGrid.innerHTML = '<div style="color:#bbb;padding:24px 0;text-align:center;">Loading...</div>';
+      pastGrid.innerHTML = '';
+      database.ref('bookings').on('value', snapshot => {
+        const bookings = [];
+        snapshot.forEach(child => {
+          const b = child.val();
+          b.id = child.key;
+          // Match user by email (could also use uid if stored)
+          if (b.user && b.user.email && b.user.email === userEmail) {
+            bookings.push(b);
+          }
         });
-        renderBookings(bookings);
-      } catch (e) {
-        bookingList.innerHTML = '';
-        noBookings.style.display = '';
-        noBookings.innerHTML = 'Error loading bookings.<br><small style="color:#b86">Please try again later.</small>';
-      }
+        const upcoming = [];
+        const past = [];
+        bookings.sort((a, b) => {
+          // Sort by date+time desc
+          const dA = new Date(a.date || 0); const dB = new Date(b.date || 0);
+          return dB - dA;
+        });
+        bookings.forEach(b => {
+          if (isPastBooking(b.date, b.time, b.status)) {
+            past.push(b);
+          } else {
+            upcoming.push(b);
+          }
+        });
+        // Render
+        upcomingGrid.innerHTML = upcoming.length
+          ? upcoming.map(createBookingCard).join('')
+          : '<div class="no-bookings">No upcoming bookings found.</div>';
+        pastGrid.innerHTML = past.length
+          ? past.map(createBookingCard).join('')
+          : '<div class="no-bookings">No past bookings found.</div>';
+      });
+    }
+    // Tab switching
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+          document.getElementById(tab.dataset.tab+'-content').classList.add('active');
+        });
+      });
+      // Auth check
+      auth.onAuthStateChanged(user => {
+        if (!user) window.location.href = "index.html";
+        else showUserBookings(user);
+      });
     });
   </script>
 </body>
