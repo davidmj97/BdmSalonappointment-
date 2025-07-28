@@ -233,6 +233,14 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const database = firebase.database();
+
+    // Ensure user is signed in or redirect
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        window.location.href = "index.html";
+      }
+    });
+
     // Format time display
     function formatTimeOnlyStart(timeStr) {
       if (!timeStr) return 'Not selected';
@@ -250,6 +258,7 @@
       const hour12 = h % 12 || 12;
       return `${hour12.toString().padStart(2, '0')}:${minutes.padStart(2, '0')} ${ampm}`;
     }
+
     // Load booking details into the page
     const loadBookingDetails = () => {
       const servicesData = localStorage.getItem('selectedServices');
@@ -311,14 +320,21 @@
         }
       }
     };
+
     // Confirm booking function, always use logged-in user's email and name
     const confirmBooking = async () => {
       const confirmBtn = document.getElementById('confirmBtn');
       const originalText = confirmBtn.textContent;
       confirmBtn.disabled = true;
       confirmBtn.textContent = 'Processing...';
+
       try {
         const authUser = firebase.auth().currentUser;
+        if (!authUser) {
+          alert("You must be logged in to book.");
+          window.location.href = "index.html";
+          return;
+        }
         const userDetails = JSON.parse(localStorage.getItem('userDetails') || '{}');
         const services = JSON.parse(localStorage.getItem('selectedServices') || '[]');
         const stylist = JSON.parse(localStorage.getItem('selectedStylist') || '{}');
@@ -333,8 +349,8 @@
           date: formattedDate,
           time: selectedTime,
           user: {
-            name: userDetails.name || (authUser ? authUser.displayName : "Guest"),
-            email: (authUser ? authUser.email : userDetails.email || ""),
+            name: userDetails.name || authUser.displayName || "Guest",
+            email: authUser.email,
             phone: userDetails.phone || ""
           },
           status: "pending",
@@ -358,14 +374,11 @@
         confirmBtn.textContent = originalText;
       }
     };
+
     // Init
     document.addEventListener('DOMContentLoaded', () => {
       loadBookingDetails();
       document.getElementById('confirmBtn').addEventListener('click', confirmBooking);
-      // Optionally, redirect to login if not logged in
-      auth.onAuthStateChanged(user => {
-        if (!user) window.location.href = "index.html";
-      });
     });
   </script>
 </body>
