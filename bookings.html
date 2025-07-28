@@ -24,6 +24,8 @@
       --danger: #c62828;
       --warning: #ff9800;
       --primary-blue: #1a73e8;
+      --whatsapp-green: #25d366;
+      --call-orange: #ff9800;
     }
     html { scroll-behavior: smooth; }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', Arial, sans-serif;}
@@ -219,23 +221,76 @@
     .btn i { font-size: 12px;}
     .btn:active { opacity: 0.9; }
     .btn-call {
-      background: #2ecc40;
+      background: var(--call-orange);
       color: #fff;
       font-weight: 700;
-      border-radius: 10px; /* Changed from 50px to 10px for curve */
+      border-radius: 10px;
       padding: 7px 16px;
       font-size: 13px;
       transition: background 0.18s;
       border: none;
-      margin-right: 8px;
+      margin-right: 4px;
       display: inline-flex;
       align-items: center;
       gap: 7px;
     }
     .btn-call:hover {
-      background: #189c1c;
+      background: #db8500;
       color: #fff;
       transform: scale(1.08);
+    }
+    .btn-whatsapp {
+      background: var(--whatsapp-green);
+      color: #fff;
+      font-weight: 700;
+      border-radius: 10px;
+      padding: 7px 16px;
+      font-size: 13px;
+      transition: background 0.18s;
+      border: none;
+      margin-right: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .btn-whatsapp:hover {
+      background: #128c7e;
+      color: #fff;
+      transform: scale(1.08);
+    }
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 18px;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+    .pagination-btn {
+      min-width: 36px;
+      min-height: 30px;
+      padding: 6px 14px;
+      margin: 0 3px;
+      color: #fff;
+      background: var(--btn-gradient);
+      border: none;
+      border-radius: 7px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: filter 0.18s, background 0.2s;
+      outline: none;
+    }
+    .pagination-btn.active,
+    .pagination-btn:focus {
+      filter: brightness(1.2);
+      border: 2px solid #fff;
+    }
+    .pagination-btn:disabled {
+      opacity: 0.5;
+      cursor: default;
+      border: none;
+      filter: none;
     }
     @media (max-width: 900px) {
       .container {
@@ -349,9 +404,11 @@
     </div>
     <div id="upcoming-content" class="tab-content active">
       <div class="bookings-grid" id="upcoming-grid"></div>
+      <div class="pagination" id="upcoming-pagination"></div>
     </div>
     <div id="past-content" class="tab-content">
       <div class="bookings-grid" id="past-grid"></div>
+      <div class="pagination" id="past-pagination"></div>
     </div>
   </div>
   <!-- Order Details Modal -->
@@ -485,6 +542,40 @@
       date.setHours(h || 0, m || 0, 0, 0);
       return date.getTime() < Date.now();
     }
+    // Whatsapp util
+    function getWhatsappLink(phone, name = "") {
+      if (!phone) return "";
+      let cleanPhone = phone.replace(/[^+\d]/g, "");
+      let msg = encodeURIComponent(`Hello${name ? ' ' + name : ''}, I want to talk about my booking.`);
+      return `https://wa.me/${cleanPhone}?text=${msg}`;
+    }
+    // Pagination helper
+    function renderPagination(containerId, total, page, perPage, onPageChange) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      container.innerHTML = '';
+      if (total <= perPage) return; // No pagination if 5 or less
+      const totalPages = Math.ceil(total / perPage);
+      const prevBtn = document.createElement('button');
+      prevBtn.className = 'pagination-btn';
+      prevBtn.textContent = '<';
+      prevBtn.disabled = page <= 1;
+      prevBtn.onclick = () => onPageChange(page - 1);
+      container.appendChild(prevBtn);
+      for (let i = 1; i <= totalPages; i++) {
+        const pageBtn = document.createElement('button');
+        pageBtn.className = 'pagination-btn' + (i === page ? ' active' : '');
+        pageBtn.textContent = i;
+        pageBtn.onclick = () => onPageChange(i);
+        container.appendChild(pageBtn);
+      }
+      const nextBtn = document.createElement('button');
+      nextBtn.className = 'pagination-btn';
+      nextBtn.textContent = '>';
+      nextBtn.disabled = page >= totalPages;
+      nextBtn.onclick = () => onPageChange(page + 1);
+      container.appendChild(nextBtn);
+    }
     function createBookingCard(booking) {
       const status = booking.status || 'pending';
       const totalPrice = calculateTotal(booking.services);
@@ -492,6 +583,15 @@
       const serviceCount = booking.services?.length || 0;
       const extraClass = status === "completed" ? "completed" : "";
       const phoneNumber = booking.user?.phone || "";
+      const customerName = booking.user?.name || '';
+      // Whatsapp button only if phone exists
+      const whatsappBtn = phoneNumber
+        ? `<a class="btn-whatsapp" href="${getWhatsappLink(phoneNumber, customerName)}" target="_blank" title="Message on WhatsApp"><i class="fab fa-whatsapp"></i> Message</a>`
+        : '';
+      // Call button only if phone exists
+      const callBtn = phoneNumber
+        ? `<a class="btn-call" href="tel:${phoneNumber}" title="Call ${phoneNumber}"><i class="fas fa-phone"></i> Call</a>`
+        : '';
       return `
         <div class="booking-card ${status} ${extraClass}">
           <div class="booking-header">
@@ -521,7 +621,8 @@
             }</span>
           </div>
           <div class="booking-actions">
-            ${phoneNumber ? `<a class="btn-call" href="tel:${phoneNumber}" title="Call ${phoneNumber}"><i class="fas fa-phone"></i> Call</a>` : ''}
+            ${whatsappBtn}
+            ${callBtn}
             <button class="btn btn-view" data-id="${booking.id}">
               <i class="fas fa-eye"></i> View
             </button>
@@ -535,39 +636,31 @@
       const pastGrid = document.getElementById('past-grid');
       const upCount = document.getElementById('upcoming-count');
       const pastCount = document.getElementById('past-count');
-      upcomingGrid.innerHTML = '<div style="color:#bbb;padding:24px 0;text-align:center;">Loading...</div>';
-      pastGrid.innerHTML = '';
-      database.ref('bookings').on('value', snapshot => {
-        const bookings = [];
-        snapshot.forEach(child => {
-          const b = child.val();
-          b.id = child.key;
-          if (b.user && b.user.email && b.user.email === userEmail) {
-            bookings.push(b);
-          }
-        });
-        const upcoming = [];
-        const past = [];
-        bookings.sort((a, b) => {
-          const dA = new Date(a.date || 0); const dB = new Date(b.date || 0);
-          return dB - dA;
-        });
-        bookings.forEach(b => {
-          if (isPastBooking(b.date, b.time, b.status)) {
-            past.push(b);
-          } else {
-            upcoming.push(b);
-          }
-        });
+      const perPage = 5;
+      let upcoming = [], past = [];
+      let upPage = 1, pastPage = 1;
+      function paginate(arr, page) {
+        return arr.slice((page-1)*perPage, page*perPage);
+      }
+      function renderAll() {
         upCount.textContent = upcoming.length;
         pastCount.textContent = past.length;
-        upcomingGrid.innerHTML = upcoming.length
-          ? upcoming.map(createBookingCard).join('')
+        // Render paginated upcoming
+        const currentUpcoming = paginate(upcoming, upPage);
+        upcomingGrid.innerHTML = currentUpcoming.length
+          ? currentUpcoming.map(createBookingCard).join('')
           : '<div class="no-bookings">No upcoming bookings found.</div>';
-        pastGrid.innerHTML = past.length
-          ? past.map(createBookingCard).join('')
+        renderPagination('upcoming-pagination', upcoming.length, upPage, perPage, pg => {
+          upPage = pg; renderAll();
+        });
+        // Render paginated past
+        const currentPast = paginate(past, pastPage);
+        pastGrid.innerHTML = currentPast.length
+          ? currentPast.map(createBookingCard).join('')
           : '<div class="no-bookings">No past bookings found.</div>';
-
+        renderPagination('past-pagination', past.length, pastPage, perPage, pg => {
+          pastPage = pg; renderAll();
+        });
         setTimeout(() => {
           document.querySelectorAll('.btn-view').forEach(btn => {
             btn.onclick = function(e) {
@@ -579,6 +672,35 @@
             };
           });
         }, 100);
+      }
+      upcomingGrid.innerHTML = '<div style="color:#bbb;padding:24px 0;text-align:center;">Loading...</div>';
+      pastGrid.innerHTML = '';
+      database.ref('bookings').on('value', snapshot => {
+        const bookings = [];
+        snapshot.forEach(child => {
+          const b = child.val();
+          b.id = child.key;
+          if (b.user && b.user.email && b.user.email === userEmail) {
+            bookings.push(b);
+          }
+        });
+        upcoming = [];
+        past = [];
+        bookings.sort((a, b) => {
+          const dA = new Date(a.date || 0); const dB = new Date(b.date || 0);
+          return dB - dA;
+        });
+        bookings.forEach(b => {
+          if (isPastBooking(b.date, b.time, b.status)) {
+            past.push(b);
+          } else {
+            upcoming.push(b);
+          }
+        });
+        // Reset to first page on data reload
+        upPage = 1;
+        pastPage = 1;
+        renderAll();
       });
     }
 
