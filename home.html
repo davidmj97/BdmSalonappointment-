@@ -18,6 +18,7 @@
       --white: #fff;
       --header-blur: blur(14px);
       --header-height: 76px;
+      --profile-sidebar-width: 370px;
     }
     html {
       scroll-behavior: smooth;
@@ -506,81 +507,209 @@
     }
     /* Account Sheet Modal Styles */
     .sheet {
+      display: none !important;
+    }
+
+    /* ========== PROFILE SIDEBAR (RIGHT DRAWER) ========== */
+    .profile-sidebar {
       position: fixed;
-      left: 0;
-      right: 0;
-      bottom: -100%;
-      background: #fff;
-      color: #000;
-      border-top-left-radius: 18px;
-      border-top-right-radius: 18px;
-      box-shadow: 0 -4px 20px #0005;
-      max-height: 92vh;
+      top: 0;
+      right: -400px;
+      width: var(--profile-sidebar-width);
+      max-width: 96vw;
+      height: 100vh;
+      background: var(--primary-dark);
+      box-shadow: -4px 0 32px #0008;
+      z-index: 4000;
+      transition: right 0.38s cubic-bezier(.57,1.32,.54,1);
+      color: var(--white);
+      display: flex;
+      flex-direction: column;
+      padding: 0;
       overflow-y: auto;
-      transition: bottom .35s;
-      z-index: 3000;
-      padding: 24px 22px;
-      font-size: 15px;
     }
-    .sheet.open {
-      bottom: 0;
+    .profile-sidebar.open {
+      right: 0;
     }
-    .close-x {
-      position: absolute;
-      top: 12px;
-      right: 14px;
-      font-size: 20px;
-      font-weight: 600;
+    .profile-sidebar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 28px 28px 14px 28px;
+      border-bottom: 1.5px solid #2631b9;
+      background: rgba(25, 35, 90, 0.95);
+    }
+    .profile-sidebar-title {
+      font-size: 1.45rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: var(--white);
+      margin: 0;
+    }
+    .profile-sidebar-close {
+      font-size: 2.1rem;
+      font-weight: 800;
+      color: var(--white);
+      background: none;
+      border: none;
       cursor: pointer;
+      transition: color 0.2s;
+      padding: 0 2px;
+      line-height: 1;
+      margin-left: 16px;
     }
-    .sheet input {
+    .profile-sidebar-close:hover {
+      color: #abb5ff;
+    }
+    .profile-sidebar-content {
+      flex: 1;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      background: #13131a;
+    }
+    .profile-sidebar-content input {
       width: 100%;
-      padding: 10px;
-      margin-bottom: 12px;
-      font-size: 15px;
-      border: 1.2px solid #ccc;
-      border-radius: 6px;
+      padding: 11px 12px;
+      border-radius: 7px;
+      border: none;
+      background: #232338;
+      color: var(--white);
+      font-size: 1rem;
+      margin-bottom: 10px;
+      font-family: inherit;
+      font-weight: 500;
+      outline: none;
+      transition: box-shadow 0.17s;
     }
-    .save-btn {
+    .profile-sidebar-content input:focus {
+      box-shadow: 0 0 0 2px #233dff70;
+    }
+    .profile-sidebar-btn,
+    .profile-sidebar-reset-btn {
       display: block;
-      margin: 18px auto 0;
-      padding: 12px 28px;
+      width: 100%;
+      margin-top: 10px;
+      padding: 13px 0;
       border: none;
       border-radius: 8px;
-      background: #13131a;
+      background: var(--btn-gradient);
+      color: var(--white);
+      font-size: 1.08rem;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+      cursor: pointer;
+      margin-bottom: 6px;
+      transition: filter 0.17s, background 0.17s;
+      box-shadow: 0 2px 9px #212a5a44;
+    }
+    .profile-sidebar-btn:hover,
+    .profile-sidebar-reset-btn:hover {
+      background: #233dff;
+      filter: brightness(1.12);
+    }
+    .profile-sidebar-reset-btn {
+      background: var(--btn-gradient);
+      margin-bottom: 0;
+    }
+    .profile-sidebar-signout-btn {
+      display: block;
+      width: 100%;
+      margin-top: 12px;
+      padding: 13px 0;
+      border: none;
+      border-radius: 8px;
+      background: #232338;
+      color: var(--white);
+      font-size: 1.08rem;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      cursor: pointer;
+      transition: background 0.15s;
+      box-shadow: 0 2px 7px #212a5a33;
+    }
+    .profile-sidebar-signout-btn:hover {
+      background: #1a237e;
+    }
+    .profile-sidebar .reset-link {
+      margin-top: 0;
+      font-size: 0.93rem;
+      color: #cdd3ff;
+      text-align: left;
+    }
+    .profile-sidebar .reset-link a {
       color: #fff;
-      font-size: 15px;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    .profile-sidebar .reset-link a:hover {
+      color: #abb5ff;
+    }
+    .profile-sidebar .reset-popup {
+      background: #181a23;
+      border-radius: 13px;
+      box-shadow: 0 4px 44px #212a5a22;
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 5000;
+      min-width: 320px;
+      max-width: 94vw;
+      padding: 32px 20px 26px 20px;
+      color: var(--white);
+      display: none;
+      flex-direction: column;
+      align-items: stretch;
+      border: 2px solid #233dff70;
+      animation: fadeIn 0.23s;
+    }
+    .profile-sidebar .reset-popup.open {
+      display: flex;
+    }
+    .profile-sidebar .reset-popup input {
+      background: #232338;
+      color: var(--white);
+      border: none;
+      border-radius: 7px;
+      padding: 11px 12px;
+      margin-bottom: 16px;
+      font-size: 1rem;
+      outline: none;
+    }
+    .profile-sidebar .reset-popup button {
+      background: var(--btn-gradient);
+      color: var(--white);
+      border: none;
+      border-radius: 7px;
+      padding: 11px 0;
+      font-size: 1rem;
       font-weight: 700;
       cursor: pointer;
-    }
-    .signout-btn {
-      width: 100%;
-      margin-top: 20px;
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      background: #22232a;
-      color: #fff;
-      font-size: 15px;
-      cursor: pointer;
-    }
-    .reset-link {
-      font-size: 13px;
-      text-align: center;
+      margin-bottom: 8px;
       margin-top: 2px;
     }
-    .reset-link a {
-      font-weight: 700;
-      color: #13131a;
-      text-decoration: none;
+    .profile-sidebar .reset-popup .close-x {
+      position: absolute;
+      top: 7px;
+      right: 14px;
+      font-size: 1.7rem;
+      cursor: pointer;
+      color: #fff;
+      background: none;
+      border: none;
+      z-index: 2;
     }
-    @media (max-width: 800px) {
-      .sheet {
-        max-height: 98vh;
-        padding: 14px 8px;
-        font-size: 14px;
+    @media (max-width: 600px) {
+      .profile-sidebar {
+        width: 96vw;
+        min-width: 0;
+        max-width: 100vw;
+        padding: 0;
       }
+      .profile-sidebar-header, .profile-sidebar-content { padding: 18px 10px 10px 18px; }
     }
+    /* ========== END PROFILE SIDEBAR ========== */
   </style>
 </head>
 <body>
@@ -644,20 +773,27 @@
     </button>
   </div>
 
-  <!-- Account Sheet Modal -->
-  <aside class="sheet" id="accountSheet">
-    <span class="close-x" id="closeSheetX">&times;</span>
-    <h3>Account</h3>
-    <input id="displayName" placeholder="Full name">
-    <input id="phone" placeholder="Phone number">
-    <input id="email" placeholder="Email">
-    <div class="reset-link">Forgot password? <a href="#" id="resetPwdLink">Reset</a></div>
-    <div id="resetBox" style="display:none;margin-top:10px;">
-      <input id="resetEmail" placeholder="Enter your email">
-      <button class="save-btn" id="sendResetBtn" style="margin-top:10px;width:100%;max-width:160px;">Send</button>
+  <!-- PROFILE SIDEBAR -->
+  <aside class="profile-sidebar" id="profileSidebar" tabindex="-1" aria-modal="true" role="dialog">
+    <div class="profile-sidebar-header">
+      <span class="profile-sidebar-title">Profile</span>
+      <button class="profile-sidebar-close" id="closeProfileSidebar" aria-label="Close">&times;</button>
     </div>
-    <button class="save-btn" id="saveBtn">Save Changes</button>
-    <button class="signout-btn" id="signoutBtn">Sign Out</button>
+    <form class="profile-sidebar-content" id="profileSidebarForm" autocomplete="off" onsubmit="return false;">
+      <input id="sidebarDisplayName" placeholder="Full name" autocomplete="off">
+      <input id="sidebarPhone" placeholder="Phone number" autocomplete="off">
+      <input id="sidebarEmail" placeholder="Email" type="email" autocomplete="off">
+      <div class="reset-link">Forgot password? <a href="#" id="sidebarResetLink">Reset</a></div>
+      <button class="profile-sidebar-btn" id="sidebarSaveBtn">Save Changes</button>
+      <button class="profile-sidebar-signout-btn" id="sidebarSignoutBtn" type="button">Sign Out</button>
+    </form>
+    <!-- Reset Popup -->
+    <div class="reset-popup" id="resetPopup">
+      <button class="close-x" id="closeResetPopup" aria-label="Close">&times;</button>
+      <h3 style="margin-bottom:18px;font-size:1.18rem;font-weight:800;">Reset Password</h3>
+      <input id="resetPopupEmail" placeholder="Enter your email" type="email">
+      <button id="sendResetPopupBtn">Send Reset Email</button>
+    </div>
   </aside>
 
   <!-- HERO SECTION -->
@@ -724,35 +860,93 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    const profileBtnHeader = document.getElementById('profileBtnHeader');
-    const profileBtnMobile = document.getElementById('profileBtnMobile');
-    const accountSheet = document.getElementById('accountSheet');
-    const closeSheetX = document.getElementById('closeSheetX');
-    const displayNameIn = document.getElementById('displayName');
-    const phoneIn = document.getElementById('phone');
-    const emailIn = document.getElementById('email');
-    const resetPwdLink = document.getElementById('resetPwdLink');
-    const resetBox = document.getElementById('resetBox');
-    const resetEmailIn = document.getElementById('resetEmail');
-    const sendResetBtn = document.getElementById('sendResetBtn');
-    const saveBtn = document.getElementById('saveBtn');
-    const signoutBtn = document.getElementById('signoutBtn');
+    // --------- PROFILE SIDEBAR LOGIC ---------
+    const profileSidebar = document.getElementById('profileSidebar');
+    const closeProfileSidebar = document.getElementById('closeProfileSidebar');
+    const profileSidebarForm = document.getElementById('profileSidebarForm');
+    const sidebarDisplayName = document.getElementById('sidebarDisplayName');
+    const sidebarPhone = document.getElementById('sidebarPhone');
+    const sidebarEmail = document.getElementById('sidebarEmail');
+    const sidebarSaveBtn = document.getElementById('sidebarSaveBtn');
+    const sidebarSignoutBtn = document.getElementById('sidebarSignoutBtn');
+    const sidebarResetLink = document.getElementById('sidebarResetLink');
+    const resetPopup = document.getElementById('resetPopup');
+    const closeResetPopup = document.getElementById('closeResetPopup');
+    const resetPopupEmail = document.getElementById('resetPopupEmail');
+    const sendResetPopupBtn = document.getElementById('sendResetPopupBtn');
     const profileAvatarHeader = document.getElementById('profileAvatarHeader');
     const profileAvatarMobile = document.getElementById('profileAvatarMobile');
     const profileNameHeader = document.getElementById('profileNameHeader');
     const profileNameMobile = document.getElementById('profileNameMobile');
 
-    function openAccountSheet() {
-      accountSheet.classList.add('open');
+    function openProfileSidebar() {
+      const u = auth.currentUser;
+      if (u) {
+        sidebarDisplayName.value = u.displayName || '';
+        sidebarEmail.value = u.email || '';
+        sidebarPhone.value = localStorage.getItem('phone_' + u.uid) || '';
+        resetPopupEmail.value = u.email || '';
+      }
+      profileSidebar.classList.add('open');
+      setTimeout(() => { profileSidebar.focus(); }, 140);
     }
-    function closeAccountSheet() {
-      accountSheet.classList.remove('open');
-      resetBox.style.display = 'none';
+    function closeProfileSidebarFn() {
+      profileSidebar.classList.remove('open');
+      closeResetPopupFn();
     }
-    profileBtnHeader.addEventListener('click', openAccountSheet);
-    profileBtnMobile.addEventListener('click', openAccountSheet);
-    closeSheetX.addEventListener('click', closeAccountSheet);
+    function openResetPopup() {
+      resetPopup.classList.add('open');
+      resetPopupEmail.value = sidebarEmail.value;
+      resetPopupEmail.focus();
+    }
+    function closeResetPopupFn() {
+      resetPopup.classList.remove('open');
+    }
+    sidebarSaveBtn.onclick = async (e) => {
+      e.preventDefault();
+      const u = auth.currentUser;
+      if (!u) return;
+      try {
+        if (sidebarDisplayName.value !== u.displayName)
+          await u.updateProfile({ displayName: sidebarDisplayName.value });
+        if (sidebarEmail.value !== u.email)
+          await u.updateEmail(sidebarEmail.value);
+        localStorage.setItem('phone_' + u.uid, sidebarPhone.value);
+        alert('Saved!');
+        closeProfileSidebarFn();
+        profileAvatarHeader.textContent = (sidebarDisplayName.value || 'U')[0].toUpperCase();
+        profileAvatarMobile.textContent = (sidebarDisplayName.value || 'U')[0].toUpperCase();
+        profileNameHeader.textContent = sidebarDisplayName.value || 'Profile';
+        profileNameMobile.textContent = sidebarDisplayName.value || 'Profile';
+      } catch (e) { alert(e.message); }
+    };
+    sidebarSignoutBtn.onclick = () => {
+      auth.signOut().then(() => {
+        window.location.href = 'index.html';
+      });
+    };
+    document.getElementById('profileBtnHeader').onclick = openProfileSidebar;
+    document.getElementById('profileBtnMobile').onclick = openProfileSidebar;
+    closeProfileSidebar.onclick = closeProfileSidebarFn;
+    document.addEventListener('keydown', function(e){
+      if (e.key === 'Escape' && profileSidebar.classList.contains('open')) {
+        closeProfileSidebarFn();
+      }
+    });
+    sidebarResetLink.onclick = (e) => {
+      e.preventDefault();
+      openResetPopup();
+    };
+    closeResetPopup.onclick = closeResetPopupFn;
+    sendResetPopupBtn.onclick = async () => {
+      try {
+        await auth.sendPasswordResetEmail(resetPopupEmail.value.trim());
+        alert('Reset e-mail sent!');
+        closeResetPopupFn();
+      } catch (e) { alert(e.message); }
+    };
 
+    // Firebase state & avatar
     auth.onAuthStateChanged(u => {
       if (!u) { window.location.href = 'index.html'; return; }
       let initial = (u.displayName || 'U')[0].toUpperCase();
@@ -760,54 +954,18 @@
       profileAvatarMobile.textContent = initial;
       profileNameHeader.textContent = u.displayName || 'Profile';
       profileNameMobile.textContent = u.displayName || 'Profile';
-      displayNameIn.value = u.displayName || '';
-      emailIn.value = u.email || '';
-      phoneIn.value = localStorage.getItem('phone_' + u.uid) || '';
+      sidebarDisplayName.value = u.displayName || '';
+      sidebarEmail.value = u.email || '';
+      sidebarPhone.value = localStorage.getItem('phone_' + u.uid) || '';
     });
 
-    saveBtn.onclick = async () => {
-      const u = auth.currentUser; if (!u) return;
-      try {
-        if (displayNameIn.value !== u.displayName)
-          await u.updateProfile({ displayName: displayNameIn.value });
-        if (emailIn.value !== u.email)
-          await u.updateEmail(emailIn.value);
-        localStorage.setItem('phone_' + u.uid, phoneIn.value);
-        alert('Saved!');
-        closeAccountSheet();
-        profileAvatarHeader.textContent = (displayNameIn.value || 'U')[0].toUpperCase();
-        profileAvatarMobile.textContent = (displayNameIn.value || 'U')[0].toUpperCase();
-        profileNameHeader.textContent = displayNameIn.value || 'Profile';
-        profileNameMobile.textContent = displayNameIn.value || 'Profile';
-      } catch (e) { alert(e.message); }
-    };
-
-    resetPwdLink.onclick = e => {
-      e.preventDefault();
-      resetBox.style.display = 'block';
-      resetEmailIn.value = emailIn.value;
-    };
-    sendResetBtn.onclick = async () => {
-      try {
-        await auth.sendPasswordResetEmail(resetEmailIn.value.trim());
-        alert('Reset e-mail sent!');
-        resetBox.style.display = 'none';
-      } catch (e) { alert(e.message); }
-    };
-
-    signoutBtn.onclick = () => {
-      auth.signOut().then(() => {
-        window.location.href = 'index.html';
-      });
-    };
-
+    // Bookings, navigation, etc.
     function openBookings() {
       window.location.href = 'bookings.html';
     }
     document.querySelectorAll('.bookings-btn').forEach(el =>
       el.addEventListener('click', openBookings)
     );
-
     document.getElementById('bookNowBtn').onclick = () => {
       window.location.href = 'booknow.html';
     };
