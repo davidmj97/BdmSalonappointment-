@@ -76,6 +76,32 @@
       margin: 80px auto 0 auto;
       padding: 0 24px;
     }
+    /* Booking Policy Styles */
+    .booking-policy {
+      background: var(--card-bg);
+      color: var(--white);
+      border-radius: 9px;
+      padding: 22px 20px 18px 20px;
+      margin: 24px auto 16px auto;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+      border-left: 5px solid #233dff;
+      max-width: 630px;
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .booking-policy-title {
+      font-size: 1.18rem;
+      font-weight: 900;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+      color: #233dff;
+      text-shadow: 0 2px 6px #0002;
+    }
+    .booking-policy-list {
+      margin: 0;
+      padding-left: 20px;
+      list-style: disc;
+    }
     .tabs { 
       display: flex; 
       margin-top: 0;
@@ -307,6 +333,8 @@
       .container {padding: 0 4px;}
       .page-title {font-size: 1.01rem;}
       .tab {padding: 9px 11px; font-size: 12px;}
+      .booking-policy {padding: 16px 7px 10px 12px;}
+      .booking-policy-title {font-size: 1.05rem;}
     }
     /* MODAL styles */
     .modal {
@@ -393,6 +421,15 @@
     <span class="page-title">My Bookings</span>
   </div>
   <div style="height: 60px;"></div>
+  <!-- Booking Policy Section -->
+  <div class="booking-policy">
+    <div class="booking-policy-title">Booking Policy</div>
+    <ul class="booking-policy-list">
+      <li>Clients must call at least 24 hours in advance to cancel or reschedule appointments</li>
+      <li>Please be on time for your appointment</li>
+      <li>Working hours are Monday to Saturday, 10:00 AM to 7:00 PM; Sunday closed.</li>
+    </ul>
+  </div>
   <div class="container">
     <div class="tabs">
       <div class="tab active" data-tab="upcoming">Upcoming Bookings
