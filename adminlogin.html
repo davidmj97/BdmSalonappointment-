@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ADMIN LOGIN</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Righteous&display=swap');
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Righteous', cursive;
+      background: linear-gradient(to bottom right, #233dff, #232338 80%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      padding: 1rem;
+    }
+
+    .admin-login-wrapper {
+      width: 100%;
+      max-width: 260px;
+      background-color: #181a23;
+      border-radius: 16px;
+      padding: 1.5rem 1.2rem;
+      box-shadow: 0 10px 30px rgba(35, 61, 255, 0.12);
+      margin: 0 auto;
+    }
+
+    .admin-login-logo {
+      text-align: center;
+      color: #233dff;
+      font-size: 2rem;
+      margin-bottom: 1.2rem;
+      font-weight: bold;
+      letter-spacing: 2px;
+      text-shadow: 1px 1px 8px #1a237e40;
+      font-family: 'Montserrat', Arial, sans-serif;
+    }
+
+    .admin-login-label {
+      display: block;
+      color: #b3baff;
+      font-size: 1rem;
+      margin-bottom: 0.3rem;
+      text-align: left;
+      margin-left: 8px;
+    }
+
+    .admin-login-select,
+    .admin-login-input {
+      width: 100%;
+      padding: 0.5rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      background: #232338;
+      color: #fff;
+      text-align: center;
+      margin-bottom: 1rem;
+      font-family: 'Montserrat', Arial, sans-serif;
+    }
+
+    .admin-login-input {
+      letter-spacing: 6px;
+      font-size: 1.2rem;
+      padding-left: 16px;
+    }
+
+    .admin-login-keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      justify-content: center;
+      margin: 1rem auto 0;
+      max-width: 260px;
+    }
+
+    .admin-login-keypad button {
+      padding: 0.66rem 0;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: none;
+      background: #233dff;
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.14s;
+      font-family: 'Montserrat', Arial, sans-serif;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+    }
+
+    .admin-login-keypad button:hover {
+      background: #1a237e;
+      transform: scale(1.09);
+    }
+
+    .admin-login-cancel {
+      background: #b71c1c;
+      font-size: 1.2rem;
+    }
+
+    .admin-login-cancel:hover {
+      background: #e53935;
+    }
+
+    .admin-login-login {
+      background: #2bffdc;
+      color: #181a23;
+      font-weight: bold;
+    }
+
+    .admin-login-login:hover {
+      background: #82fff1;
+    }
+
+    .admin-login-error {
+      color: #ef5350;
+      font-size: 0.95rem;
+      font-weight: bold;
+      min-height: 1.2rem;
+      margin-top: 8px;
+      text-align: center;
+      letter-spacing: 0.5px;
+    }
+
+    @media (min-width: 768px) {
+      .admin-login-wrapper {
+        max-width: 300px;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .admin-login-wrapper {
+        max-width: 320px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="admin-login-wrapper">
+    <div class="admin-login-logo">ADMIN LOGIN</div>
+
+    <label for="admin-username" class="admin-login-label">Username</label>
+    <select id="admin-username" class="admin-login-select">
+      <option value="" disabled selected>Select username</option>
+      <option value="DAVID">DAVID</option>
+      <option value="BDM">BDM</option>
+    </select>
+
+    <label for="admin-password" class="admin-login-label">PIN (4-digit)</label>
+    <input id="admin-password" class="admin-login-input" type="password" placeholder="****" maxlength="4" readonly />
+
+    <div class="admin-login-keypad" id="admin-keypad">
+      <button data-key="1">1</button>
+      <button data-key="2">2</button>
+      <button data-key="3">3</button>
+      <button data-key="4">4</button>
+      <button data-key="5">5</button>
+      <button data-key="6">6</button>
+      <button data-key="7">7</button>
+      <button data-key="8">8</button>
+      <button data-key="9">9</button>
+      <button id="admin-clear" class="admin-login-cancel">⌫</button>
+      <button data-key="0">0</button>
+      <button id="admin-login" class="admin-login-login">Login</button>
+    </div>
+
+    <div class="admin-login-error" id="admin-errorMsg"></div>
+  </div>
+
+  <script>
+    const adminPassword = document.getElementById('admin-password');
+    const adminKeypad = document.getElementById('admin-keypad');
+    const adminClear = document.getElementById('admin-clear');
+    const adminLogin = document.getElementById('admin-login');
+    const adminError = document.getElementById('admin-errorMsg');
+    const adminUser = document.getElementById('admin-username');
+
+    let adminPin = '';
+
+    function updateAdminInput() {
+      adminPassword.value = '*'.repeat(adminPin.length);
+    }
+
+    adminKeypad.addEventListener('click', e => {
+      if (e.target.tagName !== 'BUTTON') return;
+      const key = e.target.getAttribute('data-key');
+      if (key && adminPin.length < 4) {
+        adminPin += key;
+        updateAdminInput();
+        adminError.textContent = '';
+        adminError.style.color = '#ef5350';
+      }
+    });
+
+    adminClear.addEventListener('click', () => {
+      adminPin = adminPin.slice(0, -1);
+      updateAdminInput();
+      adminError.textContent = '';
+      adminError.style.color = '#ef5350';
+    });
+
+    adminLogin.addEventListener('click', () => {
+      const user = adminUser.value;
+      if (!user) {
+        adminError.textContent = 'Please select a username!';
+        adminError.style.color = '#ef5350';
+        return;
+      }
+      if (adminPin.length !== 4) {
+        adminError.textContent = 'Enter a 4-digit PIN!';
+        adminError.style.color = '#ef5350';
+        return;
+      }
+      if ((user === 'DAVID' || user === 'BDM') && adminPin === '1234') {
+        adminError.style.color = '#4caf50';
+        adminError.textContent = 'Login successful!';
+        setTimeout(() => {
+          window.location.href = 'admin-dashboard.html';
+        }, 800);
+      } else {
+        adminError.style.color = '#ef5350';
+        adminError.textContent = 'Invalid username or PIN!';
+        adminPin = '';
+        updateAdminInput();
+      }
+    });
+
+    updateAdminInput();
+  </script>
+
+</body>
+</html>
