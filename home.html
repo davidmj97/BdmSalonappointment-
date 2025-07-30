@@ -753,7 +753,7 @@
       }
       .profile-sidebar-header,
       .profile-sidebar-content {
-  padding: 20px 10px 18px 10px;      }
+     }
       .profile-sidebar-header {
         border-radius: 14px 0 0 0;
       }
@@ -785,6 +785,12 @@
         font-size: 0.96rem;
       }
     }
+    @media (max-width: 600px) {
+  .profile-sidebar-content input {
+    margin-left: 16px; /* or any value you like, e.g. 16px or 20px */
+    width: calc(100% - 24px); /* keep it responsive */
+  }
+}
     /* ========== END PROFILE SIDEBAR ========== */
   </style>
 </head>
