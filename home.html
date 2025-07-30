@@ -509,8 +509,7 @@
     .sheet {
       display: none !important;
     }
-
-  /* PROFILE SIDEBAR (rounded corners, mobile sizing, cell spacing, social) */
+  /* PROFILE SIDEBAR (rounded corners, mobile sizing, cell spacing, centered socials) */
     .profile-sidebar {
       position: fixed;
       top: 0;
@@ -560,6 +559,21 @@
       flex-direction: column;
       gap: 14px;
       background: #13131a;
+    }
+    .sidebar-field-group {
+      margin-bottom: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .sidebar-label {
+      color: #90caf9;
+      font-size: 0.97rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+      margin-left: var(--sidebar-cell-padding);
+      letter-spacing: 0.1px;
+      /* Add extra space at start */
     }
     .profile-sidebar-content input {
       width: 100%;
@@ -633,6 +647,50 @@
       cursor: pointer;
     }
     .profile-sidebar .reset-link a:hover { color: #abb5ff; }
+
+    .profile-sidebar .sidebar-socials {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 30px 0 0 0;
+      /* space after sign out */
+      padding-top: 16px;
+      border-top: 1px solid #232338;
+    }
+    .sidebar-socials-label {
+      font-size: 1.04rem;
+      letter-spacing: 0.3px;
+      color: #cdd3ff;
+      font-weight: 700;
+      margin-bottom: 6px;
+      text-align: center;
+    }
+    .sidebar-socials-icons {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      justify-content: center;
+    }
+    .sidebar-socials-icons a {
+      color: #fff;
+      font-size: 1.35rem;
+      transition: color 0.18s, transform 0.18s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: #232338;
+      width: 38px;
+      height: 38px;
+      text-align: center;
+    }
+    .sidebar-socials-icons a:hover {
+      color: #233dff;
+      background: #18192b;
+      transform: scale(1.15) rotate(-8deg);
+    }
     .profile-sidebar .reset-popup {
       background: #181a23;
       border-radius: 13px;
@@ -643,6 +701,7 @@
       z-index: 5000;
       min-width: 320px;
       max-width: 94vw;
+      width: 400px;
       padding: 32px 20px 26px 20px;
       color: var(--white);
       display: none;
@@ -685,48 +744,6 @@
       border: none;
       z-index: 2;
     }
-    .profile-sidebar .sidebar-socials {
-      margin-left: var(--sidebar-cell-padding);
-      margin-right: var(--sidebar-cell-padding);
-      margin-top: 24px;
-      margin-bottom: 18px;
-      padding-top: 18px;
-      border-top: 1px solid #232338;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 10px;
-    }
-    .sidebar-socials-label {
-      font-size: 1.04rem;
-      letter-spacing: 0.3px;
-      color: #cdd3ff;
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-    .sidebar-socials-icons {
-      display: flex;
-      gap: 18px;
-      align-items: center;
-    }
-    .sidebar-socials-icons a {
-      color: #fff;
-      font-size: 1.35rem;
-      transition: color 0.18s, transform 0.18s;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      background: #232338;
-      width: 38px;
-      height: 38px;
-      text-align: center;
-    }
-    .sidebar-socials-icons a:hover {
-      color: #233dff;
-      background: #18192b;
-      transform: scale(1.15) rotate(-8deg);
-    }
     @media (max-width: 600px) {
       .profile-sidebar {
         width: 96vw;
@@ -744,6 +761,7 @@
       }
       .profile-sidebar-title { font-size: 1.01rem; }
       .profile-sidebar-content { gap: 8px; font-size: 0.94rem; }
+      .sidebar-label { font-size: 0.93rem; }
       .profile-sidebar-content input,
       .profile-sidebar-btn,
       .profile-sidebar-signout-btn,
@@ -755,14 +773,18 @@
       .profile-sidebar-btn,
       .profile-sidebar-signout-btn { margin-top: 7px; }
       .profile-sidebar .reset-link { font-size: 0.89rem; }
-      .profile-sidebar .reset-popup { min-width: 180px; padding: 20px 7px 18px 7px; font-size: 0.91rem; }
-      .profile-sidebar .reset-popup h3 { font-size: 0.97rem !important; }
-      .profile-sidebar .reset-popup input,
-      .profile-sidebar .reset-popup button { font-size: 0.91rem; padding: 7px 0; border-radius: 6px; }
-      .profile-sidebar .reset-popup .close-x { font-size: 1.2rem; top: 2px; right: 6px; }
-      .profile-sidebar .sidebar-socials { margin-top: 14px; margin-bottom: 8px; gap: 8px;}
+      .profile-sidebar .sidebar-socials { margin-top: 20px; }
       .sidebar-socials-label { font-size: 0.93rem; }
       .sidebar-socials-icons a { font-size: 1.13rem; width: 30px; height: 30px;}
+      .profile-sidebar .reset-popup {
+        min-width: 90vw;
+        width: 90vw;
+        max-width: 98vw;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        padding: 20px 10px 18px 10px;
+        font-size: 0.96rem;
+      }
     }
     /* ========== END PROFILE SIDEBAR ========== */
   </style>
@@ -828,34 +850,43 @@
     </button>
   </div>
 
- <!-- PROFILE SIDEBAR -->
+  <!-- PROFILE SIDEBAR -->
   <aside class="profile-sidebar" id="profileSidebar" tabindex="-1" aria-modal="true" role="dialog">
     <div class="profile-sidebar-header">
       <span class="profile-sidebar-title">Profile</span>
       <button class="profile-sidebar-close" id="closeProfileSidebar" aria-label="Close">&times;</button>
     </div>
     <form class="profile-sidebar-content" id="profileSidebarForm" autocomplete="off" onsubmit="return false;">
-      <input id="sidebarDisplayName" placeholder="Full name" autocomplete="off">
-      <input id="sidebarPhone" placeholder="Phone number" autocomplete="off">
-      <input id="sidebarEmail" placeholder="Email" type="email" autocomplete="off">
+      <div class="sidebar-field-group">
+        <label class="sidebar-label" for="sidebarDisplayName">Full name</label>
+        <input id="sidebarDisplayName" placeholder="Full name" autocomplete="off">
+      </div>
+      <div class="sidebar-field-group">
+        <label class="sidebar-label" for="sidebarPhone">Phone number</label>
+        <input id="sidebarPhone" placeholder="Phone number" autocomplete="off">
+      </div>
+      <div class="sidebar-field-group">
+        <label class="sidebar-label" for="sidebarEmail">Email</label>
+        <input id="sidebarEmail" placeholder="Email" type="email" autocomplete="off">
+      </div>
       <div class="reset-link">Forgot password? <a href="#" id="sidebarResetLink">Reset</a></div>
       <button class="profile-sidebar-btn" id="sidebarSaveBtn">Save Changes</button>
       <button class="profile-sidebar-signout-btn" id="sidebarSignoutBtn" type="button">Sign Out</button>
-    </form>
-    <div class="sidebar-socials">
-      <div class="sidebar-socials-label">Follow us on</div>
-      <div class="sidebar-socials-icons">
-        <a href="https://facebook.com/" target="_blank" title="Facebook" aria-label="Facebook">
-          <i class="fab fa-facebook-f"></i>
-        </a>
-        <a href="https://instagram.com/" target="_blank" title="Instagram" aria-label="Instagram">
-          <i class="fab fa-instagram"></i>
-        </a>
-        <a href="https://youtube.com/" target="_blank" title="YouTube" aria-label="YouTube">
-          <i class="fab fa-youtube"></i>
-        </a>
+      <div class="sidebar-socials">
+        <div class="sidebar-socials-label">Follow us on</div>
+        <div class="sidebar-socials-icons">
+          <a href="https://facebook.com/" target="_blank" title="Facebook" aria-label="Facebook">
+            <i class="fab fa-facebook-f"></i>
+          </a>
+          <a href="https://instagram.com/" target="_blank" title="Instagram" aria-label="Instagram">
+            <i class="fab fa-instagram"></i>
+          </a>
+          <a href="https://youtube.com/" target="_blank" title="YouTube" aria-label="YouTube">
+            <i class="fab fa-youtube"></i>
+          </a>
+        </div>
       </div>
-    </div>
+    </form>
     <!-- Reset Popup -->
     <div class="reset-popup" id="resetPopup">
       <button class="close-x" id="closeResetPopup" aria-label="Close">&times;</button>
@@ -864,7 +895,6 @@
       <button id="sendResetPopupBtn">Send Reset Email</button>
     </div>
   </aside>
-
   <!-- HERO SECTION -->
   <section class="hero-section">
     <div class="hero-bg">
