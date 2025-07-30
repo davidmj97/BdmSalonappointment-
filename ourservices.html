@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>BDMSALON – Our Premium Services</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Google Fonts: Montserrat Extra Bold -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #13131a;
+      color: #f1f1f1;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      min-height: 100vh;
+      width: 100vw;
+      overflow-x: hidden;
+    }
+    .section-wrapper {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 36px 10px 24px 10px;
+      box-sizing: border-box;
+      position: relative;
+    }
+    .heading {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 48px;
+      font-weight: 900;
+      margin: 0 0 14px 0;
+      text-align: center;
+      line-height: 1.06;
+      letter-spacing: -2px;
+      color: #fff;
+      text-transform: uppercase;
+      text-shadow: 1px 2px 2px #000c, 0 2px 6px #233dff22;
+    }
+    @media (min-width: 1024px) {
+      .heading { font-size: 72px; }
+    }
+    .desc {
+      text-align: center;
+      font-size: 1.2rem;
+      color: #aaa;
+      margin-bottom: 38px;
+      max-width: 520px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .back-icon {
+      position: absolute;
+      top: 18px;
+      left: 4px;
+      background: none;
+      border: none;
+      color: #90caf9;
+      font-size: 2.25rem;
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 22;
+      transition: transform 0.18s, background 0.2s, color 0.2s;
+    }
+    .back-icon:hover {
+      transform: scale(1.25) rotate(-13deg);
+      background: #191948;
+      color: #fff;
+    }
+    /* Category Swiper Styles */
+    .category-swiper-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 36px;
+      margin-top: 10px;
+      gap: 0;
+    }
+    .cat-arrow-btn {
+      background: #181a23;
+      border: none;
+      color: #fff;
+      font-size: 2rem;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      min-width: 40px;
+      min-height: 40px;
+      cursor: pointer;
+      box-shadow: 0 2px 10px #233dff22;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 12px;
+      transition: background 0.14s, box-shadow 0.14s;
+    }
+    .cat-arrow-btn:active,
+    .cat-arrow-btn:focus,
+    .cat-arrow-btn:hover {
+      background: #233dff;
+      color: #fff;
+      box-shadow: 0 2px 18px #233dff66;
+    }
+    .cat-swiper {
+      display: flex;
+      overflow-x: auto;
+      gap: 18px;
+      padding: 50px 23px;
+      scroll-behavior: smooth;
+      min-width: 0;
+      max-width: 95vw;
+    }
+    .cat-swiper::-webkit-scrollbar { display: none; }
+    .cat-btn {
+      background: linear-gradient(90deg, #233dff 0%, #1a237e 100%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.08rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 12px 28px;
+      cursor: pointer;
+      outline: none;
+      min-width: 110px;
+      box-shadow: 0 2px 10px #1a237e14;
+      transition: filter 0.18s, box-shadow 0.18s, transform 0.16s;
+      white-space: nowrap;
+      will-change: transform;
+    }
+    .cat-btn.active,
+    .cat-btn:hover {
+      filter: brightness(1.14);
+      box-shadow: 0 4px 28px #233dff55;
+      transform: scale(1.13);
+      z-index: 2;
+    }
+    .services-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      justify-items: center;
+      align-items: stretch;
+      width: 100%;
+      margin: 0 auto;
+      padding-bottom: 16px;
+    }
+    @media (min-width: 650px) {
+      .services-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 22px;
+      }
+    }
+    @media (min-width: 1100px) {
+      .services-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 28px 32px;
+        padding: 0 10px;
+      }
+    }
+    .service-card {
+      background: #21212a;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px 0 #233dff22, 0 1px 8px #0003;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
+      width: 100%;
+      max-width: 550px;
+      max-height: 530px;
+      min-width: 0;
+      min-height: 0;
+      aspect-ratio: 1/1.18;
+      overflow: hidden;
+      position: relative;
+      box-sizing: border-box;
+      transition: box-shadow 0.18s, transform 0.18s;
+      cursor: pointer;
+      margin: 0;
+    }
+    .service-card:hover {
+      box-shadow: 0 12px 44px 0 #233dff44, 0 4px 48px 0 #000a;
+      transform: scale(1.035);
+      z-index: 2;
+    }
+    .service-img-wrap {
+      width: 100%;
+      height: 95%;
+      min-height: 110px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px 12px 0 0;
+      overflow: hidden;
+      background: #18192b;
+      box-shadow: 0 6px 32px 0 #0002;
+    }
+    .service-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 12px 12px 0 0;
+      display: block;
+      transition: transform 0.2s;
+    }
+    .service-card:hover .service-img {
+      transform: scale(1.04);
+    }
+    .service-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+      padding: 16px 16px 14px 16px;
+      min-height: 5;
+      box-sizing: border-box;
+    }
+    .service-title {
+      font-size: 1.31rem;
+      font-weight: 900;
+      margin: 2px 0 8px 0;
+      color: #233dff;
+      letter-spacing: -0.5px;
+      text-align: left;
+      width: 100%;
+      font-family: 'Montserrat', sans-serif;
+      text-transform: uppercase;
+    }
+    .service-desc {
+      color: #d6d8ee;
+      font-size: 1.04rem;
+      text-align: left;
+      margin-bottom: 10px;
+      min-height: 18px;
+      width: 100%;
+      font-weight: 500;
+    }
+    .booknow-btn {
+      margin-top: auto;
+      background: linear-gradient(90deg, #233dff 0%, #1a237e 100%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.98rem;
+      font-weight: 700;
+      padding: 8px 20px;
+      cursor: pointer;
+      box-shadow: 0 2px 12px 0 #1a237e22;
+      transition: background 0.18s, transform 0.12s;
+      outline: none;
+      letter-spacing: .5px;
+      align-self: flex-start;
+    }
+    .booknow-btn:hover, .booknow-btn:focus {
+      background: #233dff;
+      transform: scale(1.07);
+    }
+    .white-line {
+      width: 350px;
+      height: 3px;
+      background-color: white;
+      margin: 40px auto;
+      border: none;
+      border-radius: 2px;
+    }
+    @media (max-width: 650px) {
+      .white-line {
+        width: 80px;
+        height: 3px;
+        background-color: white;
+        margin: 40px auto;
+        border: none;
+        border-radius: 2px;
+      }
+      .back-icon { font-size: 1.5rem; width: 38px; height: 38px; top: 10px;}
+    }
+    @media (max-width: 900px) {
+      .service-card {
+        max-width: 98vw;
+        max-height: 330px;
+        aspect-ratio: 1/1.18;
+      }
+      .service-img-wrap {
+        height: 44%;
+      }
+      .service-content {
+        padding: 14px 12px 12px 12px;
+      }
+    }
+    @media (max-width: 650px) {
+      .section-wrapper {
+        padding: 18px 2vw 8px 2vw;
+      }
+      .heading {
+        font-size: 45px;
+      }
+      .section-wrapper .heading {
+        font-size: 40px !important;
+      }
+      .desc {
+        font-size: 1rem;
+        margin-bottom: 16px;
+      }
+      .services-grid {
+        gap: 30px;
+        padding: 0 0 10px 0;
+      }
+      .service-card {
+        width: 99vw;
+        max-width: 85vw;
+        aspect-ratio: 1/1.15;
+      }
+      .service-img-wrap {
+        min-height: 70px;
+        height: 40vw;
+      }
+      .service-title {
+        font-size: 1.09rem;
+      }
+      .service-desc {
+        font-size: 0.9rem;
+      }
+      .booknow-btn {
+        font-size: 0.89rem;
+        padding: 8px 12px;
+      }
+      .cat-btn {
+        font-size: 0.97rem;
+        padding: 9px 16px;
+      }
+      .cat-arrow-btn {
+        font-size: 1.45rem;
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        min-height: 32px;
+        margin: 0 7px;
+      }
+    }
+    .services-grid > * {
+      margin: 0 !important;
+    }
+  </style>
+</head>
+<body>
+<div style="height: 60px;"></div>
+<section class="section-wrapper">
+  <button class="back-icon" onclick="window.history.back()" title="Back" aria-label="Back">
+    <!-- SVG arrow left icon -->
+    <svg width="28" height="28" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block">
+      <path d="M14.8 18.25L8.3 11.75C8.1 11.55 8 11.3 8 11.05C8 10.8 8.1 10.55 8.3 10.35L14.8 3.85C15.05 3.6 15.45 3.6 15.7 3.85C15.95 4.1 15.95 4.5 15.7 4.75L9.59 11L15.7 17.25C15.95 17.5 15.95 17.9 15.7 18.15C15.45 18.4 15.05 18.4 14.8 18.25Z" fill="currentColor"/>
+    </svg>
+  </button>
+  <div class="heading">Our Services</div>
+  <hr class="white-line">
+  <div class="desc">
+    Discover our comprehensive range of beauty services, each designed to enhance your natural elegance
+  </div>
+  <!-- CATEGORY SWIPER -->
+  <div class="category-swiper-wrapper">
+    <button class="cat-arrow-btn" id="catSwiperLeft" aria-label="Scroll left">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="12 4 6 10 12 16"/></svg>
+    </button>
+    <div class="cat-swiper" id="catSwiper"></div>
+    <button class="cat-arrow-btn" id="catSwiperRight" aria-label="Scroll right">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 4 12 10 6 16"/></svg>
+    </button>
+  </div>
+  <div class="services-grid" id="servicesGrid"></div>
+</section>
+<script>
+const servicesData = [
+  {
+    name: "Hair Styling & Color",
+    description: "Expert cuts, colors, and styling to bring out your natural beauty with the latest trends and techniques.",
+    image: "https://raw.githubusercontent.com/davidmj97/BdmSalonappointment-/refs/heads/main/ser1.png",
+    category: "Hair"
+  },
+  {
+    name: "Skin Treatments",
+    description: "Revitalize your skin with our advanced facials and skincare solutions for a radiant, healthy glow.",
+    image: "https://raw.githubusercontent.com/davidmj97/BdmSalonappointment-/refs/heads/main/ser2.png",
+    category: "Skin"
+  },
+  {
+    name: "Nail Care",
+    description: "Manicures and pedicures that combine precision and pampering, leaving your nails flawless and beautiful.",
+    image: "https://raw.githubusercontent.com/davidmj97/BdmSalonappointment-/refs/heads/main/ser3.png",
+    category: "Nails"
+  },
+  {
+    name: "Spa & Relaxation",
+    description: "Unwind with our luxurious massages and spa experiences, curated for deep relaxation and rejuvenation.",
+    image: "https://images.pexels.com/photos/3212179/pexels-photo-3212179.jpeg",
+    category: "Spa"
+  },
+  {
+    name: "Make-up & Glam",
+    description: "Professional make-up for all occasions, from classic beauty to glam looks.",
+    image: "https://images.unsplash.com/photo-1511367461989-f85a21fda167?auto=format&fit=crop&w=600&q=80",
+    category: "Makeup"
+  },
+  {
+    name: "Beard Trim & Styling",
+    description: "Shape, trim, and style your beard to perfection. Includes hot towel finish.",
+    image: "https://images.unsplash.com/photo-1520880867055-1e30d1cb001c?auto=format&fit=crop&w=600&q=80",
+    category: "Beard"
+  },
+  {
+    name: "Facial Treatment",
+    description: "Deep cleansing facial to rejuvenate your skin and leave you glowing.",
+    image: "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=600&q=80",
+    category: "Skin"
+  },
+  {
+    name: "Massage Therapy",
+    description: "Relax and unwind with our signature full body massage therapy.",
+    image: "https://raw.githubusercontent.com/davidmj97/BdmSalonappointment-/refs/heads/main/ser2.png",
+    category: "Spa"
+  }
+];
+
+const categories = Array.from(new Set(servicesData.map(s => s.category)));
+let selectedCategory = "All";
+
+// Render Category Swiper
+function renderCategorySwiper() {
+  const catSwiper = document.getElementById('catSwiper');
+  catSwiper.innerHTML = '';
+  // "All" button always first
+  const allBtn = document.createElement('button');
+  allBtn.className = 'cat-btn' + (selectedCategory === "All" ? ' active' : '');
+  allBtn.textContent = "All";
+  allBtn.onclick = () => { selectedCategory = "All"; renderServices(); renderCategorySwiper(); };
+  catSwiper.appendChild(allBtn);
+  categories.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'cat-btn' + (selectedCategory === cat ? ' active' : '');
+    btn.textContent = cat;
+    btn.onclick = () => { selectedCategory = cat; renderServices(); renderCategorySwiper(); };
+    catSwiper.appendChild(btn);
+  });
+}
+renderCategorySwiper();
+
+// Swiper arrow functionality
+const catSwiper = document.getElementById('catSwiper');
+document.getElementById('catSwiperLeft').onclick = () => {
+  catSwiper.scrollBy({ left: -150, behavior: 'smooth' });
+};
+document.getElementById('catSwiperRight').onclick = () => {
+  catSwiper.scrollBy({ left: 150, behavior: 'smooth' });
+};
+
+// Render Services
+function renderServices() {
+  const grid = document.getElementById('servicesGrid');
+  grid.innerHTML = '';
+  let filtered = selectedCategory === "All"
+    ? servicesData
+    : servicesData.filter(s => s.category === selectedCategory);
+  if (filtered.length === 0) {
+    grid.innerHTML = `<div style="text-align:center;color:#bbb;padding:40px 0;">No services found.</div>`;
+    return;
+  }
+  filtered.forEach(service => {
+    const card = document.createElement('div');
+    card.className = 'service-card';
+    card.innerHTML = `
+      <div class="service-img-wrap">
+        <img class="service-img" src="${service.image}" alt="${service.name}">
+      </div>
+      <div class="service-content">
+        <div class="service-title">${service.name}</div>
+        <div class="service-desc">${service.description}</div>
+        <button class="booknow-btn" onclick="window.location.href='booknow.html'">Book Now</button>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+renderServices();
+</script>
+</body>
+</html>
