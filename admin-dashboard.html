@@ -7,7 +7,6 @@
   <style>
     :root {
       --sidebar-width: 220px;
-      --sidebar-collapsed-width: 60px;
       --sidebar-bg: #111;
       --sidebar-text: #fff;
       --main-bg: #181c20;
@@ -48,8 +47,9 @@
       flex-direction: column;
       height: 100vh;
     }
-    .sidebar.collapsed {
-      width: var(--sidebar-collapsed-width);
+    .sidebar.hide-mobile {
+      left: -240px;
+      transition: left 0.3s cubic-bezier(0.4,0,0.2,1);
     }
     .sidebar-header {
       display: flex;
@@ -69,12 +69,6 @@
       transition: var(--transition);
       white-space: nowrap;
     }
-    .sidebar.collapsed .sidebar-logo {
-      opacity: 0;
-      width: 0;
-      overflow: hidden;
-      transition: var(--transition);
-    }
     .sidebar-toggle {
       background: none;
       border: none;
@@ -83,6 +77,7 @@
       cursor: pointer;
       transition: color 0.2s;
       z-index: 200;
+      margin-left: 0;
     }
     .sidebar-toggle:focus { outline: none; }
     .sidebar-menu {
@@ -115,13 +110,6 @@
       color: #fff;
       font-weight: 600;
     }
-    .sidebar.collapsed .sidebar-menu button span.label {
-      display: none;
-    }
-    .sidebar.collapsed .sidebar-menu button {
-      justify-content: center;
-      padding: 14px 0;
-    }
     /* LOGOUT BUTTON */
     .sidebar-logout-btn {
       background: var(--logout-bg);
@@ -139,20 +127,11 @@
       justify-content: center;
       gap: 10px;
       box-shadow: 0 2px 12px 0 #0003;
-      /* Move logout higher on desktop and mobile */
     }
     .sidebar-logout-btn:hover {
       background: var(--logout-hover);
       color: #fff;
       transform: scale(1.09);
-    }
-    .sidebar.collapsed .sidebar-logout-btn {
-      justify-content: center;
-      padding: 13px 0;
-      margin: 20px 6px 0 6px;
-    }
-    .sidebar.collapsed .sidebar-logout-btn span.label {
-      display: none;
     }
     .sidebar-footer {
       padding: 24px 20px;
@@ -161,12 +140,6 @@
       text-align: center;
       border-top: 1px solid #222;
       transition: opacity 0.2s;
-    }
-    .sidebar.collapsed .sidebar-footer {
-      opacity: 0;
-      height: 0;
-      padding: 0;
-      overflow: hidden;
     }
     .main-content {
       margin-left: var(--sidebar-width);
@@ -180,8 +153,8 @@
       position: relative;
       border-left: none;
     }
-    .sidebar.collapsed ~ .main-content {
-      margin-left: var(--sidebar-collapsed-width);
+    .sidebar.hide-mobile ~ .main-content {
+      margin-left: 0 !important;
     }
     .top-header {
       position: fixed;
@@ -195,16 +168,16 @@
       padding-left: var(--sidebar-width);
       display: flex;
       align-items: center;
-      justify-content: flex-end;
       border-bottom: 1px solid #23272f;
       transition: padding-left var(--transition);
     }
-    .sidebar.collapsed ~ .top-header {
-      padding-left: var(--sidebar-collapsed-width);
+    .sidebar.hide-mobile ~ .top-header {
+      padding-left: 0 !important;
     }
     .header-orders {
       display: flex;
       align-items: center;
+      margin-left: auto;
       margin-right: 36px;
       position: relative;
     }
@@ -251,76 +224,64 @@
       box-shadow: none;
       display: inline-block;
     }
+    /* Hamburger always visible in mobile header, hide when sidebar open */
+    .mobile-hamburger {
+      display: none;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1.7em;
+      cursor: pointer;
+      margin-left: 14px;
+      z-index: 201;
+      height: var(--header-height);
+      align-items: center;
+    }
+    .sidebar.show-mobile ~ .main-content,
+    .sidebar.show-mobile ~ .top-header {
+      /* just for clarity, no effect */
+    }
     @media (max-width: 900px) {
       .sidebar {
         left: 0;
-        width: var(--sidebar-collapsed-width);
-        z-index: var(--sidebar-z);
-        transition: width var(--transition), left var(--transition);
-        border-right: none !important;
-      }
-      .sidebar.expanded {
         width: var(--sidebar-width);
       }
-      .sidebar.collapsed,
-      .sidebar {
-        overflow: visible;
-      }
-      .sidebar-logo,
-      .sidebar-menu,
-      .sidebar-logout-btn,
-      .sidebar-footer {
-        display: none !important;
-      }
-      .sidebar.expanded .sidebar-logo,
-      .sidebar.expanded .sidebar-menu,
-      .sidebar.expanded .sidebar-logout-btn,
-      .sidebar.expanded .sidebar-footer {
-        display: flex !important;
-      }
-      .sidebar.expanded .sidebar-logo,
-      .sidebar.expanded .sidebar-footer {
-        display: block !important;
-      }
-      .sidebar.expanded .sidebar-menu {
-        display: flex !important;
-      }
-      .sidebar.expanded .sidebar-logout-btn {
-        display: flex !important;
+      .sidebar.hide-mobile {
+        left: -240px;
       }
       .main-content {
         margin-left: 0 !important;
         border-left: none !important;
       }
-      .sidebar.expanded ~ .main-content {
+      .sidebar:not(.hide-mobile) ~ .main-content {
         margin-left: var(--sidebar-width) !important;
       }
       .top-header {
         padding-left: 0 !important;
       }
-      .sidebar.expanded ~ .top-header {
+      .sidebar:not(.hide-mobile) ~ .top-header {
         padding-left: var(--sidebar-width) !important;
       }
-      .header-orders {
-        margin-right: 12px;
+      .mobile-hamburger {
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: var(--header-height);
+        align-items: center;
+        justify-content: center;
+        width: 60px;
+        z-index: 300;
+        background: transparent;
+        border: none;
+        outline: none;
+        transition: opacity 0.2s;
       }
-      .header-orders-btn {
-        font-size: 1em !important;
-        padding: 9px 26px !important;
-        border-radius: 10px !important;
+      .sidebar:not(.hide-mobile) ~ .mobile-hamburger {
+        display: none !important;
       }
-      .header-orders-btn .order-icon {
-        font-size: 1.1em !important;
-      }
-      .header-orders-btn .order-badge {
-        padding: 2px 10px !important;
-        font-size: 1em !important;
-      }
-      .sidebar-logout-btn {
-        margin: 16px 6px 0 6px !important;
-      }
-      .sidebar.expanded .sidebar-logout-btn {
-        margin: 18px 18px 0 18px !important;
+      .sidebar-header .sidebar-toggle {
+        display: none !important;
       }
     }
     @media (max-width: 600px) {
@@ -385,28 +346,16 @@
       transition: box-shadow 0.2s;
       box-shadow: none;
     }
-    @media (max-width: 900px) {
-      .sidebar-toggle {
-        display: block;
-      }
-      .sidebar {
-        width: var(--sidebar-collapsed-width);
-      }
-      .sidebar.expanded {
-        width: var(--sidebar-width);
-      }
-    }
   </style>
-  <!-- Google Material Icons CDN -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
-  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 </head>
 <body>
+  <!-- Mobile Hamburger (always in header on mobile unless sidebar open) -->
+  <button class="mobile-hamburger" id="mobileHamburger" aria-label="Toggle Sidebar"><span class="material-icons">menu</span></button>
   <!-- Sidebar -->
-  <nav class="sidebar" id="sidebar">
+  <nav class="sidebar hide-mobile" id="sidebar">
     <div class="sidebar-header">
       <span class="sidebar-logo">ADMIN</span>
       <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle Sidebar">
@@ -464,54 +413,61 @@
     // Sidebar open/close for desktop & mobile
     const sidebar = document.getElementById('sidebar');
     const sidebarToggle = document.getElementById('sidebarToggle');
-    const toggleIcon = document.getElementById('toggleIcon');
+    const mobileHamburger = document.getElementById('mobileHamburger');
     const mainContent = document.getElementById('mainContent');
     const topHeader = document.getElementById('topHeader');
     const sidebarLogoutBtn = document.getElementById('sidebarLogoutBtn');
 
-    // Responsive: On mobile, sidebar is collapsed (icons only) by default, but now should be fully hidden except toggle
     function isMobile() {
       return window.innerWidth <= 900;
     }
 
-    function setSidebarState(expanded) {
-      if (isMobile()) {
-        sidebar.classList.toggle('expanded', expanded);
+    function showSidebarMobile(show) {
+      if (show) {
+        sidebar.classList.remove('hide-mobile');
+        // Hide hamburger icon when sidebar is open
+        mobileHamburger.style.display = "none";
       } else {
-        sidebar.classList.toggle('collapsed', !expanded);
-        sidebar.classList.remove('expanded');
-        topHeader.classList.toggle('sidebar-collapsed', !expanded);
+        sidebar.classList.add('hide-mobile');
+        // Show hamburger icon when sidebar is closed
+        mobileHamburger.style.display = "flex";
       }
     }
 
-    // Toggle sidebar when clicking the toggle button
-    sidebarToggle.addEventListener('click', (e) => {
+    // Hamburger in header (mobile only)
+    mobileHamburger.addEventListener('click', function(e) {
       e.stopPropagation();
-      if (isMobile()) {
-        sidebar.classList.toggle('expanded');
-      } else {
-        sidebar.classList.toggle('collapsed');
-      }
+      showSidebarMobile(true);
     });
+    // Hamburger in sidebar (desktop only)
+    if (sidebarToggle) {
+      sidebarToggle.addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (isMobile()) {
+          showSidebarMobile(false);
+        } else {
+          sidebar.classList.toggle('collapsed');
+        }
+      });
+    }
 
-    // Close sidebar if click outside in mobile and expanded
+    // Close sidebar if click outside in mobile and open
     document.addEventListener('click', (e) => {
-      if (isMobile() && sidebar.classList.contains('expanded')) {
-        if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
-          sidebar.classList.remove('expanded');
+      if (isMobile() && !sidebar.classList.contains('hide-mobile')) {
+        if (!sidebar.contains(e.target) && !mobileHamburger.contains(e.target)) {
+          showSidebarMobile(false);
         }
       }
     });
 
-    // On resize, set correct sidebar state
     function updateSidebarOnResize() {
       if (isMobile()) {
+        showSidebarMobile(false);
         sidebar.classList.remove('collapsed');
-        sidebar.classList.remove('expanded');
       } else {
-        sidebar.classList.remove('expanded');
+        sidebar.classList.remove('hide-mobile');
         sidebar.classList.remove('collapsed');
-        setSidebarState(true);
+        mobileHamburger.style.display = "none";
       }
     }
     window.addEventListener('resize', updateSidebarOnResize);
@@ -541,7 +497,7 @@
           pageFrame.src = src;
         }
         // On mobile, auto close sidebar after click
-        if (isMobile()) sidebar.classList.remove('expanded');
+        if (isMobile()) showSidebarMobile(false);
       });
     });
 
@@ -565,7 +521,6 @@
     const database = firebase.database();
 
     function listenNewOrderCount(callback) {
-      // Listen for changes in bookings with status 'pending'
       database.ref('bookings').orderByChild('status').equalTo('pending').on('value', function(snapshot) {
         let count = 0;
         snapshot.forEach(function(childSnapshot) {
@@ -581,12 +536,9 @@
       orderBadgeBtn.style.display = (count > 0) ? "inline-block" : "none";
     }
 
-    // Start listening for real-time new order count
     listenNewOrderCount(updateOrderCount);
 
-    // Make top right button behave like sidebar "Orders" button
     document.getElementById('headerOrdersBtn').addEventListener('click', function() {
-      // Simulate sidebar orders button click
       document.getElementById('sidebarOrdersBtn').click();
     });
   </script>
