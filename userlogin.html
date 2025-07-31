@@ -14,6 +14,42 @@
       -webkit-mask-image:linear-gradient(to bottom, black 50%, transparent 100%);
               mask-image:linear-gradient(to bottom, black 50%, transparent 100%);
     }
+    /* --- Back Icon Styles --- */
+    .back-icon {
+      position: absolute;
+      top: 18px;
+      left: 18px;
+      z-index: 20;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.44);
+      border-radius: 50%;
+      cursor: pointer;
+      transition: transform 0.18s, box-shadow 0.16s;
+      box-shadow: 0 2px 8px #0002;
+    }
+    .back-icon:hover {
+      transform: scale(1.18);
+      box-shadow: 0 4px 12px #0005;
+    }
+    .back-icon svg {
+      width: 24px;
+      height: 24px;
+      fill: #fff;
+      display: block;
+    }
+    @media (max-width:600px){
+      .back-icon {
+        top: 10px;
+        left: 10px;
+        width: 32px;
+        height: 32px;
+      }
+      .back-icon svg { width: 20px; height: 20px; }
+    }
     @media (min-width:768px){ .top-image{min-height:350px;} }
     .white-box   {
       width:100%; background:#fff; border-top-left-radius:25px; border-top-right-radius:25px;
@@ -38,7 +74,14 @@
 </head>
 <body>
   <div class="container">
-    <div class="top-image"></div>
+    <div class="top-image">
+      <!-- Back Icon (Top Left) -->
+      <div class="back-icon" onclick="history.back()" title="Back">
+        <svg viewBox="0 0 24 24">
+          <path d="M15.7 5.29a1 1 0 010 1.41L10.41 12l5.3 5.29a1 1 0 01-1.42 1.42l-6-6a1 1 0 010-1.42l6-6a1 1 0 011.42 0z"></path>
+        </svg>
+      </div>
+    </div>
 
     <div class="white-box">
       <h1>WELCOME TO BDM SALON</h1>
