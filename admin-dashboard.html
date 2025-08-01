@@ -52,6 +52,11 @@
       flex-direction: column;
       height: 100vh;
     }
+    .sidebar.collapsed ~ .main-content {
+  margin-left: var(--sidebar-collapsed-width);
+  width: calc(100vw - var(--sidebar-collapsed-width));
+}
+
     .sidebar.collapsed {
       width: var(--sidebar-collapsed-width) !important;
       min-width: var(--sidebar-collapsed-width) !important;
