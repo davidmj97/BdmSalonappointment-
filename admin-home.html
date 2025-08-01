@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- Chart.js for line charts -->
+    <!-- Chart.js for charts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { 
@@ -20,466 +20,113 @@
             --completed: #205c26;
             --cancelled: #992424;
         }
-        body {
-            background: var(--bg);
-            color: var(--fg);
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            margin: 0;
-            min-height: 100vh;
-        }
-        .container {
-            max-width: 1100px;
-            margin: 36px auto 20px;
-            padding: 0 12px;
-        }
-        .summary-row, .filter-row {
-            display: flex;
-            gap: 18px;
-            margin-bottom: 22px;
-            flex-wrap: wrap;
-        }
-        .summary-box {
-            flex: 1;
-            min-width: 120px;
-            box-shadow: 0 2px 8px #0003;
-            border-radius: 8px;
-            padding: var(--box-padding);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            cursor: pointer;
-            transition: box-shadow .2s, transform .2s, border-bottom .2s;
-            border: 2px solid transparent;
-            position: relative;
-            background: linear-gradient(90deg, #fbc02d 0%, #ff9800 100%);
-            color: #fff;
-        }
-        .summary-box.pending {
-            background: linear-gradient(90deg, #fbc02d 0%, #ff9800 100%);
-        }
-        .summary-box.completed {
-            background: linear-gradient(90deg, #43ea7a 0%, #205c26 100%);
-        }
-        .summary-box.cancelled {
-            background: linear-gradient(90deg, #ff3d3d 0%, #992424 100%);
-        }
-        .summary-box:hover {
-            box-shadow: 0 4px 18px #0006;
-            transform: scale(1.04);
-        }
-        .summary-box.selected {
-            border-bottom: 4px solid #fff;
-        }
-        .summary-box .icon {
-            font-size: 22px;
-            margin-bottom: 4px;
-        }
-        .summary-box .count {
-            font-family: 'Montserrat', 'Arial', sans-serif;
-            font-size: 32px;
-            font-weight: 800;
-            letter-spacing: 1px;
-            margin-bottom: 2px;
-        }
-        .summary-box .label {
-            font-size: 15px;
-            color: #fff;
-            margin-top: 2px;
-            font-family: 'Montserrat', 'Arial', sans-serif;
-            letter-spacing: 0.5px;
-        }
-
-        /* Filter Boxes */
-        .filter-box {
-            flex: 1;
-            min-width: 120px;
-            background: linear-gradient(90deg, #233dff 0%, #1a237e 100%);
-            box-shadow: 0 2px 8px #0003;
-            border-radius: 8px;
-            padding: var(--box-padding);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            cursor: pointer;
-            font-size: 16px;
-            color: #fff;
-            justify-content: center;
-            transition: box-shadow .2s, transform .2s, border-bottom .2s;
-            border: 2px solid transparent;
-            font-family: 'Montserrat', 'Arial', sans-serif;
-        }
-        .filter-box .count {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 3px;
-            font-family: 'Montserrat', 'Arial', sans-serif;
-        }
-        .filter-box.selected {
-            border-bottom: 4px solid #fff;
-        }
-        .filter-box:hover {
-            box-shadow: 0 4px 18px #0006;
-            transform: scale(1.04);
-        }
-
-        .date-selector-row {
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .date-selector-group {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-        .month-selector, .date-selector {
-            background: var(--card-bg);
-            color: var(--fg);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 8px 14px;
-            font-size: 15px;
-            outline: none;
-        }
-        .table-container {
-            background: var(--card-bg);
-            padding: 12px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px #0001;
-            overflow-x: auto;
-            margin-top: 20px;
-        }
-        .pagination-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 12px 0 0 0;
-            gap: 8px;
-        }
-        .pagination-btn {
-            background: linear-gradient(90deg, #233dff 0%, #1a237e 100%);
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            padding: 5px 12px;
-            font-size: 13px;
-            cursor: pointer;
-            transition: background .2s;
-        }
-        .pagination-btn.active {
-            background: var(--accent);
-            font-weight: bold;
-        }
-        .pagination-btn:disabled {
-            background: #444;
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            background: transparent;
-            margin-top: 12px;
-        }
-        thead tr {
-            background: linear-gradient(90deg, #233dff 0%, #1a237e 100%);
-            border-radius: 10px;
-        }
-        th {
-            color: #fff;
-            letter-spacing: 0.5px;
-            padding: 11px 0px;
-            text-align: left;
-            font-size: 14px;
-            border-bottom: 1px solid var(--border);
-        }
-        th:first-child {
-            border-top-left-radius: 10px;
-            padding-left: 10px;
-        }
-        th:last-child {
-            border-top-right-radius: 10px;
-        }
-        td {
-            padding: 11px 0px;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-            font-size: 14px;
-        }
-        td:first-child {
-            padding-left: 10px;
-        }
-        td.status-cell {
-            font-weight: 600;
-            position: relative;
-        }
-        .status-select-wrapper {
-            position: relative;
-            display: inline-block;
-            width: 105px;
-            height: 28px;
-        }
-        .status-select {
-            background: #222;
-            color: #fff;
-            border: none;
-            border-radius: 7px;
-            padding: 5px 25px 5px 10px;
-            font-size: 13px;
-            font-weight: 700;
-            width: 105px;
-            height: 28px;
-            outline: none;
-            appearance: none;
-            cursor: pointer;
-        }
+        body { background: var(--bg); color: var(--fg); font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; min-height: 100vh;}
+        .container { max-width: 1100px; margin: 36px auto 20px; padding: 0 12px;}
+        .summary-row, .filter-row { display: flex; gap: 18px; margin-bottom: 22px; flex-wrap: wrap;}
+        .summary-box { flex: 1; min-width: 120px; box-shadow: 0 2px 8px #0003; border-radius: 8px; padding: var(--box-padding); display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: box-shadow .2s, transform .2s, border-bottom .2s; border: 2px solid transparent; position: relative; background: linear-gradient(90deg, #fbc02d 0%, #ff9800 100%); color: #fff;}
+        .summary-box.pending { background: linear-gradient(90deg, #fbc02d 0%, #ff9800 100%);}
+        .summary-box.completed { background: linear-gradient(90deg, #43ea7a 0%, #205c26 100%);}
+        .summary-box.cancelled { background: linear-gradient(90deg, #ff3d3d 0%, #992424 100%);}
+        .summary-box:hover { box-shadow: 0 4px 18px #0006; transform: scale(1.04);}
+        .summary-box.selected { border-bottom: 4px solid #fff;}
+        .summary-box .icon { font-size: 22px; margin-bottom: 4px;}
+        .summary-box .count { font-family: 'Montserrat', 'Arial', sans-serif; font-size: 32px; font-weight: 800; letter-spacing: 1px; margin-bottom: 2px;}
+        .summary-box .label { font-size: 15px; color: #fff; margin-top: 2px; font-family: 'Montserrat', 'Arial', sans-serif; letter-spacing: 0.5px;}
+        .filter-box { flex: 1; min-width: 120px; background: linear-gradient(90deg, #233dff 0%, #1a237e 100%); box-shadow: 0 2px 8px #0003; border-radius: 8px; padding: var(--box-padding); display: flex; flex-direction: column; align-items: center; cursor: pointer; font-size: 16px; color: #fff; justify-content: center; transition: box-shadow .2s, transform .2s, border-bottom .2s; border: 2px solid transparent; font-family: 'Montserrat', 'Arial', sans-serif;}
+        .filter-box .count { font-size: 22px; font-weight: 700; margin-bottom: 3px; font-family: 'Montserrat', 'Arial', sans-serif;}
+        .filter-box.selected { border-bottom: 4px solid #fff;}
+        .filter-box:hover { box-shadow: 0 4px 18px #0006; transform: scale(1.04);}
+        .date-selector-row { margin-bottom: 12px; display: flex; align-items: center; gap: 10px;}
+        .date-selector-group { display: flex; gap: 8px; align-items: center;}
+        .month-selector, .date-selector { background: var(--card-bg); color: var(--fg); border: 1px solid var(--border); border-radius: 6px; padding: 8px 14px; font-size: 15px; outline: none;}
+        .table-container { background: var(--card-bg); padding: 12px; border-radius: 8px; box-shadow: 0 2px 8px #0001; overflow-x: auto; margin-top: 20px;}
+        .pagination-container { display: flex; justify-content: center; align-items: center; margin: 12px 0 0 0; gap: 8px;}
+        .pagination-btn { background: linear-gradient(90deg, #233dff 0%, #1a237e 100%); color: #fff; border: none; border-radius: 5px; padding: 5px 12px; font-size: 13px; cursor: pointer; transition: background .2s;}
+        .pagination-btn.active { background: var(--accent); font-weight: bold;}
+        .pagination-btn:disabled { background: #444; opacity: 0.5; cursor: not-allowed;}
+        table { width: 100%; border-collapse: separate; border-spacing: 0; background: transparent; margin-top: 12px;}
+        thead tr { background: linear-gradient(90deg, #233dff 0%, #1a237e 100%); border-radius: 10px;}
+        th { color: #fff; letter-spacing: 0.5px; padding: 11px 0px; text-align: left; font-size: 14px; border-bottom: 1px solid var(--border);}
+        th:first-child { border-top-left-radius: 10px; padding-left: 10px;}
+        th:last-child { border-top-right-radius: 10px;}
+        td { padding: 11px 0px; text-align: left; border-bottom: 1px solid var(--border); font-size: 14px;}
+        td:first-child { padding-left: 10px;}
+        td.status-cell { font-weight: 600; position: relative;}
+        .status-select-wrapper { position: relative; display: inline-block; width: 105px; height: 28px;}
+        .status-select { background: #222; color: #fff; border: none; border-radius: 7px; padding: 5px 25px 5px 10px; font-size: 13px; font-weight: 700; width: 105px; height: 28px; outline: none; appearance: none; cursor: pointer;}
         .status-select.pending { background: var(--pending);}
         .status-select.completed { background: var(--completed);}
         .status-select.cancelled { background: var(--cancelled);}
         .status-select option.pending { background: var(--pending); color: #fff;}
         .status-select option.completed { background: var(--completed); color: #fff;}
         .status-select option.cancelled { background: var(--cancelled); color: #fff;}
-        .status-select-wrapper .dropdown-icon {
-            position: absolute;
-            right: 9px;
-            top: 50%;
-            transform: translateY(-50%);
-            pointer-events: none;
-            font-size: 13px;
-            color: #fff;
-            opacity: 0.7;
-        }
-        .view-btn {
-            background: var(--accent);
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            padding: 6px 16px;
-            cursor: pointer;
-            font-size: 13px;
-            transition: background .2s;
-        }
-        .view-btn:hover {
-            background: #0d47a1;
-        }
-        /* Chart styles */
-        .charts-row {
-            display: flex;
-            gap: 30px;
-            flex-wrap: nowrap;
-            margin-top: 45px;
-            margin-bottom: 30px;
-            justify-content: space-between;
-        }
-        .chart-container {
-            background: var(--card-bg);
-            border-radius: 8px;
-            padding: 18px;
-            box-shadow: 0 2px 8px #0002;
-            flex: 1;
-            min-width: 340px;
-            max-width: 530px;
-            min-height: 320px;
-            height: 320px;
-            display: flex;
-            flex-direction: column;
-        }
-        .chart-header {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: space-between;
-            background: linear-gradient(90deg, #233dff 0%, #1a237e 100%);
-            color: #fff;
-            border-radius: 6px;
-            padding: 15px 18px 10px 18px;
-            margin-bottom: 12px;
-        }
-        .chart-header-left {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            flex: 1;
-        }
-        .chart-header-title {
-            font-size: 18px;
-            font-weight: 800;
-            margin-bottom: 4px;
-            letter-spacing: 0.5px;
-        }
-        .chart-header-details {
-            display: none;
-        }
-        .chart-header-total {
-            font-size: 14px;
-            font-weight: 700;
-            opacity: 1;
-        }
-        .chart-header-year {
-            font-size: 18px;
-            font-weight: 900;
-            margin-left: 16px;
-            opacity: 0.95;
-        }
-        .chart-title {
-            display: none;
-        }
-        .chart-controls {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 12px;
-            gap: 15px;
-        }
-        .chart-dropdown {
-            background: var(--card-bg);
-            color: var(--fg);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 6px 12px;
-            font-size: 14px;
-            outline: none;
-        }
-        /* --- MOBILE CHART SIZING FIX --- */
+        .status-select-wrapper .dropdown-icon { position: absolute; right: 9px; top: 50%; transform: translateY(-50%); pointer-events: none; font-size: 13px; color: #fff; opacity: 0.7;}
+        .view-btn { background: var(--accent); color: #fff; border: none; border-radius: 6px; padding: 6px 16px; cursor: pointer; font-size: 13px; transition: background .2s;}
+        .view-btn:hover { background: #0d47a1;}
+        /* --- Chart Section --- */
+        .charts-row { display: flex; gap: 30px; flex-wrap: nowrap; margin-top: 45px; margin-bottom: 30px; justify-content: space-between;}
+        .chart-container { background: var(--card-bg); border-radius: 8px; padding: 18px; box-shadow: 0 2px 8px #0002; flex: 1; min-width: 340px; max-width: 530px; min-height: 320px; height: 320px; display: flex; flex-direction: column; margin-bottom: 18px;}
+        .chart-header { display: flex; align-items: center; justify-content: space-between; background: linear-gradient(90deg, #233dff 0%, #1a237e 100%); color: #fff; border-radius: 6px; padding: 15px 18px 10px 18px; margin-bottom: 12px;}
+        .chart-header-left { display: flex; flex-direction: column; align-items: flex-start; flex: 1;}
+        .chart-header-title { font-size: 18px; font-weight: 800; margin-bottom: 4px; letter-spacing: 0.5px;}
+        .chart-header-total { font-size: 14px; font-weight: 700; opacity: 1; display:none;}
+        .chart-header-year { font-size: 18px; font-weight: 900; margin-left: 16px; opacity: 0.95;}
+        .chart-controls { display: flex; justify-content: center; align-items: center; margin-bottom: 12px; gap: 15px;}
+        .chart-dropdown { background: var(--card-bg); color: var(--fg); border: 1px solid var(--border); border-radius: 6px; padding: 6px 12px; font-size: 14px; outline: none;}
+        /* Chart Totals Row */
+        .chart-totals-row { display: flex; gap: 10px; margin: 7px 0 0 0; justify-content: space-between; flex-wrap: wrap;}
+        .chart-totals-box { flex: 1; background: #222; color: #fff; border-radius: 6px; padding: 7px 8px; text-align: center; min-width: 80px; font-size: 13px; margin: 0 3px; font-family: 'Montserrat', Arial, sans-serif; }
+        .chart-totals-label { font-size: 12px; color: #bbb; line-height: 1.2;}
+        .chart-totals-count { font-size: 15px; font-weight: 700; margin-top: 1px; letter-spacing: .5px;}
         @media (max-width: 650px) {
-            .container {
-                max-width: 100vw;
-                padding: 0 2px;
-            }
-            .summary-row,
-            .filter-row,
-            .date-selector-group {
-                flex-direction: row;
-                gap: 4px;
-            }
-            .summary-box,
-            .filter-box {
-                min-width: 40px;
-                padding: 2px;
-                font-size: 9px;
-            }
-            .summary-box .count,
-            .filter-box .count {
-                font-size: 9px;
-            }
-            .summary-box .label,
-            .filter-box {
-                font-size: 9px;
-            }
+            .container { max-width: 100vw; padding: 0 2px;}
+            .summary-row, .filter-row, .date-selector-group { flex-direction: row; gap: 4px;}
+            .summary-box, .filter-box { min-width: 40px; padding: 2px; font-size: 9px;}
+            .summary-box .count, .filter-box .count { font-size: 9px;}
+            .summary-box .label, .filter-box { font-size: 9px;}
             .table-container { padding: 1px;}
-            th, td {
-                font-size: 8px;
-                padding: 4px 0;
-                min-width: 60px !important;
-                max-width: 60px !important;
-                width: 20% !important;
-                box-sizing: border-box;
-                word-break: break-word;
-                text-align: left;
-                vertical-align: middle;
-            }
-            table th, table td {
-                width: 20% !important;
-                min-width: 60px !important;
-                max-width: 60px !important;
-                text-align: left;
-            }
-            th:first-child, td:first-child {
-                padding-left: 2px;
-            }
-            th:first-child, th:last-child {
-                border-radius: 0 !important;
-            }
-            .status-select-wrapper {
-                height: 18px !important;
-                width: 74px !important;
-            }
-            .status-select {
-                font-size: 8px;
-                width: 74px;
-                height: 18px !important;
-                padding: 1px 20px 1px 4px;
-                min-width: 0;
-                max-width: 100%;
-            }
-            .status-select option {
-                font-size: 8px;
-            }
-            .view-btn {
-                font-size: 8px;
-                padding: 3px 8px;
-                min-width: unset;
-            }
-            .charts-row {
-                flex-direction: column;
-                gap: 8px;
-                margin-top: 8px;
-                margin-bottom: 8px;
-            }
-            .chart-container {
-                min-width: 100% !important;
-                max-width: 100vw !important;
-                padding: 4px !important;
-                margin: 0 !important;
-                min-height: unset !important;
-                height: auto !important;
-                box-sizing: border-box;
-            }
-            .chart-header-title { font-size: 8px; }
-            .chart-header-details, .chart-header-total { font-size: 7px; }
-            .chart-header-year { font-size: 8px; margin-left: 3px; }
+            th, td { font-size: 8px; padding: 4px 0; min-width: 60px !important; max-width: 60px !important; width: 20% !important; box-sizing: border-box; word-break: break-word; text-align: left; vertical-align: middle;}
+            table th, table td { width: 20% !important; min-width: 60px !important; max-width: 60px !important; text-align: left;}
+            th:first-child, td:first-child { padding-left: 2px;}
+            th:first-child, th:last-child { border-radius: 0 !important;}
+            .status-select-wrapper { height: 18px !important; width: 74px !important;}
+            .status-select { font-size: 8px; width: 74px; height: 18px !important; padding: 1px 20px 1px 4px; min-width: 0; max-width: 100%;}
+            .status-select option { font-size: 8px;}
+            .view-btn { font-size: 8px; padding: 3px 8px; min-width: unset;}
+            .charts-row { flex-direction: column; gap: 8px; margin-top: 8px; margin-bottom: 8px;}
+            .chart-container { min-width: 100% !important; max-width: 100vw !important; padding: 4px !important; margin: 0 !important; min-height: unset !important; height: auto !important; box-sizing: border-box;}
+            .chart-header-title { font-size: 8px;}
+            .chart-header-total { font-size: 7px; display:none;}
+            .chart-header-year { font-size: 8px; margin-left: 3px;}
             .chart-controls label { font-size: 7px;}
             .chart-dropdown { font-size: 7px; padding: 1px 2px;}
-            canvas {
-                width: 100% !important;
-                height: auto !important;
-                max-width: 100vw !important;
-                aspect-ratio: 2/1 !important;
-                display: block;
-            }
+            canvas { width: 100% !important; height: auto !important; max-width: 100vw !important; aspect-ratio: 2/1 !important; display: block;}
+            .chart-totals-row { gap: 2px; margin: 3px 0 0 0;}
+            .chart-totals-box { min-width: 50px; font-size: 7px; padding: 3px 2px;}
+            .chart-totals-label { font-size: 7px;}
+            .chart-totals-count { font-size: 8px;}
         }
         @media (max-width: 650px) and (orientation: landscape) {
-            .container { max-width: 1100px; padding: 0 12px; }
-            .summary-row,
-            .filter-row,
-            .date-selector-group {
-                flex-direction: row;
-                gap: 18px;
-            }
-            .summary-box, .filter-box {
-                min-width: 120px;
-                padding: var(--box-padding);
-                font-size: 16px;
-            }
+            .container { max-width: 1100px; padding: 0 12px;}
+            .summary-row, .filter-row, .date-selector-group { flex-direction: row; gap: 18px;}
+            .summary-box, .filter-box { min-width: 120px; padding: var(--box-padding); font-size: 16px;}
             .summary-box .count, .filter-box .count { font-size: 22px;}
             .summary-box .label, .filter-box { font-size: 15px;}
             .table-container { padding: 12px;}
             th, td { font-size: 14px; padding: 11px 0px;}
             th:first-child, td:first-child { padding-left: 10px;}
             .charts-row { flex-direction: column; gap: 8px; margin-top: 8px; margin-bottom: 8px;}
-            .chart-container {
-                min-width: 100% !important;
-                max-width: 100vw !important;
-                padding: 4px !important;
-                margin: 0 !important;
-                min-height: unset !important;
-                height: auto !important;
-                box-sizing: border-box;
-            }
+            .chart-container { min-width: 100% !important; max-width: 100vw !important; padding: 4px !important; margin: 0 !important; min-height: unset !important; height: auto !important; box-sizing: border-box;}
             .chart-header-title { font-size: 8px;}
-            .chart-header-details, .chart-header-total { font-size: 7px;}
+            .chart-header-total { font-size: 7px; display:none;}
             .chart-header-year { font-size: 8px;}
             .chart-controls label { font-size: 7px;}
             .chart-dropdown { font-size: 7px; padding: 1px 2px;}
-            canvas {
-                width: 100% !important;
-                height: auto !important;
-                max-width: 100vw !important;
-                aspect-ratio: 2/1 !important;
-                display: block;
-            }
+            canvas { width: 100% !important; height: auto !important; max-width: 100vw !important; aspect-ratio: 2/1 !important; display: block;}
+            .chart-totals-row { gap: 2px; margin: 3px 0 0 0;}
+            .chart-totals-box { min-width: 50px; font-size: 7px; padding: 3px 2px;}
+            .chart-totals-label { font-size: 7px;}
+            .chart-totals-count { font-size: 8px;}
         }
         @media (max-width: 900px) and (min-width: 651px) {
             .container { max-width: 99vw;}
@@ -488,99 +135,22 @@
         }
         @media (min-width: 651px) and (max-width: 1100px) {
             .charts-row { flex-direction: column; gap: 20px;}
-            .chart-container { max-width: 100%; }
+            .chart-container { max-width: 100%;}
         }
         /* Modal styles, similar to orders.html */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 1000;
-            overflow-y: auto;
-            padding: 20px 10px;
-        }
-        .modal-content {
-            background: var(--card-bg);
-            margin: 20px auto;
-            padding: 20px;
-            border-radius: 8px;
-            width: 95%;
-            max-width: 500px;
-            position: relative;
-            box-shadow: 0 5px 30px rgba(0,0,0,0.5);
-            border: 1px solid var(--border);
-        }
-        .close-modal {
-            position: absolute;
-            top: 12px; right: 15px;
-            font-size: 22px;
-            cursor: pointer;
-            color: var(--fg);
-            background: none;
-            border: none;
-            width: 30px; height: 30px;
-            display: flex; align-items: center; justify-content: center;
-            border-radius: 50%;
-        }
-        .close-modal:hover {
-            background: rgba(255,255,255,0.1);
-        }
-        .modal-header {
-            padding-bottom: 12px;
-            margin-bottom: 15px;
-            border-bottom: 1px solid var(--border);
-        }
-        .modal-title {
-            font-size: 18px;
-            color: #90caf9;
-            margin: 0;
-            font-weight: 600;
-        }
-        .detail-row {
-            display: flex;
-            margin-bottom: 10px;
-            padding-bottom: 10px;
-            border-bottom: 1px dashed var(--border);
-            font-size: 13px;
-        }
-        .detail-label {
-            width: 100px;
-            font-weight: 500;
-            color: #90caf9;
-            flex-shrink: 0;
-        }
-        .detail-value {
-            flex: 1;
-            color: var(--fg);
-            word-break: break-word;
-        }
-        .services-list {
-            margin-top: 5px;
-        }
-        .service-item {
-            background: #1a237e;
-            padding: 10px;
-            margin-bottom: 8px;
-            border-radius: 5px;
-            border-left: 3px solid #0d47a1;
-            font-size: 12px;
-        }
-        .service-item .service-name {
-            font-weight: bold;
-            color: white;
-            font-size: 13px;
-        }
-        .modal-footer {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            padding-top: 15px;
-            margin-top: 10px;
-            border-top: 1px solid var(--border);
-            flex-wrap: wrap;
-        }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; overflow-y: auto; padding: 20px 10px;}
+        .modal-content { background: var(--card-bg); margin: 20px auto; padding: 20px; border-radius: 8px; width: 95%; max-width: 500px; position: relative; box-shadow: 0 5px 30px rgba(0,0,0,0.5); border: 1px solid var(--border);}
+        .close-modal { position: absolute; top: 12px; right: 15px; font-size: 22px; cursor: pointer; color: var(--fg); background: none; border: none; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 50%;}
+        .close-modal:hover { background: rgba(255,255,255,0.1);}
+        .modal-header { padding-bottom: 12px; margin-bottom: 15px; border-bottom: 1px solid var(--border);}
+        .modal-title { font-size: 18px; color: #90caf9; margin: 0; font-weight: 600;}
+        .detail-row { display: flex; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px dashed var(--border); font-size: 13px;}
+        .detail-label { width: 100px; font-weight: 500; color: #90caf9; flex-shrink: 0;}
+        .detail-value { flex: 1; color: var(--fg); word-break: break-word;}
+        .services-list { margin-top: 5px;}
+        .service-item { background: #1a237e; padding: 10px; margin-bottom: 8px; border-radius: 5px; border-left: 3px solid #0d47a1; font-size: 12px;}
+        .service-item .service-name { font-weight: bold; color: white; font-size: 13px;}
+        .modal-footer { display: flex; justify-content: flex-end; gap: 10px; padding-top: 15px; margin-top: 10px; border-top: 1px solid var(--border); flex-wrap: wrap;}
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&display=swap');
     </style>
 </head>
@@ -652,44 +222,52 @@
         </table>
         <div class="pagination-container" id="pagination-container"></div>
     </div>
-    <!-- Charts -->
+    <!-- Charts Section (editable) -->
     <div class="charts-row">
+        <!-- Week Chart Section -->
         <div class="chart-container">
             <div class="chart-header" id="weekChartHeader">
                 <div class="chart-header-left">
-                    <span class="chart-header-title" id="weekChartHeaderTitle">Sales Report: Next 7 Days</span>
-                    <span class="chart-header-total" id="weekChartHeaderTotal"></span>
+                    <span class="chart-header-title" id="weekChartHeaderTitle">Reports: Next 7 Days</span>
+                    <span class="chart-header-total" id="weekChartHeaderTotal" style="display:none;"></span>
                 </div>
                 <span class="chart-header-year" id="weekChartHeaderYear"></span>
             </div>
             <div class="chart-controls">
                 <label for="weekChartDropdown">Show:</label>
                 <select id="weekChartDropdown" class="chart-dropdown">
-                    <option value="sales">Total Sales</option>
                     <option value="appointments">Total Appointments</option>
+                    <option value="sales">Total Sales</option>
                 </select>
             </div>
             <div style="flex:1;display:flex;align-items:center;">
                 <canvas id="weekChart"></canvas>
             </div>
+            <!-- Totals Row below chart -->
+            <div class="chart-totals-row" id="weekChartTotalsRow">
+            </div>
         </div>
+        <!-- Year Chart Section -->
         <div class="chart-container">
             <div class="chart-header" id="yearChartHeader">
                 <div class="chart-header-left">
-                    <span class="chart-header-title" id="yearChartHeaderTitle">Sales Report: Jan - Dec</span>
-                    <span class="chart-header-total" id="yearChartHeaderTotal"></span>
+                    <span class="chart-header-title" id="yearChartHeaderTitle">Report: Jan - Dec</span>
+                    <span class="chart-header-total" id="yearChartHeaderTotal" style="display:none;"></span>
                 </div>
                 <span class="chart-header-year" id="yearChartHeaderYear"></span>
             </div>
             <div class="chart-controls">
                 <label for="yearChartDropdown">Show:</label>
                 <select id="yearChartDropdown" class="chart-dropdown">
-                    <option value="sales">Total Sales</option>
                     <option value="appointments">Total Appointments</option>
+                    <option value="sales">Total Sales</option>
                 </select>
             </div>
             <div style="flex:1;display:flex;align-items:center;">
                 <canvas id="yearChart"></canvas>
+            </div>
+            <!-- Totals Row below chart -->
+            <div class="chart-totals-row" id="yearChartTotalsRow">
             </div>
         </div>
     </div>
@@ -872,7 +450,9 @@ let weekChart, yearChart;
 const weekChartDropdown = document.getElementById('weekChartDropdown');
 const yearChartDropdown = document.getElementById('yearChartDropdown');
 
-// Chart header elements
+const weekChartTotalsRow = document.getElementById('weekChartTotalsRow');
+const yearChartTotalsRow = document.getElementById('yearChartTotalsRow');
+
 const weekChartHeaderTitle = document.getElementById('weekChartHeaderTitle');
 const weekChartHeaderTotal = document.getElementById('weekChartHeaderTotal');
 const weekChartHeaderYear = document.getElementById('weekChartHeaderYear');
@@ -880,7 +460,6 @@ const yearChartHeaderTitle = document.getElementById('yearChartHeaderTitle');
 const yearChartHeaderTotal = document.getElementById('yearChartHeaderTotal');
 const yearChartHeaderYear = document.getElementById('yearChartHeaderYear');
 
-// Modal fields
 const modalOrderNumber = document.getElementById('modal-order-number');
 const modalCustomerName = document.getElementById('modal-customer-name');
 const modalPhone = document.getElementById('modal-phone');
@@ -1274,17 +853,17 @@ function renderCharts() {
     let weekCompleted = [];
     let weekCancelled = [];
     let weekAppointments = [];
+    let weekCompletedCount = [];
+    let weekCancelledCount = [];
     let weekTotalSales = 0;
     let weekTotalAppointments = 0;
+    let weekTotalCompleted = 0;
+    let weekTotalCancelled = 0;
 
     for(let i=1; i<=7; i++) {
-        let d = new Date(today);
-        d.setDate(today.getDate() + i);
+        let d = new Date(today); d.setDate(today.getDate() + i);
         weekLabels.push(formatDateChart(d));
-        let total = 0;
-        let completed = 0;
-        let cancelled = 0;
-        let appointments = 0;
+        let total = 0, completed = 0, cancelled = 0, appointments = 0, completedCount = 0, cancelledCount = 0;
         orders.forEach(order=>{
             if(!order.date) return;
             let od = new Date(order.date);
@@ -1292,9 +871,11 @@ function renderCharts() {
                 appointments++;
                 if(order._tableStatus === 'completed') {
                     completed += calculateTotal(order.services);
+                    completedCount++;
                 }
                 if(order._tableStatus === 'cancelled') {
                     cancelled += calculateTotal(order.services);
+                    cancelledCount++;
                 }
                 total += calculateTotal(order.services);
             }
@@ -1303,133 +884,63 @@ function renderCharts() {
         weekCompleted.push(parseFloat(completed.toFixed(2)));
         weekCancelled.push(parseFloat(cancelled.toFixed(2)));
         weekAppointments.push(appointments);
+        weekCompletedCount.push(completedCount);
+        weekCancelledCount.push(cancelledCount);
         weekTotalSales += total;
         weekTotalAppointments += appointments;
+        weekTotalCompleted += weekChartDropdown.value === 'sales' ? completed : completedCount;
+        weekTotalCancelled += weekChartDropdown.value === 'sales' ? cancelled : cancelledCount;
     }
     weekChartHeaderYear.textContent = weekYear;
-    if(weekChartDropdown.value === 'sales') {
-        weekChartHeaderTotal.textContent = `Total Sales: $${weekTotalSales.toFixed(2)}`;
-    } else {
-        weekChartHeaderTotal.textContent = `Total Appointments: ${weekTotalAppointments}`;
-    }
+    // weekChartHeaderTotal.style.display = "none"; // Hide total on header
 
     if(weekChart) weekChart.destroy();
     let weekType = weekChartDropdown.value;
     let weekDataSets = [];
     if(weekType === 'sales') {
         weekDataSets = [
-            {
-                label: 'Total Sales',
-                data: weekSales,
-                borderColor: '#1a73e8',
-                backgroundColor: 'rgba(26,115,232,0.09)',
-                fill: true,
-                tension: .4,
-                pointBackgroundColor: '#fff',
-                borderWidth: 3,
-            },
-            {
-                label: 'Completed Sales',
-                data: weekCompleted,
-                borderColor: '#2e7d32',
-                backgroundColor: 'rgba(46,125,50,0.11)',
-                fill: false,
-                tension: .4,
-                pointBackgroundColor: '#fff',
-                borderWidth: 2,
-            },
-            {
-                label: 'Cancelled Sales',
-                data: weekCancelled,
-                borderColor: '#d32f2f',
-                backgroundColor: 'rgba(211,47,47,0.13)',
-                fill: false,
-                tension: .4,
-                pointBackgroundColor: '#fff',
-                borderWidth: 2,
-            },
+            { label: 'Total Sales', data: weekSales, borderColor: '#1a73e8', backgroundColor: 'rgba(26,115,232,0.09)', fill: true, tension: .4, pointBackgroundColor: '#fff', borderWidth: 3 },
+            { label: 'Completed Sales', data: weekCompleted, borderColor: '#2e7d32', backgroundColor: 'rgba(46,125,50,0.11)', fill: false, tension: .4, pointBackgroundColor: '#fff', borderWidth: 2 },
+            { label: 'Cancelled Sales', data: weekCancelled, borderColor: '#d32f2f', backgroundColor: 'rgba(211,47,47,0.13)', fill: false, tension: .4, pointBackgroundColor: '#fff', borderWidth: 2 }
         ];
     } else {
         weekDataSets = [
-            {
-                label: 'Total Appointments',
-                data: weekAppointments,
-                borderColor: '#1a73e8',
-                backgroundColor: 'rgba(26,115,232,0.09)',
-                fill: true,
-                tension: .4,
-                pointBackgroundColor: '#fff',
-                borderWidth: 3,
-            },
-            {
-                label: 'Completed',
-                data: weekCompleted.map((_, i) => {
-                    let d = new Date(today);
-                    d.setDate(today.getDate() + i + 1);
-                    let count = 0;
-                    orders.forEach(order=>{
-                        if(!order.date) return;
-                        let od = new Date(order.date);
-                        if(od.getFullYear() === d.getFullYear() && od.getMonth() === d.getMonth() && od.getDate() === d.getDate() && order._tableStatus === 'completed') {
-                            count++;
-                        }
-                    });
-                    return count;
-                }),
-                borderColor: '#2e7d32',
-                backgroundColor: 'rgba(46,125,50,0.08)',
-                fill: false,
-                tension: .4,
-                pointBackgroundColor: '#fff',
-                borderWidth: 2,
-            },
-            {
-                label: 'Cancelled',
-                data: weekCancelled.map((_, i) => {
-                    let d = new Date(today);
-                    d.setDate(today.getDate() + i + 1);
-                    let count = 0;
-                    orders.forEach(order=>{
-                        if(!order.date) return;
-                        let od = new Date(order.date);
-                        if(od.getFullYear() === d.getFullYear() && od.getMonth() === d.getMonth() && od.getDate() === d.getDate() && order._tableStatus === 'cancelled') {
-                            count++;
-                        }
-                    });
-                    return count;
-                }),
-                borderColor: '#d32f2f',
-                backgroundColor: 'rgba(211,47,47,0.09)',
-                fill: false,
-                tension: .4,
-                pointBackgroundColor: '#fff',
-                borderWidth: 2,
-            },
+            { label: 'Total Appointments', data: weekAppointments, borderColor: '#1a73e8', backgroundColor: 'rgba(26,115,232,0.09)', fill: true, tension: .4, pointBackgroundColor: '#fff', borderWidth: 3 },
+            { label: 'Completed', data: weekCompletedCount, borderColor: '#2e7d32', backgroundColor: 'rgba(46,125,50,0.08)', fill: false, tension: .4, pointBackgroundColor: '#fff', borderWidth: 2 },
+            { label: 'Cancelled', data: weekCancelledCount, borderColor: '#d32f2f', backgroundColor: 'rgba(211,47,47,0.09)', fill: false, tension: .4, pointBackgroundColor: '#fff', borderWidth: 2 }
         ];
     }
     weekChart = new Chart(weekChartCtx, {
         type: 'line',
-        data: {
-            labels: weekLabels,
-            datasets: weekDataSets
-        },
+        data: { labels: weekLabels, datasets: weekDataSets },
         options: {
             plugins: {legend: {display: true}},
             responsive: true,
             maintainAspectRatio: false,
             animation: { duration: 600 },
             scales: {
-                y: {
-                    beginAtZero: true, color:'#fff',
-                    grid:{color:'#444', drawBorder: false, drawOnChartArea: false}
-                },
-                x: {
-                    color:'#fff',
-                    grid:{color:'#444', drawBorder: false, drawOnChartArea: false}
-                }
+                y: { beginAtZero: true, color:'#fff', grid:{color:'#444', drawBorder: false, drawOnChartArea: false} },
+                x: { color:'#fff', grid:{color:'#444', drawBorder: false, drawOnChartArea: false} }
             }
         }
     });
+
+    // Week Chart Totals Row
+    let weekTotalsLabel = weekChartDropdown.value === 'sales' ? 'Total Sales' : 'Total Appointments';
+    weekChartTotalsRow.innerHTML = `
+        <div class="chart-totals-box">
+            <div class="chart-totals-label">${weekTotalsLabel}</div>
+            <div class="chart-totals-count">${weekChartDropdown.value === 'sales' ? '$'+weekTotalSales.toFixed(2) : weekTotalAppointments}</div>
+        </div>
+        <div class="chart-totals-box">
+            <div class="chart-totals-label">Total Completed</div>
+            <div class="chart-totals-count">${weekChartDropdown.value === 'sales' ? '$'+weekTotalCompleted.toFixed(2) : weekTotalCompleted}</div>
+        </div>
+        <div class="chart-totals-box">
+            <div class="chart-totals-label">Total Cancelled</div>
+            <div class="chart-totals-count">${weekChartDropdown.value === 'sales' ? '$'+weekTotalCancelled.toFixed(2) : weekTotalCancelled}</div>
+        </div>
+    `;
 
     // --- YEAR CHART HEADER DETAILS ---
     let year = today.getFullYear();
@@ -1438,13 +949,14 @@ function renderCharts() {
     let yearCompleted = [];
     let yearCancelled = [];
     let yearAppointments = [];
+    let yearCompletedCount = [];
+    let yearCancelledCount = [];
     let yearTotalSales = 0;
     let yearTotalAppointments = 0;
+    let yearTotalCompleted = 0;
+    let yearTotalCancelled = 0;
     for(let m=0; m<12; m++) {
-        let total = 0;
-        let completed = 0;
-        let cancelled = 0;
-        let appointments = 0;
+        let total = 0, completed = 0, cancelled = 0, appointments = 0, completedCount = 0, cancelledCount = 0;
         orders.forEach(order=>{
             if(!order.date) return;
             let od = new Date(order.date);
@@ -1452,9 +964,11 @@ function renderCharts() {
                 appointments++;
                 if(order._tableStatus === 'completed') {
                     completed += calculateTotal(order.services);
+                    completedCount++;
                 }
                 if(order._tableStatus === 'cancelled') {
                     cancelled += calculateTotal(order.services);
+                    cancelledCount++;
                 }
                 total += calculateTotal(order.services);
             }
@@ -1463,124 +977,63 @@ function renderCharts() {
         yearCompleted.push(parseFloat(completed.toFixed(2)));
         yearCancelled.push(parseFloat(cancelled.toFixed(2)));
         yearAppointments.push(appointments);
+        yearCompletedCount.push(completedCount);
+        yearCancelledCount.push(cancelledCount);
         yearTotalSales += total;
         yearTotalAppointments += appointments;
+        yearTotalCompleted += yearChartDropdown.value === 'sales' ? completed : completedCount;
+        yearTotalCancelled += yearChartDropdown.value === 'sales' ? cancelled : cancelledCount;
     }
     yearChartHeaderYear.textContent = year;
-    if(yearChartDropdown.value === 'sales') {
-        yearChartHeaderTotal.textContent = `Total Sales: $${yearTotalSales.toFixed(2)}`;
-    } else {
-        yearChartHeaderTotal.textContent = `Total Appointments: ${yearTotalAppointments}`;
-    }
+    // yearChartHeaderTotal.style.display = "none"; // Hide total on header
+
     if(yearChart) yearChart.destroy();
     let yearType = yearChartDropdown.value;
     let yearDataSets = [];
     if(yearType === 'sales') {
         yearDataSets = [
-            {
-                label: 'Total Sales',
-                data: yearSales,
-                borderColor: '#1a73e8',
-                backgroundColor: 'rgba(26,115,232,0.09)',
-                fill: true,
-                tension: .4,
-                pointBackgroundColor: '#fff',
-                borderWidth: 3,
-            },
-            {
-                label: 'Completed Sales',
-                data: yearCompleted,
-                borderColor: '#2e7d32',
-                backgroundColor: 'rgba(46,125,50,0.11)',
-                fill: false,
-                tension: .4,
-                pointBackgroundColor: '#fff',
-                borderWidth: 2,
-            },
-            {
-                label: 'Cancelled Sales',
-                data: yearCancelled,
-                borderColor: '#d32f2f',
-                backgroundColor: 'rgba(211,47,47,0.13)',
-                fill: false,
-                tension: .4,
-                pointBackgroundColor: '#fff',
-                borderWidth: 2,
-            },
+            { label: 'Total Sales', data: yearSales, backgroundColor: 'rgba(26,115,232,0.18)', borderColor: '#1a73e8', borderWidth: 2, },
+            { label: 'Completed Sales', data: yearCompleted, backgroundColor: 'rgba(46,125,50,0.19)', borderColor: '#2e7d32', borderWidth: 2, },
+            { label: 'Cancelled Sales', data: yearCancelled, backgroundColor: 'rgba(211,47,47,0.18)', borderColor: '#d32f2f', borderWidth: 2, }
         ];
     } else {
         yearDataSets = [
-            {
-                label: 'Total Appointments',
-                data: yearAppointments,
-                borderColor: '#1a73e8',
-                backgroundColor: 'rgba(26,115,232,0.09)',
-                fill: true,
-                tension: .4,
-                pointBackgroundColor: '#fff',
-                borderWidth: 3,
-            },
-            {
-                label: 'Completed',
-                data: monthAbbrs.map((_, m) => {
-                    let count = 0;
-                    orders.forEach(order=>{
-                        if(!order.date) return;
-                        let od = new Date(order.date);
-                        if(od.getFullYear() === year && od.getMonth() === m && order._tableStatus === 'completed') count++;
-                    });
-                    return count;
-                }),
-                borderColor: '#2e7d32',
-                backgroundColor: 'rgba(46,125,50,0.08)',
-                fill: false,
-                tension: .4,
-                pointBackgroundColor: '#fff',
-                borderWidth: 2,
-            },
-            {
-                label: 'Cancelled',
-                data: monthAbbrs.map((_, m) => {
-                    let count = 0;
-                    orders.forEach(order=>{
-                        if(!order.date) return;
-                        let od = new Date(order.date);
-                        if(od.getFullYear() === year && od.getMonth() === m && order._tableStatus === 'cancelled') count++;
-                    });
-                    return count;
-                }),
-                borderColor: '#d32f2f',
-                backgroundColor: 'rgba(211,47,47,0.09)',
-                fill: false,
-                tension: .4,
-                pointBackgroundColor: '#fff',
-                borderWidth: 2,
-            },
+            { label: 'Total Appointments', data: yearAppointments, backgroundColor: 'rgba(26,115,232,0.18)', borderColor: '#1a73e8', borderWidth: 2, },
+            { label: 'Completed', data: yearCompletedCount, backgroundColor: 'rgba(46,125,50,0.19)', borderColor: '#2e7d32', borderWidth: 2, },
+            { label: 'Cancelled', data: yearCancelledCount, backgroundColor: 'rgba(211,47,47,0.18)', borderColor: '#d32f2f', borderWidth: 2, }
         ];
     }
     yearChart = new Chart(yearChartCtx, {
-        type: 'line',
-        data: {
-            labels: yearLabels,
-            datasets: yearDataSets
-        },
+        type: 'bar',
+        data: { labels: yearLabels, datasets: yearDataSets },
         options: {
             plugins: {legend: {display: true}},
             responsive: true,
             maintainAspectRatio: false,
             animation: { duration: 600 },
             scales: {
-                y: {
-                    beginAtZero: true, color:'#fff',
-                    grid:{color:'#444', drawBorder: false, drawOnChartArea: false}
-                },
-                x: {
-                    color:'#fff',
-                    grid:{color:'#444', drawBorder: false, drawOnChartArea: false}
-                }
+                y: { beginAtZero: true, color:'#fff', grid:{color:'#444', drawBorder: false, drawOnChartArea: false} },
+                x: { color:'#fff', grid:{color:'#444', drawBorder: false, drawOnChartArea: false} }
             }
         }
     });
+
+    // Year Chart Totals Row
+    let yearTotalsLabel = yearChartDropdown.value === 'sales' ? 'Total Sales' : 'Total Appointments';
+    yearChartTotalsRow.innerHTML = `
+        <div class="chart-totals-box">
+            <div class="chart-totals-label">${yearTotalsLabel}</div>
+            <div class="chart-totals-count">${yearChartDropdown.value === 'sales' ? '$'+yearTotalSales.toFixed(2) : yearTotalAppointments}</div>
+        </div>
+        <div class="chart-totals-box">
+            <div class="chart-totals-label">Total Completed</div>
+            <div class="chart-totals-count">${yearChartDropdown.value === 'sales' ? '$'+yearTotalCompleted.toFixed(2) : yearTotalCompleted}</div>
+        </div>
+        <div class="chart-totals-box">
+            <div class="chart-totals-label">Total Cancelled</div>
+            <div class="chart-totals-count">${yearChartDropdown.value === 'sales' ? '$'+yearTotalCancelled.toFixed(2) : yearTotalCancelled}</div>
+        </div>
+    `;
 }
 
 window.addEventListener('resize', () => {
