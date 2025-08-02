@@ -197,20 +197,22 @@
     .sidebar.collapsed .sidebar-footer {
       display: none;
     }
-   .main-content {
+  .main-content {
   margin-left: var(--sidebar-width);
+  width: 100%;
+  max-width: 100%;
   padding: calc(var(--header-height) + 20px) 32px 32px 32px;
   min-height: 100vh;
   background: var(--main-bg);
   transition: var(--transition);
   overflow-x: hidden;
-  width: calc(100vw - var(--sidebar-width));
   box-sizing: border-box;
 }
-   .sidebar.collapsed ~ .main-content {
+
+  .sidebar.collapsed ~ .main-content {
   margin-left: var(--sidebar-collapsed-width);
-  width: calc(100vw - var(--sidebar-collapsed-width));
 }
+
     .sidebar.hide-mobile ~ .main-content {
       margin-left: 0 !important;
       padding-left: 0 !important;
