@@ -197,21 +197,20 @@
     .sidebar.collapsed .sidebar-footer {
       display: none;
     }
-  .main-content {
-  margin-left: var(--sidebar-width);
-  width: 100%;
-  max-width: 100%;
-  padding: calc(var(--header-height) + 20px) 32px 32px 32px;
-  min-height: 100vh;
-  background: var(--main-bg);
-  transition: var(--transition);
-  overflow-x: hidden;
-  box-sizing: border-box;
-}
-
-  .sidebar.collapsed ~ .main-content {
-  margin-left: var(--sidebar-collapsed-width);
-}
+.main-content {
+      margin-left: var(--sidebar-width);
+      padding: calc(var(--header-height) + 20px) 32px 32px 32px;
+      flex: 1;
+      min-height: 100vh;
+      background: var(--main-bg);
+      transition: margin-left var(--transition), padding var(--transition);
+      overflow: auto;
+      width: 100%;
+      position: relative;
+    }
+    .sidebar.collapsed ~ .main-content {
+      margin-left: var(--sidebar-collapsed-width);
+    }
 
     .sidebar.hide-mobile ~ .main-content {
       margin-left: 0 !important;
@@ -614,16 +613,8 @@
       });
     }
     
-    function syncMainContentWidth() {
-  if (!isMobile()) {
-    const isCollapsed = sidebar.classList.contains('collapsed');
-    const width = isCollapsed ? 'calc(100vw - var(--sidebar-collapsed-width))' : 'calc(100vw - var(--sidebar-width))';
-    mainContent.style.width = width;
-  }
-}
+   
 
-window.addEventListener('resize', syncMainContentWidth);
-sidebarToggle.addEventListener('click', syncMainContentWidth);
 
 
     function updateOrderCount(count) {
