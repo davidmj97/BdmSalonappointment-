@@ -4,10 +4,10 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Choose Services - BDM Salon</title>
-<!-- Firebase for realtime sync -->
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<!-- AUTHENTICATION ADDITIONS START -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="auth.js"></script>
 <!-- AUTHENTICATION ADDITIONS END -->
 <style>
 :root {
@@ -30,7 +30,8 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  padding-top: 150px; /* Increased space below header */
+  padding-top: 170px; /* Increased space below header */
+  margin: 0;
 }
 
 /* Fixed Header */
@@ -41,15 +42,18 @@ body {
   right: 0;
   background: #000;
   z-index: 100;
-  padding: 15px 0; /* Increased vertical padding */
+  padding: 15px 0 10px; /* Adjusted vertical padding */
   box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  border-bottom: 1px solid #333;
 }
 
 .step-heading {
   text-align: center;
-  margin: 5px 0 15px; /* Adjusted spacing */
-  font-size: 20px;
+  margin: 0 0 12px; /* Tighter spacing */
+  padding: 0 16px;
+  font-size: 18px;
   color: white;
+  font-weight: 500;
 }
 
 /* Category Dropdown */
@@ -171,23 +175,10 @@ body {
   color: rgba(255, 255, 255, 0.9);
 }
 
-/* Info Container */
-.service-info {
-  display: flex;
-  gap: 16px;
-  align-items: flex-end;
-}
-
-.service-time {
-  font-size: 12px;
-  color: #ccc;
-  margin: 0;
-}
-
 /* Mobile adjustments for service cards */
 @media (max-width: 900px) {
   body {
-    padding-top: 140px; /* Increased space on mobile */
+    padding-top: 160px; /* Increased space on mobile */
   }
   
   .header-container {
@@ -220,7 +211,7 @@ body {
     gap: 12px;
   }
   
-  .service-time {
+  .service-points {
     font-size: 10px;
   }
 }
@@ -263,142 +254,138 @@ body {
 
 <!-- AUTHENTICATION ADDITIONS START -->
 <script>
-// Firebase configuration - MUST match admin-services.html
+// Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyAmimDsjW_pF2NGg-w-40QzTsgmf1tdqyI",
+  apiKey: "AIzaSyAmimDsjW_pF2NGw-w-40QzTsgmf1tdqyI",
   authDomain: "bdmsalonappointment.firebaseapp.com",
-  databaseURL: "https://bdmsalonappointment-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "bdmsalonappointment",
-  storageBucket: "bdmsalonappointment.appspot.com",
-  messagingSenderId: "123933913893",
-  appId: "1:123933913893:web:c1f57caf4dc2a5440ba0cc"
+  projectId: "bdmsalonappointment"
 };
 
 // Initialize Firebase
-const app = firebase.initializeApp(firebaseConfig);
-const database = firebase.database();
-const auth = firebase.auth();
+firebase.initializeApp(firebaseConfig);
 
-// Database paths - MUST match admin-services.html
-const SERVICES_DB_PATH = "services";
-const CATEGORIES_DB_PATH = "categories";
+// Firebase auth state listener
+firebase.auth().onAuthStateChanged(function(user) {
+  if (user) {
+    localStorage.setItem('isLoggedIn', 'true');
+  } else {
+    localStorage.removeItem('isLoggedIn');
+    if (!window.location.href.includes('index.html')) {
+      window.location.href = 'index.html';
+    }
+  }
+});
 
+// Authentication check
+if (!auth.isAuthenticated()) {
+  window.location.href = 'index.html';
+}
+</script>
+<!-- AUTHENTICATION ADDITIONS END -->
+
+<script>
 // DOM refs
 const servicesGrid = document.getElementById('servicesGrid');
 const nextBtn = document.getElementById('nextBtn');
 const categorySelect = document.getElementById('categorySelect');
 
-// Services data - will be loaded from Firebase
+// Initialize Firestore
+const db = firebase.firestore();
+
+// Services data will be loaded from Firestore
 let services = [];
 let categories = [];
-let selectedServices = [];
 
-// Initialize the app when the DOM is loaded
-function initApp() {
-  // Set up real-time listeners
-  setupRealtimeListeners();
-  
-  // Set up event listeners
-  categorySelect.addEventListener('change', filterServices);
-  nextBtn.onclick = handleNextButtonClick;
-}
-
-function setupRealtimeListeners() {
-  // Listen for services changes
-  database.ref(SERVICES_DB_PATH).on('value', (snapshot) => {
-    if (snapshot.exists()) {
-      const data = snapshot.val();
-      services = data ? Object.values(data) : [];
-      renderServices(services);
-      updateCategorySelect();
-    } else {
-      services = [];
-      renderServices([]);
+// Load services from Firestore
+function loadServices() {
+  db.collection('services').orderBy('name').onSnapshot(snapshot => {
+    services = [];
+    const categoriesSet = new Set();
+    
+    // Clear existing category options except the first one
+    while (categorySelect.options.length > 1) {
+      categorySelect.remove(1);
     }
-  }, (error) => {
-    console.error("Error loading services:", error);
-  });
-
-  // Listen for categories changes
-  database.ref(CATEGORIES_DB_PATH).on('value', (snapshot) => {
-    if (snapshot.exists()) {
-      const data = snapshot.val();
-      categories = Array.isArray(data) ? data : (data ? Object.values(data) : []);
-      updateCategorySelect();
+    
+    snapshot.forEach(doc => {
+      const service = { 
+        id: doc.id, 
+        ...doc.data(),
+        // Ensure all services have required fields with defaults
+        name: doc.data().name || 'Unnamed Service',
+        desc: doc.data().desc || '',
+        category: doc.data().category || 'Other',
+        time: doc.data().time || '30 min',
+        price: doc.data().price || '$0'
+      };
+      services.push(service);
+      categoriesSet.add(service.category);
+    });
+    
+    // Add default categories if none exist
+    if (categoriesSet.size === 0) {
+      categoriesSet.add('Hair');
+      categoriesSet.add('Beard');
+      categoriesSet.add('Nails');
+      categoriesSet.add('Makeup');
+      categoriesSet.add('Skin');
+      categoriesSet.add('Brows');
+      categoriesSet.add('Lashes');
+      categoriesSet.add('Massage');
+      categoriesSet.add('Waxing');
+      categoriesSet.add('Hair Treatment');
+      categoriesSet.add("Men's Grooming");
     }
-  }, (error) => {
-    console.error("Error loading categories:", error);
-  });
-}
-
-// Update category dropdown
-function updateCategorySelect() {
-  // Get unique categories from services if categories collection is empty
-  const uniqueCategories = categories.length > 0 
-    ? categories 
-    : [...new Set(services.map(service => service.category))];
-  
-  // Save current selection
-  const currentSelection = categorySelect.value;
-  
-  // Clear and rebuild dropdown
-  categorySelect.innerHTML = '<option value="all">All Categories</option>';
-  
-  // Add categories to dropdown
-  uniqueCategories.forEach(category => {
-    if (category) {  // Only add if category is not null/undefined
+    
+    // Update categories dropdown
+    categories = Array.from(categoriesSet).sort();
+    categories.forEach(category => {
       const option = document.createElement('option');
       option.value = category;
       option.textContent = category;
       categorySelect.appendChild(option);
-    }
+    });
+    
+    // Initialize UI with all services
+    renderServices(services);
+  }, error => {
+    console.error('Error loading services:', error);
+    // Fallback to empty services if there's an error
+    renderServices([]);
   });
-  
-  // Restore selection if possible
-  if (currentSelection && uniqueCategories.includes(currentSelection)) {
-    categorySelect.value = currentSelection;
-  }
-  
-  // Re-apply current filter
-  filterServices();
 }
 
-// Filter services by category
-function filterServices() {
+// Selected services
+let selectedServices = [];
+
+// Load services when the page loads
+loadServices();
+
+// Event listener for category filter
+categorySelect.addEventListener('change', () => {
   const selectedCategory = categorySelect.value;
-  let filteredServices = [...services];
-  
-  if (selectedCategory !== "all") {
-    filteredServices = services.filter(service => 
-      service && service.category === selectedCategory
-    );
+  if (selectedCategory === "all") {
+    renderServices(services);
+  } else {
+    const filteredServices = services.filter(service => service.category === selectedCategory);
+    renderServices(filteredServices);
   }
-  
-  renderServices(filteredServices);
-}
+});
 
 // Render services to the grid
 function renderServices(servicesToRender) {
-  if (!servicesToRender || !servicesToRender.length) {
-    servicesGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:#888;">No services available. Please check back later.</div>';
-    return;
-  }
-  
   servicesGrid.innerHTML = '';
-  
   servicesToRender.forEach(service => {
-    if (!service) return;
-    
     const isSelected = selectedServices.some(s => s.id === service.id);
     const card = document.createElement('div');
     card.className = `service-card ${isSelected ? 'selected' : ''}`;
     card.innerHTML = `
-      <strong class="service-name">${service.name || 'Unnamed Service'}</strong>
-      <p class="service-desc">${service.description || service.desc || 'No description available'}</p>
+      <strong class="service-name">${service.name}</strong>
+      <p class="service-desc">${service.desc}</p>
       <div class="service-info">
-        <span class="service-time">${service.duration || service.time || ''}</span>
+        <span class="service-time">${service.time}</span>
       </div>
-      <span class="service-price">${service.price || ''}</span>
+      <span class="service-price">${service.price}</span>
     `;
     card.onclick = () => toggleServiceSelection(service, card);
     servicesGrid.appendChild(card);
@@ -414,8 +401,10 @@ function toggleServiceSelection(service, card) {
     selectedServices.splice(index, 1);
   }
   
-  // Update UI
+  // Update card appearance
   card.classList.toggle('selected');
+  
+  // Enable/disable next button
   updateNextButton();
 }
 
@@ -424,8 +413,8 @@ function updateNextButton() {
   nextBtn.disabled = selectedServices.length === 0;
 }
 
-// Handle next button click
-function handleNextButtonClick() {
+// Next button handler
+nextBtn.onclick = () => {
   if (selectedServices.length === 0) return;
   
   // Store selected services in localStorage
@@ -437,16 +426,13 @@ function handleNextButtonClick() {
     localStorage.setItem('selectedService', JSON.stringify({
       name: selectedService.name,
       price: selectedService.price,
-      duration: selectedService.duration || selectedService.time
+      duration: selectedService.time
     }));
   }
   
-  // Redirect to next page
+  // Redirect to Pick Stylist page
   window.location.href = 'pick-stylist.html';
-}
-
-// Initialize the app when the DOM is loaded
-document.addEventListener('DOMContentLoaded', initApp);
+};
 </script>
 </body>
 </html>
