@@ -198,19 +198,25 @@
       display: none;
     }
  .main-content {
-  margin-left: var(--sidebar-width, );
-      padding: calc(var(--header-height) + 20px) 32px 33px 0px;
-      flex: 1;
-      min-height: 100vh;
-      background: var(--main-bg);
-      transition: margin-left var(--transition), padding var(--transition);
-      overflow: auto;
-      width: 100%;
-      position: relative;
-    }
+  margin-left: var(--sidebar-width);
+  padding: calc(var(--header-height) + 20px) 32px 33px 0px;
+  flex: 1;
+  min-height: 100vh;
+  background: var(--main-bg);
+  transition: margin-left var(--transition), padding var(--transition);
+  overflow: auto;
+  width: calc(100vw - var(--sidebar-width));
+  max-width: calc(100vw - var(--sidebar-width));
+  box-sizing: border-box;
+  position: relative;
+}
+
     .sidebar.collapsed ~ .main-content {
-      margin-left: var(--sidebar-collapsed-width);
-    }
+  margin-left: var(--sidebar-collapsed-width);
+  width: calc(100vw - var(--sidebar-collapsed-width));
+  max-width: calc(100vw - var(--sidebar-collapsed-width));
+}
+
 
     .sidebar.hide-mobile ~ .main-content {
       margin-left: 0 !important;
