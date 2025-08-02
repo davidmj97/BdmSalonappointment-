@@ -197,27 +197,20 @@
     .sidebar.collapsed .sidebar-footer {
       display: none;
     }
-    .main-content {
-      margin-left: var(--sidebar-width);
-      padding: calc(var(--header-height) + 20px) 32px 32px 32px;
-      flex: 1;
-      min-height: 100vh;
-      background: var(--main-bg);
-      transition: margin-left var(--transition), padding var(--transition), width var(--transition);
-      overflow-x: hidden;
-      width: calc(100vw - var(--sidebar-width));
-      position: relative;
-      border-left: none;
-      box-sizing: border-box;
-      max-width: calc(100vw - var(--sidebar-width));
-    }
-    .sidebar.collapsed ~ .main-content {
-      margin-left: var(--sidebar-collapsed-width) !important;
-      width: calc(100vw - var(--sidebar-collapsed-width)) !important;
-      max-width: calc(100vw - var(--sidebar-collapsed-width)) !important;
-      box-sizing: border-box !important;
-      padding-left: 32px !important;
-    }
+   .main-content {
+  margin-left: var(--sidebar-width);
+  padding: calc(var(--header-height) + 20px) 32px 32px 32px;
+  min-height: 100vh;
+  background: var(--main-bg);
+  transition: var(--transition);
+  overflow-x: hidden;
+  width: calc(100vw - var(--sidebar-width));
+  box-sizing: border-box;
+}
+   .sidebar.collapsed ~ .main-content {
+  margin-left: var(--sidebar-collapsed-width);
+  width: calc(100vw - var(--sidebar-collapsed-width));
+}
     .sidebar.hide-mobile ~ .main-content {
       margin-left: 0 !important;
       padding-left: 0 !important;
@@ -618,6 +611,18 @@
         callback(count);
       });
     }
+    
+    function syncMainContentWidth() {
+  if (!isMobile()) {
+    const isCollapsed = sidebar.classList.contains('collapsed');
+    const width = isCollapsed ? 'calc(100vw - var(--sidebar-collapsed-width))' : 'calc(100vw - var(--sidebar-width))';
+    mainContent.style.width = width;
+  }
+}
+
+window.addEventListener('resize', syncMainContentWidth);
+sidebarToggle.addEventListener('click', syncMainContentWidth);
+
 
     function updateOrderCount(count) {
       const orderBadgeBtn = document.getElementById('orderBadgeBtn');
